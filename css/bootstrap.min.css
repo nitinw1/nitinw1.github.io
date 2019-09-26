@@ -18,7 +18,8 @@
     }
     abbr[title]::after {
         content: " (" attr(title) ")"
-    }
+    transform: translate3d(-300px, 0, 0);
+}
     pre {
         white-space: pre-wrap!important
     }
@@ -3511,7 +3512,7 @@ tbody.collapse.show {
 }
 
 .navbar-toggler {
-    padding: .25rem .75rem;
+    padding: .2rem 36rem;
     font-size: 1.25rem;
     line-height: 1;
     background: 0 0;
