@@ -58,13 +58,14 @@
 
                 <!-- Load our React component. -->
                 <script src="js/like_button.js"></script>
+                <script src="js/dark-mode.js"></script>
 
             </nav>
         </div>
     </header>
     <div class="page-content">
         <div>
-            <const user div class="profile-page">
+            <div class="profile-page">
                 <div class="wrapper">
                     <div class="page-header page-header-small">
                         <div class="page-header-image" data-parallax="true"
@@ -80,42 +81,36 @@
                                     data-aos="zoom-in" data-aos-anchor="data-aos-anchor">PDF of Resume</a>
                             </div>
                         </div>
-                        <div class="section">
+                        <div class="section" style="margin-top: 30px;">
                             <div class="container">
-                                <div class="button-container"></a><a class="btn btn-default btn-round btn-lg btn-icon"
+                                <div class="button-container"><a class="btn btn-default btn-round btn-lg btn-icon"
                                         href="#" rel="tooltip"
                                         onclick="window.location.href = 'https://www.linkedin.com/in/nitin-wadhwani';"
                                         title="Connect with me on Linkedin"><i class="fa fa-linkedin"></i></a></div>
                             </div>
                         </div>
+                        <div class="section" style="margin-top: 75px;">
+                            <div class="container">
+                                <div class="button-container"><button class="btn btn-default btn-round btn-lg btn-icon btn-dark-mode-icon" id="darkModeToggle" title="Toggle Dark Mode">
+                                        🌙
+                                    </button></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
         </div>
-        <div class="section" id="about">
+        <div class="section" id="about" style="margin-top: 75px;">
             <div class="container">
                 <div class="card" data-aos="fade-up" data-aos-offset="10">
                     <div class="row">
                         <div class="col-lg-6 col-md-12">
                             <div class="card-body">
                                 <div class="h4 mt-0 title">About</div>
-                                <p>Hello there! I'm Nitin Wadhwani, a Computer Science Graduate with a strong background in Web Development, Data Modeling and Machine Learning. 
-                                    I also have experience as a Business Intelligence Developer, allowing me to bring a diverse skill set to the table.</p>
+                                <p>I'm Nitin Wadhwani, a Computer Science graduate with extensive expertise in Web Development, Data Modeling, Machine Learning, and Business Intelligence. I combine technical proficiency with a deep understanding of business requirements to deliver impactful solutions.</p>
 
-                                    <p>Detail-focused Lead Developer with extensive knowledge in databases, process
-                                        validation and business requirements analysis. Proven to understand customer
-                                        requirements and translate into actionable solutions. Dedicated and hard-working
-                                        with passion for Big Data and Data Analytics.  </p>
-                                <!-- <p>Engaged, proactive undergraduate Computer Information Systems Graduate seeking to
-                                    apply my algorithm solving skills and business background to further develop my
-                                    abilities in the IT field. -->
-                                    Currently experienced in:  React.JS, Python, Java, MySQL, HTML, CSS,
-                                    Java-Script, Bootstrap-4, Linux Scripting, Node.JS, PowerQuery
-                                     PowerBi, DAX, Power Automate/Flow, PowerApps, Postman, Azure Functional App, API's</p>
-                                
-                                    Database Experience: Amazon Red Shift, Snowflake SQL DB, Mongo NOSQL DB, Azure SQL DB and Snowflake Cloud / Warehousing. </p>
+                                <p>As a detail-focused developer, I excel at analyzing complex business problems, designing scalable data architectures, and creating intelligent reporting solutions. I'm passionate about transforming raw data into actionable insights and have a proven track record of delivering high-value projects.</p>
 
-                                    Self-motivated, goal-oriented, creative problem solver and excellent team player and mentor. 
-                                </p>
+                                <p>I'm a self-motivated problem solver, collaborative team player, and mentor who thrives in fast-paced environments. My approach combines technical excellence with strong communication skills to ensure stakeholder alignment and project success.</p>
                             </div>
                         </div>
                         <div class="col-lg-6 col-md-12">
@@ -150,207 +145,277 @@
         <div class="section" id="skill">
             <div class="container">
                 <div class="h4 text-center mb-4 title">Professional Skills</div>
-                <div class="card" data-aos="fade-up" data-aos-anchor-placement="top-bottom">
+                
+                <!-- Frontend Development -->
+                <div class="card skill-category" data-aos="fade-up" data-aos-anchor-placement="top-bottom">
                     <div class="card-body">
+                        <div class="skill-category-title mb-3"><strong>Frontend Development</strong></div>
                         <div class="row">
                             <div class="col-md-6">
-                                <div class="progress-container progress-primary"><span
-                                        class="progress-badge">HTML</span>
+                                <div class="progress-container progress-primary"><span class="progress-badge">HTML</span>
                                     <div class="progress">
-                                        <div class="progress-bar progress-bar-primary" data-aos="progress-full"
-                                            data-aos-offset="10" data-aos-duration="2000" role="progressbar"
-                                            aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"
-                                            style="width: 90%;"></div><span class="progress-value"></span>
+                                        <div class="progress-bar progress-bar-primary" data-aos="progress-full" data-aos-offset="10" data-aos-duration="2000" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 90%;"></div><span class="progress-value"></span>
                                     </div>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="progress-container progress-primary"><span class="progress-badge">CSS</span>
                                     <div class="progress">
-                                        <div class="progress-bar progress-bar-primary" data-aos="progress-full"
-                                            data-aos-offset="10" data-aos-duration="2000" role="progressbar"
-                                            aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"
-                                            style="width: 80%;"></div><span class="progress-value"></span>
-                                    </div>
-
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="progress-container progress-primary"><span
-                                        class="progress-badge">JavaScript</span>
-                                    <div class="progress">
-                                        <div class="progress-bar progress-bar-primary" data-aos="progress-full"
-                                            data-aos-offset="10" data-aos-duration="2000" role="progressbar"
-                                            aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"
-                                            style="width: 60%;"></div><span class="progress-value"></span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="progress-container progress-primary"><span class="progress-badge">Java
-                                        (Programing) </span>
-                                    <div class="progress">
-                                        <div class="progress-bar progress-bar-primary" data-aos="progress-full"
-                                            data-aos-offset="10" data-aos-duration="2000" role="progressbar"
-                                            aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"
-                                            style="width: 85%;"></div><span class="progress-value"></span>
+                                        <div class="progress-bar progress-bar-primary" data-aos="progress-full" data-aos-offset="10" data-aos-duration="2000" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 80%;"></div><span class="progress-value"></span>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-6">
-                                <div class="progress-container progress-primary"><span class="progress-badge">Bootstrap
-                                        4</span>
+                                <div class="progress-container progress-primary"><span class="progress-badge">JavaScript</span>
                                     <div class="progress">
-                                        <div class="progress-bar progress-bar-primary" data-aos="progress-full"
-                                            data-aos-offset="10" data-aos-duration="2000" role="progressbar"
-                                            aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"
-                                            style="width: 75%;"></div><span class="progress-value"></span>
+                                        <div class="progress-bar progress-bar-primary" data-aos="progress-full" data-aos-offset="10" data-aos-duration="2000" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 60%;"></div><span class="progress-value"></span>
                                     </div>
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                <div class="progress-container progress-primary"><span
-                                        class="progress-badge">MySQL</span>
+                                <div class="progress-container progress-primary"><span class="progress-badge">React.JS</span>
                                     <div class="progress">
-                                        <div class="progress-bar progress-bar-primary" data-aos="progress-full"
-                                            data-aos-offset="10" data-aos-duration="2000" role="progressbar"
-                                            aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"
-                                            style="width: 75%;"></div><span class="progress-value"></span>
+                                        <div class="progress-bar progress-bar-primary" data-aos="progress-full" data-aos-offset="10" data-aos-duration="2000" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 70%;"></div><span class="progress-value"></span>
                                     </div>
-
                                 </div>
-
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-6">
-                                <div class="progress-container progress-primary"><span class="progress-badge">Power Apps
-                                    </span>
+                                <div class="progress-container progress-primary"><span class="progress-badge">Bootstrap 4</span>
                                     <div class="progress">
-                                        <div class="progress-bar progress-bar-primary" data-aos="progress-full"
-                                            data-aos-offset="10" data-aos-duration="2000" role="progressbar"
-                                            aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"
-                                            style="width: 80%;"></div><span class="progress-value"></span>
+                                        <div class="progress-bar progress-bar-primary" data-aos="progress-full" data-aos-offset="10" data-aos-duration="2000" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 75%;"></div><span class="progress-value"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Backend & Programming -->
+                <div class="card skill-category" data-aos="fade-up" data-aos-anchor-placement="top-bottom">
+                    <div class="card-body">
+                        <div class="skill-category-title mb-3"><strong>Backend & Programming</strong></div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="progress-container progress-primary"><span class="progress-badge">Python</span>
+                                    <div class="progress">
+                                        <div class="progress-bar progress-bar-primary" data-aos="progress-full" data-aos-offset="10" data-aos-duration="2000" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 75%;"></div><span class="progress-value"></span>
                                     </div>
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                <div class="progress-container progress-primary"><span class="progress-badge">Bash
-                                        Scripting</span>
+                                <div class="progress-container progress-primary"><span class="progress-badge">Java</span>
                                     <div class="progress">
-                                        <div class="progress-bar progress-bar-primary" data-aos="progress-full"
-                                            data-aos-offset="10" data-aos-duration="2000" role="progressbar"
-                                            aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"
-                                            style="width: 80%;"></div><span class="progress-value"></span>
+                                        <div class="progress-bar progress-bar-primary" data-aos="progress-full" data-aos-offset="10" data-aos-duration="2000" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 85%;"></div><span class="progress-value"></span>
                                     </div>
                                 </div>
-
                             </div>
-
+                        </div>
+                        <div class="row">
                             <div class="col-md-6">
-                                <div class="progress-container progress-primary"><span class="progress-badge">Agile
-                                        Methodology</span>
+                                <div class="progress-container progress-primary"><span class="progress-badge">Node.JS</span>
                                     <div class="progress">
-                                        <div class="progress-bar progress-bar-primary" data-aos="progress-full"
-                                            data-aos-offset="10" data-aos-duration="2000" role="progressbar"
-                                            aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"
-                                            style="width: 90%;"></div><span class="progress-value"></span>
+                                        <div class="progress-bar progress-bar-primary" data-aos="progress-full" data-aos-offset="10" data-aos-duration="2000" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 60%;"></div><span class="progress-value"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="progress-container progress-primary"><span class="progress-badge">Bash Scripting</span>
+                                    <div class="progress">
+                                        <div class="progress-bar progress-bar-primary" data-aos="progress-full" data-aos-offset="10" data-aos-duration="2000" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 80%;"></div><span class="progress-value"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Databases -->
+                <div class="card skill-category" data-aos="fade-up" data-aos-anchor-placement="top-bottom">
+                    <div class="card-body">
+                        <div class="skill-category-title mb-3"><strong>Databases & Data Warehousing</strong></div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="progress-container progress-primary"><span class="progress-badge">Snowflake</span>
+                                    <div class="progress">
+                                        <div class="progress-bar progress-bar-primary" data-aos="progress-full" data-aos-offset="10" data-aos-duration="2000" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 90%;"></div><span class="progress-value"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="progress-container progress-primary"><span class="progress-badge">SQL Server</span>
+                                    <div class="progress">
+                                        <div class="progress-bar progress-bar-primary" data-aos="progress-full" data-aos-offset="10" data-aos-duration="2000" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 75%;"></div><span class="progress-value"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="progress-container progress-primary"><span class="progress-badge">Azure SQL DB</span>
+                                    <div class="progress">
+                                        <div class="progress-bar progress-bar-primary" data-aos="progress-full" data-aos-offset="10" data-aos-duration="2000" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 80%;"></div><span class="progress-value"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="progress-container progress-primary"><span class="progress-badge">Amazon Redshift</span>
+                                    <div class="progress">
+                                        <div class="progress-bar progress-bar-primary" data-aos="progress-full" data-aos-offset="10" data-aos-duration="2000" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 75%;"></div><span class="progress-value"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="progress-container progress-primary"><span class="progress-badge">Mongo NoSQL DB</span>
+                                    <div class="progress">
+                                        <div class="progress-bar progress-bar-primary" data-aos="progress-full" data-aos-offset="10" data-aos-duration="2000" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 65%;"></div><span class="progress-value"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="progress-container progress-primary"><span class="progress-badge">Databricks</span>
+                                    <div class="progress">
+                                        <div class="progress-bar progress-bar-primary" data-aos="progress-full" data-aos-offset="10" data-aos-duration="2000" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 75%;"></div><span class="progress-value"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Business Intelligence -->
+                <div class="card skill-category" data-aos="fade-up" data-aos-anchor-placement="top-bottom">
+                    <div class="card-body">
+                        <div class="skill-category-title mb-3"><strong>Business Intelligence & Analytics</strong></div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="progress-container progress-primary"><span class="progress-badge">Power BI (DAX + Power Query)</span>
+                                    <div class="progress">
+                                        <div class="progress-bar progress-bar-primary" data-aos="progress-full" data-aos-offset="10" data-aos-duration="2000" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 95%;"></div><span class="progress-value"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="progress-container progress-primary"><span class="progress-badge">Data Analysis</span>
+                                    <div class="progress">
+                                        <div class="progress-bar progress-bar-primary" data-aos="progress-full" data-aos-offset="10" data-aos-duration="2000" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 80%;"></div><span class="progress-value"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="progress-container progress-primary"><span class="progress-badge">Machine Learning (Python)</span>
+                                    <div class="progress">
+                                        <div class="progress-bar progress-bar-primary" data-aos="progress-full" data-aos-offset="10" data-aos-duration="2000" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 70%;"></div><span class="progress-value"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="progress-container progress-primary"><span class="progress-badge">ETL Processes</span>
+                                    <div class="progress">
+                                        <div class="progress-bar progress-bar-primary" data-aos="progress-full" data-aos-offset="10" data-aos-duration="2000" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 85%;"></div><span class="progress-value"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="progress-container progress-primary"><span class="progress-badge">Grafana</span>
+                                    <div class="progress">
+                                        <div class="progress-bar progress-bar-primary" data-aos="progress-full" data-aos-offset="10" data-aos-duration="2000" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 75%;"></div><span class="progress-value"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="progress-container progress-primary"><span class="progress-badge">Genie (Developed AI Data Assistant in Databricks)</span>
+                                    <div class="progress">
+                                        <div class="progress-bar progress-bar-primary" data-aos="progress-full" data-aos-offset="10" data-aos-duration="2000" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 70%;"></div><span class="progress-value"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Microsoft Stack -->
+                <div class="card skill-category" data-aos="fade-up" data-aos-anchor-placement="top-bottom">
+                    <div class="card-body">
+                        <div class="skill-category-title mb-3"><strong>Microsoft Stack & Cloud</strong></div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="progress-container progress-primary"><span class="progress-badge">Power Apps</span>
+                                    <div class="progress">
+                                        <div class="progress-bar progress-bar-primary" data-aos="progress-full" data-aos-offset="10" data-aos-duration="2000" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 80%;"></div><span class="progress-value"></span>
                                     </div>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="progress-container progress-primary"><span class="progress-badge">Power Automate/Flow</span>
                                     <div class="progress">
-                                        <div class="progress-bar progress-bar-primary" data-aos="progress-full"
-                                            data-aos-offset="10" data-aos-duration="2000" role="progressbar"
-                                            aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"
-                                            style="width: 80%;"></div><span class="progress-value"></span>
-                                    </div>
-                                </div>
-
-                            </div>
-
-
-
-                            <div class="col-md-6">
-                                <div class="progress-container progress-primary"><span
-                                        class="progress-badge">Node.JS</span>
-                                    <div class="progress">
-                                        <div class="progress-bar progress-bar-primary" data-aos="progress-full"
-                                            data-aos-offset="10" data-aos-duration="2000" role="progressbar"
-                                            aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"
-                                            style="width: 60%;"></div><span class="progress-value"></span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="progress-container progress-primary"><span class="progress-badge">
-                                        SAP PPM Experience </span>
-                                    <div class="progress">
-                                        <div class="progress-bar progress-bar-primary" data-aos="progress-full"
-                                            data-aos-offset="10" data-aos-duration="2000" role="progressbar"
-                                            aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"
-                                            style="width: 80%;"></div><span class="progress-value"></span>
-                                    </div>
-                                </div>
-
-                            </div>
-
-                            <div class="col-md-6">
-                                <div class="progress-container progress-primary"><span class="progress-badge">Power Bi (DAX) + Power Query
-                                    </span>
-                                    <div class="progress">
-                                        <div class="progress-bar progress-bar-primary" data-aos="progress-full"
-                                            data-aos-offset="10" data-aos-duration="2000" role="progressbar"
-                                            aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"
-                                            style="width: 95%;"></div><span class="progress-value"></span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="progress-container progress-primary"><span class="progress-badge">Data
-                                        Analysis</span>
-                                    <div class="progress">
-                                        <div class="progress-bar progress-bar-primary" data-aos="progress-full"
-                                            data-aos-offset="10" data-aos-duration="2000" role="progressbar"
-                                            aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"
-                                            style="width: 75%;"></div><span class="progress-value"></span>
-                                    </div>
-
-                                </div>
-
-                            </div>
-                            <div class="col-md-6">
-                                <div class="progress-container progress-primary"><span class="progress-badge">Process Flow Mapping (MS Visio) </span>
-                                    <div class="progress">
-                                        <div class="progress-bar progress-bar-primary" data-aos="progress-full"
-                                            data-aos-offset="10" data-aos-duration="2000" role="progressbar"
-                                            aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"
-                                            style="width: 65%;"></div><span class="progress-value"></span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="progress-container progress-primary"><span class="progress-badge">Machine
-                                        Learning</span>
-                                    <div class="progress">
-                                        <div class="progress-bar progress-bar-primary" data-aos="progress-full"
-                                            data-aos-offset="10" data-aos-duration="2000" role="progressbar"
-                                            aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"
-                                            style="width: 70%;"></div><span class="progress-value"></span>
+                                        <div class="progress-bar progress-bar-primary" data-aos="progress-full" data-aos-offset="10" data-aos-duration="2000" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 80%;"></div><span class="progress-value"></span>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="progress-container progress-primary"><span class="progress-badge">Dynamics 365</span>
+                                    <div class="progress">
+                                        <div class="progress-bar progress-bar-primary" data-aos="progress-full" data-aos-offset="10" data-aos-duration="2000" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 75%;"></div><span class="progress-value"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="progress-container progress-primary"><span class="progress-badge">Azure Functions</span>
+                                    <div class="progress">
+                                        <div class="progress-bar progress-bar-primary" data-aos="progress-full" data-aos-offset="10" data-aos-duration="2000" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 80%;"></div><span class="progress-value"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-
-
-
-
+                <!-- Tools & Other -->
+                <div class="card skill-category" data-aos="fade-up" data-aos-anchor-placement="top-bottom">
+                    <div class="card-body">
+                        <div class="skill-category-title mb-3"><strong>Tools & Other Technologies</strong></div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="progress-container progress-primary"><span class="progress-badge">MS Visio (Process Mapping)</span>
+                                    <div class="progress">
+                                        <div class="progress-bar progress-bar-primary" data-aos="progress-full" data-aos-offset="10" data-aos-duration="2000" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 65%;"></div><span class="progress-value"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row"s="row">
+                            <div class="col-md-6">
+                                <div class="progress-container progress-primary"><span class="progress-badge">MS Visio (Process Mapping)</span>
+                                    <div class="progress">
+                                        <div class="progress-bar progress-bar-primary" data-aos="progress-full" data-aos-offset="10" data-aos-duration="2000" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 65%;"></div><span class="progress-value"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="progress-container progress-primary"><span class="progress-badge">Agile Methodology</span>
+                                    <div class="progress">
+                                        <div class="progress-bar progress-bar-primary" data-aos="progress-full" data-aos-offset="10" data-aos-duration="2000" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 90%;"></div><span class="progress-value"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="section" id="portfolio">
 
                         <div class="section" id="portfolio">
                             <div class="container">
@@ -485,7 +550,29 @@
                                             <div class="col-md-3 bg-primary" data-aos="fade-right" data-aos-offset="50"
                                                 data-aos-duration="500">
                                                 <div class="card-body cc-experience-header">
-                                                    <p>May 2022 - Current</p>
+                                                    <p>December 2024 - Present</p>
+                                                    <div class="h5">Secure</div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-9" data-aos="fade-left" data-aos-offset="50"
+                                                data-aos-duration="500">
+                                                <div class="card-body">
+                                                    <div class="h5">Business Intelligence Developer</div>
+                                                    <p>● Developed a comprehensive cost of service data model and created Power BI reports to provide sales and operations teams with first-time cost and process waste analysis, enabling data-driven decision making<br>
+                                                        ● Engineered energy infrastructure financial reporting solutions leveraging Dynamics 365 data and Power BI, collaborating directly with customers to gather requirements and deliver customized reporting solutions<br>
+                                                        ● Implemented free cash flow and expense tracking reports while revamping core KPIs, designing underlying data models that enable operations teams to identify value and optimize financial performance<br>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="card">
+                                        <div class="row">
+                                            <div class="col-md-3 bg-primary" data-aos="fade-right" data-aos-offset="50"
+                                                data-aos-duration="500">
+                                                <div class="card-body cc-experience-header">
+                                                    <p>May 2022 - April 2024</p>
                                                     <div class="h5">Precision Drilling </div>
                                                 </div>
                                             </div>

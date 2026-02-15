@@ -7235,3 +7235,143 @@ a.credit {
 .section {
   padding-bottom: 0;
 }
+/* Dark Mode Toggle Icon Button */
+.btn-dark-mode-icon.btn-default.btn-round.btn-lg.btn-icon {
+  background-color: #333 !important;
+  border-color: #333 !important;
+  color: #ffd700 !important;
+}
+
+.btn-dark-mode-icon.btn-default.btn-round.btn-lg.btn-icon::before {
+  color: #ffd700 !important;
+}
+
+.btn-dark-mode-icon i {
+  color: #ffd700 !important;
+  display: block !important;
+  font-size: 1.2rem !important;
+}
+
+.btn-dark-mode-icon:hover {
+  background-color: #444 !important;
+  border-color: #444 !important;
+}
+
+/* Skill Categories */
+.skill-category {
+  margin-bottom: 25px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.skill-category:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+.skill-category-title {
+  color: #51cbce;
+  font-size: 1.1rem;
+  border-bottom: 2px solid #51cbce;
+  padding-bottom: 10px;
+}
+
+/* Section Spacing */
+.section {
+  padding-top: 30px;
+  padding-bottom: 30px;
+}
+
+/* Card Spacing */
+.card {
+  margin-bottom: 15px;
+  border-radius: 8px;
+}
+
+/* Dark Mode for Skill Categories */
+body.dark-mode .skill-category {
+  background-color: #2d2d2d;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode .skill-category:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+}
+
+body.dark-mode .skill-category-title {
+  color: #51cbce;
+  border-bottom-color: #51cbce;
+}
+
+/* Dark Mode Styles */
+body.dark-mode {
+  background-color: #1a1a1a;
+  color: #e0e0e0;
+}
+
+body.dark-mode .profile-page {
+  background-color: #1a1a1a;
+  color: #e0e0e0;
+}
+
+body.dark-mode .card {
+  background-color: #2d2d2d;
+  color: #e0e0e0;
+  border: 1px solid #444;
+}
+
+body.dark-mode .card-body {
+  background-color: #2d2d2d;
+  color: #e0e0e0;
+}
+
+body.dark-mode .section {
+  background-color: #1a1a1a;
+  color: #e0e0e0;
+}
+
+body.dark-mode h1,
+body.dark-mode h2,
+body.dark-mode h3,
+body.dark-mode h4,
+body.dark-mode h5,
+body.dark-mode h6 {
+  color: #ffffff;
+}
+
+body.dark-mode p {
+  color: #c0c0c0;
+}
+
+body.dark-mode .page-content {
+  background-color: #1a1a1a;
+}
+
+body.dark-mode .progress-container {
+  background-color: #333;
+}
+
+body.dark-mode .progress {
+  background-color: #444;
+}
+
+body.dark-mode textarea,
+body.dark-mode input[type="text"],
+body.dark-mode input[type="email"],
+body.dark-mode input[type="number"] {
+  background-color: #2d2d2d;
+  color: #e0e0e0;
+  border-color: #444;
+}
+
+body.dark-mode .btn-default {
+  background-color: #444;
+  color: #e0e0e0;
+  border-color: #555;
+}
+
+body.dark-mode .btn-default:hover {
+  background-color: #555;
+  border-color: #666;
+}
