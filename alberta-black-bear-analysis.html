@@ -53,8 +53,13 @@ nav .brand span{color:var(--ink-3);font-weight:400}
 .navlinks{flex:1;min-width:0;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
 nav a{font-size:13px;color:var(--ink-2);white-space:nowrap;padding:6px 10px;border-radius:8px}
 nav a:hover{background:var(--surface-2)}
-nav a.cta{background:var(--bear);color:#0d1017;font-weight:600;padding:6px 13px;border-radius:20px}
-nav a.cta:hover{opacity:.88;color:#0d1017}
+nav a.cta{background:var(--bear);color:#0d1017;font-weight:600;padding:6px 13px;border-radius:20px;
+  order:1;flex:none}
+nav a.cta:hover{opacity:.88;color:#0d1017;border-bottom-color:transparent}
+/* the 2026 outlook shares the Dashboard button's shape but reads as secondary:
+   outlined rather than solid, since it's a projection alongside the live dashboard */
+nav a.cta.alt{background:transparent;color:var(--bear);border:1px solid var(--bear)}
+nav a.cta.alt:hover{background:color-mix(in srgb,var(--bear) 15%,transparent);color:var(--bear);opacity:1}
 
 header.hero{padding:72px 0 40px;border-bottom:1px solid var(--line)}
 .kicker{font-size:12px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3);
@@ -169,10 +174,10 @@ input[type=search],select{font:inherit;font-size:13.5px;padding:7px 10px;border:
    of row two to scroll in. */
 @media (max-width:760px){
   nav .wrap{flex-wrap:wrap;gap:0;padding:0 12px;min-height:0}
-  .nav-top{display:flex;align-items:center;gap:10px;flex:0 0 100%;min-height:44px}
-  nav .brand{font-size:13.5px;margin-right:auto}
+  .nav-top{display:flex;align-items:center;gap:6px;flex:0 0 100%;min-height:44px}
+  nav .brand{font-size:13px;margin-right:auto}
   nav .brand span{display:none}
-  nav a.cta{padding:5px 12px;font-size:12.5px;flex:none}
+  nav a.cta{padding:5px 10px;font-size:12px;flex:none}
   .navlinks{order:2;flex:0 0 100%;min-width:100%;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;
     -webkit-overflow-scrolling:touch;gap:2px;padding:0 0 7px;
     -webkit-mask-image:linear-gradient(90deg,transparent,#000 8px,#000 calc(100% - 26px),transparent);
@@ -206,6 +211,7 @@ footer a{color:var(--ink-2)}
 <nav><div class="wrap">
   <div class="nav-top">
     <span class="brand">Alberta Black Bear <span>· 2021–2025</span></span>
+    <a href="#outlook" class="cta alt">2026 outlook</a>
     <a href="#dashboard" class="cta">Dashboard</a>
   </div>
   <div class="navlinks">
@@ -213,7 +219,6 @@ footer a{color:var(--ink-2)}
     <a href="#baiting">Baiting</a>
     <a href="#composition">Composition</a>
     <a href="#trend">Five seasons</a>
-    <a href="#outlook">2026 outlook</a>
     <a href="#method">Method</a>
   </div>
 </div></nav>
