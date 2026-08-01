@@ -646,10 +646,13 @@ table.data tbody tr{cursor:pointer}
 
   <div class="callout">
     <h4>The management signal hidden in the ratios</h4>
-    <p>Where elk ratios fall below 100, cow draws are doing heavy lifting to suppress population growth.
-    Where they climb into the hundreds, the unit is effectively antlered-only and the herd is being allowed
-    to grow. Deer ratios show no such variation, because antlerless deer tags are broadly available and
-    simply go unused — the harvest is shaped by hunter choice rather than by policy.</p>
+    <p>Where elk ratios fall below 100, cow draws are doing heavy lifting to suppress growth. Where they climb
+    into the hundreds, the unit is effectively antlered-only and the herd is being allowed to grow. Read the
+    ratio and you can usually infer the tag structure without opening the draw booklet.</p>
+    <p>Deer ratios swing just as widely — 36 to 2,600 across the province in 2025 — but for a different reason.
+    Elk spread reflects where cow draws exist; deer spread reflects <em>how many</em> antlerless tags were
+    issued that year, a number the ten-season view shows moving sharply. Both are policy signals, but elk's is
+    structural and deer's is a dial being turned.</p>
   </div>
 </div></section>
 
@@ -894,10 +897,10 @@ table.data tbody tr{cursor:pointer}
 <section id="dashboard"><div class="wrap">
   <div class="sec-head">
     <h2>Harvest dashboard</h2>
-    <p>Every unit, every loaded species and season, filterable on every dimension — species, sex class,
-    region, season, harvest floor, success floor, and unit search. All summary figures, both charts and the
-    table recalculate live. Deep-link straight here with
-    <code>alberta-harvest-analysis.html#dashboard</code>.</p>
+    <p>Every unit, species and loaded season, filterable on every dimension. All figures, charts and the table
+    recalculate live. Click any row or bar for a unit's season-by-season detail.
+    <strong>Copy link</strong> encodes the entire view — filters, sort, open unit — into a URL you can send to
+    someone; <strong>Export CSV</strong> downloads exactly what is on screen.</p>
   </div>
   <div id="data"></div>
 
@@ -953,6 +956,8 @@ table.data tbody tr{cursor:pointer}
         <label class="tgl"><input type="checkbox" id="fCtrl"><i></i>Hide military bases</label>
       </div>
       <div style="display:flex;flex-wrap:wrap;gap:6px;margin-left:auto">
+        <button id="btnLink" class="mini" title="Copy a link that reopens this exact view">Copy link</button>
+        <button id="btnCsv" class="mini" title="Download the current selection as CSV">Export CSV</button>
         <button data-preset="reset" class="mini">Reset</button>
         <button data-preset="trophy" class="mini">Best odds</button>
         <button data-preset="volume" class="mini">Highest volume</button>
@@ -2711,7 +2716,8 @@ function render(){
   const CAP=80, shown=showAllRows?set:set.slice(0,CAP);
   el("dataTable").querySelector("tbody").innerHTML=shown.map(r=>{
     let cells=`<td>${r.wmu}${r.name?' <span style="color:var(--ink-3);font-weight:400">'+
-      r.name+"</span>":""}</td><td style="text-align:left;color:var(--ink-3)">${r.regionName}</td>`;
+      r.name+"</span>":""}</td><td style="text-align:left;color:var(--ink-3)">${r.regionName}</td>`+
+      `<td style="padding:2px 8px">${spark(r.wmu,list)}</td>`;
     list.forEach(sp=>{const p=PFX[sp];
       cells+=cell(r[p+"Total"])+cell(r[p+"Male"])+cell(r[p+"Female"])+cell(r[p+"Young"])+
         pc(r[p+"Succ"]||null)+cell(r[p+"Hunters"])+pc(r[p+"MaleShare"])+cell(r[p+"Ratio"]);});
@@ -2780,8 +2786,30 @@ function showUnit(wmu,keep){
 }
 function closeUnit(){openUnit=null;const p=el("unitPanel");p.hidden=true;p.innerHTML="";
   if(unitChart){unitChart.destroy();unitChart=null}}
+/* inline three-season sparkline per unit — totals across the selected species */
+const SEASONS=[2023,2024,2025];
+function spark(wmu,list){
+  if(!list.length)return "";
+  const vals=SEASONS.map(y=>{const r=M[y]&&M[y].by[wmu];
+    return r?list.reduce((a,sp)=>a+(r[PFX[sp]+"Total"]||0),0):null});
+  if(vals.every(v=>v==null||v===0))return "";
+  const nums=vals.filter(v=>v!=null);
+  const mx=Math.max(...nums),mn=Math.min(...nums);
+  const W=54,H=18,pad=2,span=(mx-mn)||1;
+  const pts=vals.map((v,i)=>v==null?null:
+    [pad+i*((W-2*pad)/(SEASONS.length-1)),H-pad-((v-mn)/span)*(H-2*pad)]).filter(Boolean);
+  const first=nums[0],last=nums[nums.length-1];
+  const col=last>first*1.05?C.ok:last<first*0.95?C.elk:C.grey;
+  const d=pts.map((p,i)=>(i?"L":"M")+p[0].toFixed(1)+" "+p[1].toFixed(1)).join(" ");
+  const end=pts[pts.length-1];
+  return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" aria-hidden="true"
+    style="vertical-align:middle"><path d="${d}" fill="none" stroke="${col}" stroke-width="1.6"
+    stroke-linejoin="round" stroke-linecap="round"/><circle cx="${end[0].toFixed(1)}"
+    cy="${end[1].toFixed(1)}" r="2.1" fill="${col}"/></svg>`;
+}
 function buildHead(list){
-  let h=`<th data-k="wmu">WMU</th><th data-k="region">Region</th>`;
+  let h=`<th data-k="wmu">WMU</th><th data-k="region">Region</th>`+
+    `<th style="cursor:default" title="Total harvest across the selected species, 2023 to 2025">2023–25</th>`;
   list.forEach(sp=>{const p=PFX[sp],n=SHORT[sp];
     h+=`<th data-k="${p}Total">${n} total</th><th data-k="${p}Male">${n} M</th>`+
        `<th data-k="${p}Female">${n} F</th><th data-k="${p}Young">${n} Y</th>`+
@@ -2807,6 +2835,74 @@ segBind("segYear","year",v=>{stYear=+v});
 segBind("segSpecies","sp",v=>{stSpecies=v});
 segBind("segSex","sex",v=>{stSex=v});
 segBind("segRegion","region",v=>{stRegion=v});
+/* ---- shareable state: the whole dashboard view encoded in the URL ---- */
+function stateToHash(){
+  const p=new URLSearchParams({y:stYear,sp:stSpecies,sx:stSex,rg:stRegion});
+  const q=el("fSearch").value.trim(); if(q)p.set("q",q);
+  if(+el("fHarvest").value)p.set("mh",el("fHarvest").value);
+  if(+el("fSuccess").value)p.set("ms",el("fSuccess").value);
+  if(el("fSort").value!=="metric")p.set("s",el("fSort").value);
+  if(!el("fZero").checked)p.set("z","0");
+  if(!el("fGroup").checked)p.set("g","0");
+  if(el("fCtrl").checked)p.set("c","1");
+  if(openUnit)p.set("u",openUnit);
+  return "#dashboard?"+p.toString();
+}
+function hashToState(){
+  const h=location.hash; const i=h.indexOf("?"); if(i<0)return false;
+  const p=new URLSearchParams(h.slice(i+1));
+  const yr=+p.get("y"); if(yr&&M[yr])stYear=yr;
+  if(p.get("sp"))stSpecies=p.get("sp");
+  if(p.get("sx")&&SEXKEY[p.get("sx")])stSex=p.get("sx");
+  if(p.get("rg"))stRegion=p.get("rg");
+  el("fSearch").value=p.get("q")||"";
+  el("fHarvest").value=p.get("mh")||0;
+  el("fSuccess").value=p.get("ms")||0;
+  el("fSort").value=p.get("s")||"metric";
+  el("fZero").checked=p.get("z")!=="0";
+  el("fGroup").checked=p.get("g")!=="0";
+  el("fCtrl").checked=p.get("c")==="1";
+  if(p.get("u"))openUnit=p.get("u");
+  return true;
+}
+el("btnLink").addEventListener("click",()=>{
+  const url=location.origin+location.pathname+stateToHash();
+  const done=ok=>{const b=el("btnLink");const t=b.textContent;
+    b.textContent=ok?"link copied":"copy failed";setTimeout(()=>{b.textContent=t},1600)};
+  if(navigator.clipboard&&window.isSecureContext)
+    navigator.clipboard.writeText(url).then(()=>done(true),()=>done(false));
+  else{const ta=document.createElement("textarea");ta.value=url;document.body.appendChild(ta);
+    ta.select();let ok=false;try{ok=document.execCommand("copy")}catch(e){}
+    document.body.removeChild(ta);done(ok)}
+  history.replaceState(null,"",stateToHash());
+});
+/* ---- CSV export of exactly what is on screen ---- */
+el("btnCsv").addEventListener("click",()=>{
+  const {set,list,sx}=currentSet();
+  const head=["WMU","Name","Region","CWD status"];
+  list.forEach(sp=>{const n=SHORT[sp];
+    head.push(n+" total",n+" male",n+" female",n+" young",n+" success %",
+      n+" est hunters",n+" male share %",n+" males per 100 females")});
+  if(list.length>1)head.push("Elk share of combined %","Combined total");
+  const esc=v=>{const s=v==null?"":String(v);
+    return /[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s};
+  const lines=[head.map(esc).join(",")];
+  set.forEach(r=>{
+    const row=[r.wmu,r.name||"",r.regionName,CWD_LABELS[r.cwd]];
+    list.forEach(sp=>{const p=PFX[sp];
+      row.push(r[p+"Total"],r[p+"Male"],r[p+"Female"],r[p+"Young"],r[p+"Succ"],
+        r[p+"Hunters"],r[p+"MaleShare"],r[p+"Ratio"])});
+    if(list.length>1)row.push(r.tilt,r.combined);
+    lines.push(row.map(esc).join(","));
+  });
+  const name="alberta-harvest-"+stYear+"-"+(list.join("-")||"none")+"-"+sx+".csv";
+  const blob=new Blob(["﻿"+lines.join("\r\n")],{type:"text/csv;charset=utf-8"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name;
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+  const b=el("btnCsv");const t=b.textContent;b.textContent=set.length+" rows saved";
+  setTimeout(()=>{b.textContent=t},1600);
+});
 document.querySelectorAll("[data-preset]").forEach(b=>b.addEventListener("click",()=>{
   const p=b.dataset.preset;
   el("fSearch").value="";el("fZero").checked=true;el("fGroup").checked=true;el("fCtrl").checked=false;
@@ -2824,7 +2920,12 @@ document.querySelectorAll("[data-preset]").forEach(b=>b.addEventListener("click"
   sortKey="metric";render();
   if(p==="suffield")showUnit("732");
 }));
+/* restore a shared view, then render */
+const restored=hashToState();
 render();
+if(restored&&openUnit)showUnit(openUnit);
+if(restored)setTimeout(()=>document.getElementById("dashboard")
+  .scrollIntoView({behavior:"smooth",block:"start"}),300);
 </script>
 
 </body>
