@@ -27,7 +27,9 @@
   --elk:#e07a4a; --deer:#7d92f0; --gold:#d8a52c; --ok:#5fae7c;
 }
 *{box-sizing:border-box}
-html{scroll-behavior:smooth}
+/* --navh tracks the real nav height (it wraps on narrow screens) so anchor
+   jumps and the sticky dashboard bar both clear it */
+html{scroll-behavior:smooth;scroll-padding-top:calc(var(--navh,56px) + 14px)}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);
   font-size:16px;line-height:1.7;-webkit-font-smoothing:antialiased}
 .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
@@ -176,7 +178,7 @@ button.mode.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 
 /* ---- dashboard ---- */
 .dash-bar{background:var(--surface);border:1px solid var(--line);border-radius:12px;
-  margin-bottom:16px;position:sticky;top:52px;z-index:30}
+  margin-bottom:16px;position:sticky;top:calc(var(--navh,52px) + 8px);z-index:30}
 .dash-row{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;padding:11px 14px;
   border-bottom:1px solid var(--line)}
 .ctl-group{display:flex;align-items:center;gap:8px;min-width:0;max-width:100%}
@@ -1341,12 +1343,21 @@ table.data tbody tr{cursor:pointer}
   no cookies, no tracking. All computation runs client-side from the embedded dataset.</p>
   <p style="margin-top:26px;padding-top:20px;border-top:1px solid var(--line);text-align:center;
     font-size:14px;color:var(--ink-2)">
-    Built by <a href="index.html">Nitin Wadhwani</a> in Calgary, Alberta · © <span id="yr"></span> ·
-    <a href="alberta-black-bear-analysis.html">black bear analysis</a>
+    Built by <a href="index.html">Nitin Wadhwani</a> in Calgary, Alberta · © <span id="yr"></span>
   </p>
 </div></footer>
 <script>
 document.getElementById("yr").textContent=new Date().getFullYear();
+/* keep --navh equal to the real nav height so anchor jumps and the sticky
+   dashboard bar both clear it, even when the nav wraps on a phone */
+(function(){
+  const nav=document.querySelector("nav");
+  const set=()=>document.documentElement.style.setProperty("--navh",nav.offsetHeight+"px");
+  set();
+  addEventListener("resize",set); addEventListener("orientationchange",set);
+  addEventListener("load",set);
+  if(window.ResizeObserver)new ResizeObserver(set).observe(nav);
+})();
 /* nav menus: one open at a time, close on outside click, Escape, or choosing a link */
 const menus=[...document.querySelectorAll("details.navmenu")];
 menus.forEach(d=>{
