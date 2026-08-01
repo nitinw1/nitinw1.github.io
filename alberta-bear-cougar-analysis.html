@@ -1,0 +1,1331 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Does Bear Baiting Work? Five Seasons of Alberta Black Bear Data</title>
+<meta name="description" content="A natural experiment in Alberta's black bear regulations: baiting is legal in 42 wildlife management units, banned in most of the rest, and partial in seven. Five seasons and 12,939 bears show what it changes, what it does not, plus a 2026 outlook and a map of where you can bait.">
+<meta property="og:title" content="Does Bear Baiting Work? Five Seasons of Alberta Black Bear Data">
+<meta property="og:description" content="Alberta permits bear baiting in 42 WMUs and bans it in most of the rest. Five seasons of harvest data show baiting units run roughly double the hunter success — with partial-baiting units landing in between every year.">
+<meta property="og:type" content="article">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+:root{
+  --bg:#f7f8fb; --surface:#ffffff; --surface-2:#eef0f4;
+  --ink:#14140f; --ink-2:#4a4943; --ink-3:#7c7b74;
+  --line:rgba(20,20,15,.10); --line-2:rgba(20,20,15,.20);
+  --bear:#c2703a; --bait:#5fae7c; --nobait:#d2604f; --part:#d8a52c; --cougar:#7d92f0;
+  --radius:8px; --maxw:1060px;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Helvetica,Arial,sans-serif;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+}
+[data-theme="dark"]{
+  --bg:#0d1017; --surface:#151a23; --surface-2:#1c2230;
+  --ink:#eef1f6; --ink-2:#c2c9d4; --ink-3:#9aa4b2;
+  --line:rgba(255,255,255,.12); --line-2:rgba(255,255,255,.22);
+  --bear:#e0904a; --bait:#5fae7c; --nobait:#e0655c; --part:#d8a52c; --cougar:#7d92f0;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;
+  line-height:1.7;-webkit-font-smoothing:antialiased}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+h1,h2,h3,h4{font-weight:600;line-height:1.25;margin:0}
+h1{font-size:clamp(28px,5vw,46px);letter-spacing:-.02em}
+h2{font-size:clamp(21px,3vw,28px);margin:0 0 6px}
+h3{font-size:18px;margin:0 0 6px}
+h4{font-size:15px;margin:0 0 4px}
+p{margin:0 0 1rem}
+a{color:var(--cougar);text-decoration:none;border-bottom:1px solid transparent}
+a:hover{border-bottom-color:currentColor}
+code{font-family:var(--mono);font-size:.88em;background:var(--surface-2);padding:1px 5px;border-radius:4px}
+
+nav{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 92%,transparent);
+  backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+nav .wrap{display:flex;align-items:center;gap:14px;min-height:52px;flex-wrap:wrap;padding:6px 24px}
+nav .brand{font-weight:600;font-size:14px;white-space:nowrap;flex:none}
+nav .brand span{color:var(--ink-3);font-weight:400}
+.navlinks{flex:1;min-width:0;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+nav a{font-size:13px;color:var(--ink-2);white-space:nowrap;padding:6px 10px;border-radius:8px}
+nav a:hover{background:var(--surface-2)}
+nav a.cta{background:var(--bear);color:#0d1017;font-weight:600;padding:6px 13px;border-radius:20px}
+nav a.cta:hover{opacity:.88;color:#0d1017}
+
+header.hero{padding:72px 0 40px;border-bottom:1px solid var(--line)}
+.kicker{font-size:12px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3);
+  font-weight:600;margin-bottom:14px}
+.lede{font-family:var(--serif);font-size:clamp(17px,2.2vw,20px);line-height:1.6;
+  color:var(--ink-2);max-width:64ch;margin:18px 0 0}
+.byline{font-size:13px;color:var(--ink-3);margin-top:22px;padding-top:16px;border-top:1px solid var(--line)}
+
+section{padding:52px 0;border-bottom:1px solid var(--line)}
+.sec-head{margin-bottom:26px;max-width:70ch}
+.sec-head p{color:var(--ink-2);margin:8px 0 0}
+.prose{max-width:68ch}
+.prose p{color:var(--ink-2)}
+.prose strong{color:var(--ink);font-weight:600}
+ul.tight{margin:0 0 1rem;padding-left:20px;color:var(--ink-2)}
+ul.tight li{margin-bottom:6px}
+
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:24px 0}
+.stats>*{min-width:0}
+.stat{background:var(--surface-2);border-radius:var(--radius);padding:16px 18px}
+.stat .lab{font-size:12px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+.stat .val{font-family:var(--serif);font-size:30px;line-height:1.1;margin:6px 0 2px;
+  font-variant-numeric:tabular-nums lining-nums}
+.stat .sub{font-size:12.5px;color:var(--ink-3)}
+.stat.hero-stat{background:color-mix(in srgb,var(--bait) 16%,var(--surface-2))}
+
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:24px 0}
+.cards>*{min-width:0}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px 20px}
+.badge{display:inline-block;font-size:11.5px;font-weight:600;padding:3px 9px;border-radius:20px;
+  letter-spacing:.03em;margin-bottom:10px}
+.badge.b1{background:color-mix(in srgb,var(--bait) 18%,transparent);color:var(--bait)}
+.badge.b2{background:color-mix(in srgb,var(--bear) 18%,transparent);color:var(--bear)}
+.badge.b3{background:color-mix(in srgb,var(--nobait) 18%,transparent);color:var(--nobait)}
+.badge.b4{background:color-mix(in srgb,var(--cougar) 20%,transparent);color:var(--cougar)}
+
+.chart-block{margin:30px 0}
+.chart-title{font-size:14.5px;font-weight:600;margin-bottom:2px}
+.chart-note{font-size:12.5px;color:var(--ink-3);margin-bottom:12px}
+.chart-box{position:relative;width:100%;background:var(--surface);border:1px solid var(--line);
+  border-radius:12px;padding:16px}
+.legend{display:flex;flex-wrap:wrap;gap:16px;font-size:12.5px;color:var(--ink-2);margin-bottom:10px}
+.legend span.k{display:inline-flex;align-items:center;gap:6px}
+.sw{width:11px;height:11px;border-radius:3px;display:inline-block}
+
+.tbl-scroll{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+table.data{width:100%;border-collapse:collapse;font-size:13px}
+table.data th{position:sticky;top:0;background:var(--surface-2);text-align:right;padding:9px 10px;
+  font-weight:600;font-size:12px;white-space:nowrap;border-bottom:1px solid var(--line);
+  color:var(--ink-2);user-select:none}
+table.data th:first-child{text-align:left}
+table.data th[data-k]{cursor:pointer}
+table.data th[data-dir="1"]:after{content:'\25B4';margin-left:4px}
+table.data th[data-dir="-1"]:after{content:'\25BE';margin-left:4px}
+table.data td{padding:7px 10px;text-align:right;font-variant-numeric:tabular-nums;
+  border-bottom:1px solid var(--line);white-space:nowrap}
+table.data td:first-child{text-align:left;font-weight:500}
+table.data tbody tr{cursor:pointer}
+table.data tbody tr:hover td{background:var(--surface-2)}
+.pill{display:inline-block;padding:1px 8px;border-radius:20px;font-size:11.5px;font-weight:600}
+.pill.bait{background:color-mix(in srgb,var(--bait) 22%,transparent);color:var(--bait)}
+.pill.part{background:color-mix(in srgb,var(--part) 22%,transparent);color:var(--part)}
+.pill.no{background:color-mix(in srgb,var(--nobait) 20%,transparent);color:var(--nobait)}
+
+.callout{background:var(--surface-2);border-left:3px solid var(--bait);padding:16px 18px;margin:22px 0}
+.callout h4{margin-bottom:4px}
+.callout p{margin:0 0 .6rem;font-size:14.5px;color:var(--ink-2)}
+.callout p:last-child{margin-bottom:0}
+.callout.warn{border-left-color:var(--part)}
+.callout.pend{border-left-color:var(--cougar)}
+.two-col{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:26px}
+
+/* dashboard */
+.dash-bar{background:var(--surface);border:1px solid var(--line);border-radius:12px;margin-bottom:16px}
+.dash-row{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;padding:11px 14px;
+  border-bottom:1px solid var(--line)}
+.dash-row:last-child{border-bottom:none}
+.ctl-group{display:flex;align-items:center;gap:8px;min-width:0;max-width:100%}
+.ctl-label{font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3);
+  font-weight:600;flex:none}
+.seg{display:flex;background:var(--surface-2);border-radius:9px;padding:3px;gap:2px;
+  overflow-x:auto;scrollbar-width:none;max-width:100%}
+.seg::-webkit-scrollbar{display:none}
+.seg button{border:none;background:transparent;padding:5px 11px;border-radius:7px;font-size:13px;
+  color:var(--ink-2);font-weight:500;flex:none;white-space:nowrap;cursor:pointer}
+.seg button:hover{background:var(--bg);color:var(--ink)}
+.seg button.on{background:var(--bear);color:#0d1017;font-weight:600}
+button{font:inherit;font-size:13px;padding:6px 12px;border:1px solid var(--line-2);
+  border-radius:var(--radius);background:var(--surface);color:var(--ink);cursor:pointer}
+button:hover{background:var(--surface-2)}
+button.mini{font-size:12px;padding:5px 10px}
+input[type=search],select{font:inherit;font-size:13.5px;padding:7px 10px;border:1px solid var(--line-2);
+  border-radius:var(--radius);background:var(--surface);color:var(--ink)}
+#fSearch{flex:1 1 190px;min-width:140px}
+.slider-ctl{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--ink-3);
+  white-space:nowrap;flex:none}
+.slider-ctl b{color:var(--ink);font-variant-numeric:tabular-nums;min-width:34px;font-weight:600}
+.slider-ctl input[type=range]{width:96px}
+.chip-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.fchip{font-size:12px;padding:3px 9px;border-radius:20px;background:var(--surface-2);
+  border:1px solid var(--line);color:var(--ink-2)}
+.fchip b{color:var(--ink);font-weight:600}
+.empty{text-align:center;padding:40px 20px;color:var(--ink-3);font-size:14px;
+  background:var(--surface-2);border-radius:12px;margin-bottom:20px}
+.unit-panel{background:var(--surface);border:1px solid var(--bear);border-radius:12px;
+  padding:18px 20px;margin-bottom:20px}
+.unit-panel .close{float:right;font-size:12px;padding:3px 9px}
+.dash-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:22px;margin-bottom:20px}
+@media (max-width:820px){.dash-grid{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:620px){
+  .wrap{padding:0 16px} section{padding:38px 0}
+  .chart-box{padding:10px} .stat .val{font-size:25px}
+  table.data{font-size:12px} table.data td,table.data th{padding:6px 8px}
+}
+footer{padding:44px 0 60px;font-size:13px;color:var(--ink-3)}
+footer a{color:var(--ink-2)}
+.src-list{list-style:none;padding:0;margin:10px 0 0}
+.src-list li{margin-bottom:5px}
+</style>
+</head>
+<body>
+
+<nav><div class="wrap">
+  <span class="brand">Alberta Black Bear <span>· 2021–2025</span></span>
+  <div class="navlinks">
+    <a href="#findings">Findings</a>
+    <a href="#baiting">The baiting experiment</a>
+    <a href="#composition">Composition</a>
+    <a href="#trend">Five seasons</a>
+    <a href="#outlook">2026 outlook</a>
+    <a href="#method">Method</a>
+  </div>
+  <a href="#dashboard" class="cta">Dashboard</a>
+</div></nav>
+
+<header class="hero"><div class="wrap">
+  <div class="kicker">Wildlife data analysis · Alberta, Canada</div>
+  <h1>Alberta banned bear baiting in half the province. Here is what the harvest data says it changed.</h1>
+  <p class="lede">Baiting black bears is legal in 42 of Alberta's wildlife management units, prohibited in
+  most of the rest, and permitted over part of seven more. That makes the province an accidental controlled
+  experiment — five seasons, 12,939 harvested bears, and a built-in intermediate group to test the
+  gradient.</p>
+  <div class="byline">
+    <strong>Scope.</strong> Black bear harvest by wildlife management unit for the <strong>2021–2025</strong>
+    seasons — five reports, 12,939 animals. Baiting classifications come from the <strong>2026</strong>
+    regulations. The 2026 outlook is a projection: no 2026 harvest data exists yet.
+    <br><br>
+    Sources: Alberta Forestry and Parks, <em>Hunter harvest report: black bear</em> 2021–2025 ·
+    <em>2026 Alberta Guide to Hunting Regulations</em>, bear seasons and baiting rules.
+    All harvest figures are estimated resident harvest combining general and special licences.
+  </div>
+</div></header>
+
+<section id="findings"><div class="wrap">
+  <div class="sec-head">
+    <h2>Headline findings</h2>
+    <p>Four results, one of which is unusually clean for observational data.</p>
+  </div>
+  <div class="cards">
+    <div class="card">
+      <span class="badge b1">Natural experiment</span>
+      <h3>Baiting units run roughly double the success</h3>
+      <p style="font-size:14px;color:var(--ink-2);margin:0">In all five seasons, units where baiting is legal
+      returned 26–36% hunter success against 13–19% where it is banned. The ratio stayed between 1.72× and
+      2.02× — a narrow band, while total harvest swung 58%.</p>
+    </div>
+    <div class="card">
+      <span class="badge b1">Dose-response</span>
+      <h3>Partial-baiting units land in between — every year</h3>
+      <p style="font-size:14px;color:var(--ink-2);margin:0">Seven units allow baiting in part of their area.
+      They sat between the two groups in all five seasons without exception. That ordering is what separates a
+      real effect from a regional coincidence.</p>
+    </div>
+    <div class="card">
+      <span class="badge b3">Null result</span>
+      <h3>Baiting does not shift the sex ratio</h3>
+      <p style="font-size:14px;color:var(--ink-2);margin:0">A common objection is that baiting leads to sows
+      being shot. In 2025 the female share of harvest was 20.6% in baiting units and 21.3% where it is banned —
+      essentially identical, and marginally lower where baiting is legal.</p>
+    </div>
+    <div class="card">
+      <span class="badge b2">Structural zero</span>
+      <h3>Not one cub in five seasons</h3>
+      <p style="font-size:14px;color:var(--ink-2);margin:0">The young column is zero in every unit in every
+      year. It is illegal to take a bear under one year or a female with a cub, and the harvest reflects that
+      absolutely — unlike deer, elk and moose where young run 2–6%.</p>
+    </div>
+  </div>
+</div></section>
+
+<section id="baiting"><div class="wrap">
+  <div class="sec-head">
+    <h2>The baiting experiment</h2>
+    <p>Alberta's regulations split the province into three groups. Nobody designed this as a study, but it
+    behaves like one.</p>
+  </div>
+
+  <div class="stats" id="baitStats"></div>
+
+  <div class="chart-block">
+    <div class="chart-title">Hunter success by baiting status, five seasons</div>
+    <div class="chart-note">Harvest-weighted success: total harvest divided by total estimated hunters in each
+    group, rather than an average of unit percentages. The three lines never cross.</div>
+    <div class="legend">
+      <span class="k"><span class="sw" style="background:var(--bait)"></span>baiting permitted</span>
+      <span class="k"><span class="sw" style="background:var(--part)"></span>permitted in part of the unit</span>
+      <span class="k"><span class="sw" style="background:var(--nobait)"></span>baiting prohibited</span>
+    </div>
+    <div class="chart-box" style="height:380px"><canvas id="chBait"></canvas></div>
+  </div>
+
+  <div class="tbl-scroll"><table class="data" id="baitTable"></table></div>
+
+  <div class="chart-block">
+    <div class="chart-title">Which units you can bait in</div>
+    <div class="chart-note">Every unit with recorded bear harvest, grouped by baiting status. Hover any unit
+    for its 2025 numbers; click to open it in the dashboard. This is a reading of the 2026 regulations — the
+    partial units allow bait over only part of their area, and additional restrictions apply near dwellings,
+    parks and industrial sites.</div>
+    <div id="baitMap"></div>
+    <div id="baitMapTip" style="font-size:13px;color:var(--ink-2);margin-top:10px;min-height:22px"></div>
+  </div>
+
+  <div class="callout">
+    <h4>Why the middle group matters</h4>
+    <p>Baiting-legal units are concentrated in the boreal north, so the obvious objection is that this is
+    geography rather than bait — northern units might simply hold more bears. The partial-baiting group is what
+    makes that hard to sustain. Those seven units are scattered across the foothills and boreal, are governed by
+    the same regulations as their neighbours in every other respect, and allow bait over only part of their
+    area. They land between the two groups in all five seasons, every time, without a single inversion.</p>
+    <p>That is a dose-response relationship: more permitted bait area, more success. It does not prove
+    causation on its own, but a confounder would have to track partial permissions unit by unit to reproduce
+    it.</p>
+  </div>
+
+  <div class="prose">
+    <p>The size of the effect is also stable in a way that regional differences usually are not. Across five
+    seasons the ratio between the two extreme groups stayed inside a narrow band — 1.72× at the low end and
+    2.02× at the high end — while total provincial harvest swung by 58%. Whatever baiting is worth to a hunter,
+    it is worth about the same amount every year.</p>
+  </div>
+</div></section>
+
+<section id="composition"><div class="wrap">
+  <div class="sec-head">
+    <h2>What the harvest is made of</h2>
+    <p>Bear composition is shaped almost entirely by what hunters choose, because bear regulations set very
+    few limits on sex.</p>
+  </div>
+
+  <div class="chart-block">
+    <div class="chart-title">Male share of harvest, five seasons</div>
+    <div class="chart-note">Males outnumber females roughly three to four times over, every year, with no
+    trend. Compare deer and elk, where the sex mix moves more than 20 percentage points as tag policy
+    changes.</div>
+    <div class="chart-box" style="height:330px"><canvas id="chSex"></canvas></div>
+  </div>
+
+  <div class="two-col">
+    <div class="prose">
+      <h3>Why the young column is empty</h3>
+      <p>It is unlawful to hunt a black bear under one year old, or a female accompanied by a cub. Five seasons
+      and 12,939 bears later, the young column is still zero in every unit. That is not rounding — it is a
+      regulation being followed essentially perfectly, which is worth noting given how often compliance is
+      assumed rather than measured.</p>
+      <p>It also means the sex split here is a clean two-way comparison, unlike the other species where a
+      sexless "young" column absorbs part of the harvest.</p>
+    </div>
+    <div class="prose">
+      <h3>The sow-avoidance question</h3>
+      <p>Because a female with cubs is protected but a lone female is not, the female share reflects hunter
+      judgment in the field: identifying sex on a bear at distance is hard, and many hunters pass anything they
+      cannot confirm. That figure sat between 20.4% and 25.4% across all five seasons, which suggests a settled
+      behavioural norm rather than a response to any regulatory change.</p>
+      <p>Which is why the baiting comparison is interesting in the other direction. Bait gives a hunter a
+      stationary animal at known range and time, exactly the conditions that should improve sex identification.
+      The data shows no penalty and, if anything, a marginally lower female share.</p>
+    </div>
+  </div>
+</div></section>
+
+<section id="trend"><div class="wrap">
+  <div class="sec-head">
+    <h2>Five seasons</h2>
+    <p>One year in this series does not belong with the others.</p>
+  </div>
+  <div class="stats" id="trendStats"></div>
+  <div class="chart-block">
+    <div class="chart-title">Total black bear harvest by season</div>
+    <div class="chart-note">2021 stands 58% above the average of the four seasons that follow it, then the
+    series settles into a narrow band.</div>
+    <div class="chart-box" style="height:330px"><canvas id="chTrend"></canvas></div>
+  </div>
+  <div class="callout warn">
+    <h4>The 2021 outlier, and what I will not claim about it</h4>
+    <p>2021 recorded 3,670 bears against 2,172 to 2,431 in every following season. Both sexes moved together
+    and the baiting gradient held, so this is not a composition change — it is more bears taken, everywhere.</p>
+    <p>The tempting explanation is pandemic-era licence sales, and the timing fits. But this dataset contains
+    no participation figures, no licence sales, and no earlier seasons for a baseline, so I cannot separate a
+    surge in hunters from a change in survey methodology or a genuinely good bear year. Flagging it as
+    unexplained is more useful than guessing.</p>
+  </div>
+  <div class="chart-block">
+    <div class="chart-title">Harvest by region</div>
+    <div class="chart-note">2025 season. Boreal and foothills carry almost the entire provincial harvest; the
+    mountain units produce almost nothing despite being bear country.</div>
+    <div class="chart-box" style="height:330px"><canvas id="chRegion"></canvas></div>
+  </div>
+  <div class="prose">
+    <p>The mountain 400-series result is the same pattern the elk data shows: 29 units, 73 bears, 6% success.
+    Bears are certainly there. Access, terrain and the absence of legal bait are what keep the harvest near
+    zero, and it is a useful reminder that a low harvest number is a statement about hunters at least as much
+    as about animals.</p>
+  </div>
+</div></section>
+
+<section id="dashboard"><div class="wrap">
+  <div class="sec-head">
+    <h2>Bear dashboard</h2>
+    <p>Every unit and season, filterable. Click any row or bar for that unit's five-season history.
+    Deep-link here with <code>#dashboard</code>.</p>
+  </div>
+
+  <div class="dash-bar">
+    <div class="dash-row">
+      <div class="ctl-group"><span class="ctl-label">Season</span>
+        <div class="seg" id="segYear" role="group" aria-label="Season"></div></div>
+      <div class="ctl-group"><span class="ctl-label">Baiting</span>
+        <div class="seg" id="segBait" role="group" aria-label="Baiting status">
+          <button data-bait="all" class="on">All</button>
+          <button data-bait="y">Permitted</button>
+          <button data-bait="p">Partial</button>
+          <button data-bait="n">Prohibited</button>
+        </div></div>
+    </div>
+    <div class="dash-row">
+      <div class="ctl-group"><span class="ctl-label">Class</span>
+        <div class="seg" id="segSex" role="group" aria-label="Sex class">
+          <button data-sex="total" class="on">Total</button>
+          <button data-sex="male">Male</button>
+          <button data-sex="female">Female</button>
+        </div></div>
+      <div class="ctl-group"><span class="ctl-label">Region</span>
+        <div class="seg" id="segRegion" role="group" aria-label="Region">
+          <button data-region="all" class="on">All</button>
+          <button data-region="2">200s</button>
+          <button data-region="3">300s</button>
+          <button data-region="4">400s</button>
+          <button data-region="5">500s</button>
+        </div></div>
+    </div>
+    <div class="dash-row">
+      <input type="search" id="fSearch" placeholder="Search unit…" aria-label="Search unit">
+      <label class="slider-ctl">Min harvest <b id="lblH">0</b>
+        <input type="range" id="fH" min="0" max="100" step="5" value="0"></label>
+      <label class="slider-ctl">Min success <b id="lblS">0%</b>
+        <input type="range" id="fS" min="0" max="70" step="1" value="0"></label>
+      <select id="fSort" aria-label="Sort by">
+        <option value="metric">Sort: harvest</option>
+        <option value="succ">Sort: success</option>
+        <option value="hunters">Sort: hunters</option>
+        <option value="femaleShare">Sort: female share</option>
+        <option value="wmu">Sort: WMU</option>
+      </select>
+      <button id="btnCsv" class="mini">Export CSV</button>
+      <button id="btnLink" class="mini">Copy link</button>
+      <button id="btnReset" class="mini">Reset</button>
+    </div>
+  </div>
+
+  <div id="chips" class="chip-row"></div>
+  <div class="stats" id="dashStats"></div>
+  <div id="empty" class="empty" hidden></div>
+
+  <div class="dash-grid">
+    <div>
+      <div class="chart-title" id="topTitle">Top units</div>
+      <div class="chart-note">Coloured by baiting status. Click a bar for unit detail.</div>
+      <div class="legend">
+        <span class="k"><span class="sw" style="background:var(--bait)"></span>permitted</span>
+        <span class="k"><span class="sw" style="background:var(--part)"></span>partial</span>
+        <span class="k"><span class="sw" style="background:var(--nobait)"></span>prohibited</span>
+      </div>
+      <div class="chart-box" style="height:640px"><canvas id="chTop"></canvas></div>
+    </div>
+    <div>
+      <div class="chart-title">Harvest vs success</div>
+      <div class="chart-note">Bubble area is estimated hunters. The baiting groups separate vertically —
+      green sits above red at almost every harvest level.</div>
+      <div class="legend">
+        <span class="k"><span class="sw" style="background:var(--bait)"></span>permitted</span>
+        <span class="k"><span class="sw" style="background:var(--part)"></span>partial</span>
+        <span class="k"><span class="sw" style="background:var(--nobait)"></span>prohibited</span>
+      </div>
+      <div class="chart-box" style="height:300px"><canvas id="chScatter"></canvas></div>
+      <div class="chart-title" style="margin-top:18px">Male / female split of selection</div>
+      <div class="chart-note">Totals across every unit currently matching.</div>
+      <div class="chart-box" style="height:260px"><canvas id="chComp"></canvas></div>
+    </div>
+  </div>
+
+  <div id="unitPanel" class="unit-panel" hidden></div>
+
+  <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:10px">
+    <span style="font-size:13px;color:var(--ink-3)" id="tblCount"></span>
+    <span style="font-size:13px;color:var(--ink-3);margin-left:auto">Click a column to sort · a row for
+    detail</span>
+  </div>
+  <div class="tbl-scroll" style="max-height:620px;overflow-y:auto">
+    <table class="data" id="tbl"><thead><tr id="thead"></tr></thead><tbody></tbody></table>
+  </div>
+</div></section>
+
+<section id="outlook"><div class="wrap">
+  <div class="sec-head">
+    <h2>2026 outlook</h2>
+    <p>Which units look strongest for the coming spring and fall — from a model you can check by hand.</p>
+  </div>
+
+  <div class="callout warn">
+    <h4>The model, in four steps</h4>
+    <p>No 2026 bear data exists yet: the spring season opens in April 2026 and the survey publishes around
+    March 2027. So this is a forecast, built on five seasons per unit — enough for a real trend, unlike the
+    three-point series on the <a href="alberta-harvest-analysis.html#outlook">elk, deer and moose page</a>.</p>
+    <ol style="font-size:14.5px;color:var(--ink-2);margin:0 0 10px;padding-left:22px">
+      <li><strong>Recency-weighted baseline</strong> — the five seasons weighted 1, 2, 3, 4, 5 from 2021 to
+      2025, so the most recent year carries a third of the weight.</li>
+      <li><strong>Fitted slope</strong> — least squares across all five seasons.</li>
+      <li><strong>Volatility</strong> — mean absolute year-over-year change as a share of the mean.</li>
+      <li><strong>Volatility-weighted shrinkage</strong> — the projection blends trend with the most recent
+      actual season, weighted by <code>1 − volatility</code>, so noisy units are pulled back toward what
+      actually happened rather than following a line through scattered points.</li>
+    </ol>
+    <p>2021 is the complication. It sits 58% above every following season, so a naive five-year mean is dragged
+    upward for every unit. The recency weighting handles most of that, and the reported range is the projection
+    ± half the volatility, so units still carrying 2021's spike show visibly wide intervals.</p>
+  </div>
+
+  <div class="dash-bar" style="margin-bottom:18px">
+    <div class="dash-row">
+      <div class="ctl-group"><span class="ctl-label">Baiting</span>
+        <div class="seg" id="segOBait" role="group" aria-label="Outlook baiting filter">
+          <button data-ob="all" class="on">All</button>
+          <button data-ob="y">Permitted</button>
+          <button data-ob="p">Partial</button>
+          <button data-ob="n">Prohibited</button>
+        </div></div>
+      <div class="ctl-group"><span class="ctl-label">Confidence</span>
+        <div class="seg" id="segOConf" role="group" aria-label="Outlook confidence filter">
+          <button data-oc="all" class="on">All</button>
+          <button data-oc="high">High only</button>
+          <button data-oc="nolow">Exclude low</button>
+        </div></div>
+      <div class="ctl-group"><span class="ctl-label">Rank by</span>
+        <div class="seg" id="segORank" role="group" aria-label="Outlook ranking">
+          <button data-or="proj" class="on">Projected harvest</button>
+          <button data-or="succ">Projected success</button>
+        </div></div>
+    </div>
+  </div>
+
+  <div class="stats" id="outStats"></div>
+
+  <div class="chart-block">
+    <div class="chart-title" id="outTitle">Projected 2026 harvest — top 20 units</div>
+    <div class="chart-note">Hollow outline is the actual 2025 harvest for reference; the solid bar is the
+    projection, coloured by confidence. Click any bar for that unit's five-season history.</div>
+    <div class="legend">
+      <span class="k"><span class="sw" style="background:transparent;border:1.5px solid var(--ink-3)"></span>actual 2025</span>
+      <span class="k"><span class="sw" style="background:var(--bait)"></span>projected — high confidence</span>
+      <span class="k"><span class="sw" style="background:var(--part)"></span>medium</span>
+      <span class="k"><span class="sw" style="background:var(--ink-3)"></span>low — treat as noise</span>
+    </div>
+    <div class="chart-box" style="height:620px"><canvas id="chOut"></canvas></div>
+  </div>
+
+  <div class="tbl-scroll" style="max-height:560px;overflow-y:auto">
+    <table class="data" id="outTable"></table>
+  </div>
+
+  <div class="callout">
+    <h4>What the model says, and what would break it</h4>
+    <p id="outNarrative"></p>
+    <p>The projection assumes baiting rules, season dates and supplemental-licence availability hold. Those are
+    the levers that would move a unit far more than any trend line: if a unit gains or loses bait permission,
+    the five-season evidence above suggests its success rate moves by roughly a factor of two, which swamps
+    everything this model estimates. Treat the high-confidence rows as the useful output and the low-confidence
+    rows as noise.</p>
+  </div>
+</div></section>
+
+<section id="method"><div class="wrap">
+  <div class="sec-head">
+    <h2>Method, limits and integrity</h2>
+  </div>
+  <div class="two-col">
+    <div class="prose">
+      <h3>Derived figures</h3>
+      <p><code>hunters ≈ harvest ÷ (success% ÷ 100)</code>. Group success is harvest-weighted — total harvest
+      over total estimated hunters — rather than a mean of unit percentages, so a unit with two bears at 100%
+      cannot distort a group.</p>
+      <h3>Baiting classification</h3>
+      <p>Taken from the 2026 regulations, which permit baiting in WMUs 322, 330–338, 348, 358–360, 500–506,
+      509, 510, 512–520, 522, 523, 529–536 and 539–544, and in <em>portions</em> of 320, 324, 357, 507, 521,
+      526 and 528. The partial group is those seven. Baiting is further restricted near dwellings, parks and
+      industrial sites, and is limited to the open season plus the preceding two weeks — none of which this
+      classification captures.</p>
+    </div>
+    <div class="prose">
+      <h3>Limits</h3>
+      <ul class="tight">
+        <li><strong>This is observational.</strong> Units were not randomly assigned to baiting. The
+        partial-unit gradient strengthens the case considerably but does not make it an experiment.</li>
+        <li><strong>Baiting status is current, harvest is historical.</strong> Classification comes from the
+        2026 regulations applied to 2021–2025 seasons. If a unit's baiting status changed in that window, it is
+        misclassified here.</li>
+        <li><strong>Spring and fall are pooled.</strong> Alberta runs two bear seasons a year and the reports
+        do not separate them, so seasonal effects are invisible.</li>
+        <li><strong>Success rates are survey estimates.</strong> Several small units report rates of 100% on
+        two animals. They are shown as published but should not be ranked.</li>
+        <li><strong>Supplemental licences are not modelled.</strong> A second bear licence is available across
+        much of the province, so "hunters" derived from success rate understates participation there.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="chart-block">
+    <div class="chart-title">Data integrity check</div>
+    <div class="chart-note">Each season's unit rows are summed and compared against the "estimated total" line
+    printed in the source report, live in the browser.</div>
+    <div class="tbl-scroll"><table class="data" id="intTable"></table></div>
+    <p id="intNote" style="font-size:13px;color:var(--ink-3);line-height:1.65;margin:12px 0 0"></p>
+  </div>
+</div></section>
+
+<footer><div class="wrap">
+  <p style="color:var(--ink-2)">Built as a data-analysis exercise on public wildlife records. Season dates,
+  baiting rules and licence classes change annually — verify against the current regulations before
+  hunting.</p>
+  <p style="margin-top:14px;color:var(--ink-3)"><strong style="color:var(--ink-2)">Sources</strong></p>
+  <ul class="src-list">
+    <li><a href="https://open.alberta.ca/publications/hunter-harvest-report-black-bear-estimated-resident-harvest-for-black-bear">Hunter harvest report: black bear</a>, 2021–2025, Alberta Forestry and Parks</li>
+    <li><a href="https://albertaregulations.ca/huntingregs/bear-cougar-seasons.html">2026 Alberta Guide to Hunting Regulations</a> — bear seasons, baiting permissions and restrictions</li>
+  </ul>
+  <p style="margin-top:20px;font-size:12px;color:var(--ink-3)">Charts rendered with Chart.js. No analytics,
+  no cookies, no tracking.</p>
+  <p style="margin-top:26px;padding-top:20px;border-top:1px solid var(--line);text-align:center;
+    font-size:14px;color:var(--ink-2)">
+    Built by <a href="index.html">Nitin Wadhwani</a> in Calgary, Alberta · © <span id="yr"></span> ·
+    <a href="alberta-harvest-analysis.html">elk, deer &amp; moose analysis</a>
+  </p>
+</div></footer>
+
+<script>
+document.getElementById("yr").textContent=new Date().getFullYear();
+/* ============================================================
+   DATA — black bear harvest by WMU, 2021-2025
+   [WMU, male, female, young, total, successPct]
+   ============================================================ */
+const P=s=>s.trim().split(";").map(r=>r.trim()).filter(Boolean).map(r=>{
+  const a=r.split(",").map(x=>x.trim());
+  return [a[0],+a[1],+a[2],+a[3],+a[4],+a[5]]});
+
+const B25=P(`200,0,0,0,0,0;202,0,0,0,0,0;203,0,0,0,0,0;204,0,0,0,0,0;206,0,0,0,0,0;208,0,0,0,0,0;
+212,5,0,0,5,12;214,2,0,0,2,4;216,0,0,0,0,0;220,0,0,0,0,0;221,0,0,0,0,0;222,0,0,0,0,0;224,0,0,0,0,0;
+226,0,0,0,0,0;228,0,2,0,2,100;230,0,0,0,0,0;232,0,0,0,0,0;234,0,0,0,0,0;236,0,0,0,0,0;238,0,0,0,0,0;
+240,0,0,0,0,0;242,0,0,0,0,0;244,0,0,0,0,0;246,0,0,0,0,0;250,2,0,0,2,8;252,2,0,0,2,11;254,2,0,0,2,9;
+256,5,2,0,7,27;258,19,0,0,19,33;260,5,5,0,9,33;300,7,2,0,9,10;302,5,0,0,5,4;303,5,2,0,7,13;
+304,9,23,0,32,8;305,16,7,0,23,5;306,0,5,0,5,5;308,9,5,0,14,5;310,0,0,0,0,0;312,0,2,0,2,2;
+314,0,0,0,0,0;316,0,0,0,0,0;318,9,5,0,14,9;320,8,0,0,8,9;322,0,0,0,0,0;324,21,7,0,28,22;
+326,7,0,0,7,6;328,41,2,0,43,19;330,29,10,0,39,14;332,2,0,0,2,3;334,6,0,0,6,21;336,5,0,0,5,7;
+337,10,11,0,21,20;338,20,5,0,25,14;339,5,2,0,7,6;340,7,2,0,9,10;342,2,2,0,5,10;344,7,2,0,9,8;
+346,36,16,0,52,20;347,27,11,0,38,23;348,29,5,0,34,21;349,80,21,0,102,22;350,28,7,0,35,14;
+351,12,2,0,14,19;352,3,2,0,6,6;353,65,16,0,81,27;354,53,8,0,61,27;355,5,0,0,5,9;356,67,17,0,84,25;
+357,42,9,0,51,16;358,51,15,0,66,23;359,82,17,0,99,41;360,22,14,0,36,34;400,11,2,0,14,4;
+402,7,0,0,7,2;404,0,0,0,0,0;406,2,0,0,2,2;408,0,0,0,0,0;410,0,0,0,0,0;412,2,0,0,2,3;414,5,2,0,7,13;
+416,0,0,0,0,0;417,0,0,0,0,0;418,2,0,0,2,20;420,2,0,0,2,8;422,0,0,0,0,0;426,0,0,0,0,0;428,0,0,0,0,0;
+429,7,2,0,9,12;430,5,0,0,5,25;432,0,0,0,0,0;434,5,0,0,5,22;436,0,0,0,0,0;437,2,0,0,2,17;
+438,5,2,0,7,23;439,0,0,0,0,0;440,2,0,0,2,5;441,5,0,0,5,20;442,0,0,0,0,0;444,2,0,0,2,7;
+445,0,0,0,0,0;446,0,0,0,0,0;500,39,9,0,49,39;501,9,0,0,9,24;502,33,10,0,43,47;503,18,5,0,23,20;
+504,26,6,0,31,43;505,8,5,0,12,28;506,22,7,0,29,38;507,18,9,0,27,21;508,0,2,0,2,11;509,18,7,0,25,25;
+510,31,11,0,42,23;511,37,7,0,44,33;512,59,10,0,69,31;514,54,5,0,59,36;515,38,10,0,48,42;
+516,5,2,0,7,26;517,16,7,0,22,40;518,35,5,0,39,36;519,54,10,0,64,28;520,30,9,0,39,38;
+521,55,12,0,67,26;522,80,18,0,99,28;523,28,8,0,36,29;524,34,2,0,37,36;525,8,0,0,8,15;
+526,53,20,0,73,26;527,52,14,0,66,39;528,8,0,0,8,35;529,5,2,0,7,15;530,20,0,0,20,21;
+531,8,2,0,10,34;532,0,0,0,0,0;534,0,0,0,0,0;535,7,2,0,9,20;536,17,3,0,20,40;537,9,0,0,9,25;
+539,7,0,0,7,28;540,7,0,0,7,33;541,16,10,0,26,41;542,8,7,0,15,26;544,9,3,0,12,23;841,0,0,0,0,0`);
+
+const B24=P(`200,0,0,0,0,0;202,0,0,0,0,0;203,0,0,0,0,0;204,0,0,0,0,0;206,0,0,0,0,0;208,0,0,0,0,0;
+212,2,0,0,2,5;214,0,0,0,0,0;216,0,0,0,0,0;220,0,0,0,0,0;221,0,0,0,0,0;222,0,0,0,0,0;224,0,0,0,0,0;
+226,0,0,0,0,0;228,0,0,0,0,0;230,0,0,0,0,0;232,0,0,0,0,0;234,2,0,0,2,33;236,0,0,0,0,0;238,0,0,0,0,0;
+240,0,0,0,0,0;242,0,0,0,0,0;244,0,0,0,0,0;246,0,0,0,0,0;250,2,2,0,4,13;252,2,0,0,2,13;254,7,0,0,7,21;
+256,0,5,0,5,20;258,7,0,0,7,15;260,5,0,0,5,14;300,5,2,0,7,9;302,12,2,0,14,12;303,2,0,0,2,5;
+304,9,14,0,23,6;305,14,9,0,23,6;306,0,9,0,9,11;308,9,0,0,9,3;310,0,0,0,0,0;312,2,0,0,2,2;
+314,0,2,0,2,2;316,9,0,0,9,7;318,12,0,0,12,8;320,2,0,0,2,3;322,0,0,0,0,0;324,5,6,0,11,11;
+326,7,0,0,7,7;328,9,12,0,21,9;330,22,21,0,43,15;332,2,0,0,2,3;334,5,0,0,5,13;336,2,5,0,7,21;
+337,18,3,0,21,14;338,38,10,0,48,25;339,0,0,0,0,0;340,10,0,0,10,9;342,7,2,0,9,13;344,21,5,0,26,17;
+346,32,10,0,42,15;347,25,5,0,30,25;348,22,7,0,29,20;349,76,15,0,91,22;350,39,12,0,51,25;
+351,14,2,0,16,18;352,10,2,0,12,15;353,40,9,0,49,15;354,27,0,0,27,16;355,5,2,0,7,11;356,74,7,0,81,26;
+357,32,9,0,41,14;358,33,9,0,42,18;359,61,15,0,76,31;360,32,0,0,32,22;400,7,5,0,12,3;
+402,16,7,0,23,7;404,2,2,0,4,5;406,5,2,0,7,4;408,0,0,0,0,0;410,0,0,0,0,0;412,2,0,0,2,3;
+414,7,5,0,12,22;416,0,0,0,0,0;417,0,0,0,0,0;418,0,0,0,0,0;420,2,0,0,2,8;422,0,0,0,0,0;
+426,0,0,0,0,0;428,0,0,0,0,0;429,12,0,0,12,16;430,0,0,0,0,0;432,0,0,0,0,0;434,0,0,0,0,0;
+436,2,0,0,2,33;437,0,0,0,0,0;438,7,5,0,12,29;439,2,0,0,2,17;440,2,0,0,2,17;441,5,0,0,5,15;
+442,2,0,0,2,33;444,5,0,0,5,33;445,0,0,0,0,0;446,2,0,0,2,8;500,20,8,0,28,27;501,13,0,0,13,31;
+502,13,2,0,15,24;503,10,5,0,15,17;504,35,10,0,45,42;505,8,6,0,14,39;506,16,0,0,16,22;
+507,13,11,0,24,20;508,2,0,0,2,9;509,35,0,0,35,28;510,37,8,0,45,22;511,17,0,0,17,14;
+512,50,9,0,59,29;514,42,9,0,51,32;515,31,2,0,33,24;516,2,5,0,7,18;517,5,2,0,7,13;518,29,0,0,29,26;
+519,38,5,0,43,30;520,16,2,0,18,31;521,72,20,0,92,36;522,50,20,0,70,26;523,40,10,0,50,37;
+524,23,0,0,23,22;525,0,2,0,2,4;526,34,42,0,76,27;527,46,6,0,52,35;528,16,0,0,16,38;529,8,0,0,8,25;
+530,17,7,0,24,33;531,8,5,0,13,27;532,7,3,0,10,60;534,7,0,0,7,75;535,12,0,0,12,22;536,27,0,0,27,70;
+537,17,0,0,17,45;539,0,0,0,0,0;540,8,0,0,8,63;541,16,0,0,16,36;542,24,2,0,26,50;544,12,0,0,12,23;
+841,2,3,0,5,100`);
+
+const B23=P(`200,0,0,0,0,0;202,0,0,0,0,0;203,0,0,0,0,0;204,0,0,0,0,0;206,0,0,0,0,0;208,2,0,0,2,25;
+212,5,0,0,5,11;214,0,0,0,0,0;216,0,0,0,0,0;220,0,0,0,0,0;221,0,0,0,0,0;222,0,0,0,0,0;224,0,2,0,2,17;
+226,0,0,0,0,0;228,0,0,0,0,0;230,0,0,0,0,0;232,0,0,0,0,0;234,0,0,0,0,0;236,0,0,0,0,0;238,2,0,0,2,33;
+240,2,0,0,2,100;242,2,0,0,2,100;244,0,0,0,0,0;246,0,0,0,0,0;250,5,0,0,5,20;252,0,0,0,0,0;
+254,5,2,0,7,20;256,0,0,0,0,0;258,7,5,0,12,26;260,5,2,0,7,24;300,0,0,0,0,0;302,2,0,0,2,2;
+303,2,0,0,2,5;304,52,9,0,61,16;305,26,9,0,35,9;306,2,0,0,2,3;308,12,7,0,19,6;310,2,0,0,2,5;
+312,2,2,0,4,4;314,0,0,0,0,0;316,2,0,0,2,3;318,0,0,0,0,0;320,0,2,0,2,5;322,0,0,0,0,0;
+324,13,0,0,13,16;326,12,2,0,14,12;328,20,9,0,29,15;330,51,21,0,72,26;332,6,2,0,8,9;334,0,0,0,0,0;
+336,6,0,0,6,15;337,30,9,0,39,27;338,21,15,0,36,27;339,12,2,0,14,13;340,11,2,0,13,12;342,7,0,0,7,11;
+344,13,2,0,15,9;346,54,22,0,76,23;347,22,2,0,24,29;348,12,2,0,14,10;349,73,14,0,87,22;
+350,43,13,0,56,23;351,7,5,0,12,17;352,2,2,0,4,8;353,47,21,0,68,22;354,33,5,0,38,23;355,0,0,0,0,0;
+356,55,15,0,70,21;357,54,12,0,66,19;358,48,14,0,62,20;359,57,29,0,86,29;360,16,5,0,21,21;
+400,14,0,0,14,5;402,9,5,0,14,5;404,0,0,0,0,0;406,7,5,0,12,6;408,0,5,0,5,20;410,2,0,0,2,8;
+412,5,5,0,10,9;414,2,2,0,4,15;416,2,0,0,2,10;417,0,2,0,2,11;418,0,0,0,0,0;420,12,0,0,12,19;
+422,0,0,0,0,0;426,0,0,0,0,0;428,5,2,0,7,75;429,5,2,0,7,14;430,0,0,0,0,0;432,0,0,0,0,0;
+434,2,2,0,4,18;436,0,0,0,0,0;437,5,0,0,5,22;438,5,2,0,7,12;439,0,0,0,0,0;440,5,0,0,5,20;
+441,2,0,0,2,11;442,0,0,0,0,0;444,5,5,0,10,57;445,0,2,0,2,14;446,0,2,0,2,9;500,36,15,0,51,40;
+501,7,0,0,7,43;502,13,5,0,18,23;503,26,12,0,38,37;504,41,11,0,52,41;505,7,0,0,7,43;
+506,24,7,0,31,38;507,25,2,0,27,27;508,2,0,0,2,13;509,18,12,0,30,32;510,48,19,0,67,32;
+511,39,29,0,68,33;512,29,34,0,63,28;514,32,11,0,43,29;515,16,5,0,21,19;516,0,8,0,8,17;
+517,12,0,0,12,20;518,27,3,0,30,26;519,34,2,0,36,25;520,20,8,0,28,30;521,30,18,0,48,21;
+522,55,26,0,81,24;523,21,0,0,21,19;524,14,0,0,14,15;525,2,0,0,2,7;526,46,12,0,58,25;
+527,34,9,0,43,30;528,8,2,0,10,29;529,7,0,0,7,20;530,32,8,0,40,41;531,2,0,0,2,13;532,2,0,0,2,50;
+534,0,2,0,2,13;535,14,3,0,17,30;536,21,0,0,21,49;537,2,0,0,2,10;539,5,3,0,8,41;540,0,0,0,0,0;
+541,5,0,0,5,21;542,7,5,0,12,32;544,9,8,0,17,35;841,0,0,0,0,0`);
+
+const B22=P(`200,0,0,0,0,0;202,0,0,0,0,0;203,2,0,0,2,33;204,0,0,0,0,0;206,0,0,0,0,0;208,0,0,0,0,0;
+212,5,2,0,7,18;214,0,0,0,0,0;216,0,0,0,0,0;220,0,0,0,0,0;221,0,0,0,0,0;222,2,0,0,2,33;
+224,0,0,0,0,0;226,0,0,0,0,0;228,0,0,0,0,0;230,0,0,0,0,0;232,0,0,0,0,0;234,0,0,0,0,0;236,0,0,0,0,0;
+238,2,0,0,2,50;240,2,0,0,2,50;242,0,0,0,0,0;244,0,0,0,0,0;246,0,0,0,0,0;250,0,0,0,0,0;
+252,2,0,0,2,100;254,2,0,0,2,17;256,2,0,0,2,9;258,11,0,0,11,25;260,0,2,0,2,8;300,7,2,0,9,14;
+302,5,0,0,5,4;303,0,0,0,0,0;304,27,23,0,50,14;305,16,5,0,21,6;306,0,0,0,0,0;308,25,14,0,39,13;
+310,0,5,0,5,8;312,5,0,0,5,6;314,5,2,0,7,9;316,0,0,0,0,0;318,7,0,0,7,6;320,0,0,0,0,0;
+322,0,0,0,0,0;324,19,5,0,24,26;326,12,2,0,15,17;328,30,5,0,34,19;330,36,16,0,52,21;332,5,0,0,5,10;
+334,0,0,0,0,0;336,5,0,0,5,12;337,17,7,0,24,16;338,22,7,0,29,14;339,16,2,0,18,12;340,11,3,0,15,18;
+342,5,2,0,7,13;344,16,7,0,22,15;346,35,12,0,48,14;347,26,19,0,46,32;348,14,8,0,21,18;
+349,105,24,0,129,27;350,36,14,0,50,18;351,16,7,0,22,39;352,5,0,0,5,6;353,52,10,0,62,17;
+354,16,10,0,26,14;355,2,0,0,2,4;356,42,27,0,70,19;357,25,11,0,37,12;358,28,9,0,37,15;
+359,71,22,0,94,32;360,23,5,0,27,24;400,25,11,0,37,9;402,16,7,0,23,7;404,2,2,0,5,4;
+406,11,5,0,16,8;408,5,0,0,5,14;410,0,0,0,0,0;412,2,2,0,5,7;414,0,0,0,0,0;416,0,0,0,0,0;
+417,0,0,0,0,0;418,0,0,0,0,0;420,14,2,0,16,39;422,0,0,0,0,0;426,0,0,0,0,0;428,2,0,0,2,33;
+429,12,5,0,17,25;430,0,0,0,0,0;432,0,0,0,0,0;434,0,0,0,0,0;436,0,0,0,0,0;437,0,2,0,2,13;
+438,5,2,0,7,17;439,0,2,0,2,17;440,0,2,0,2,7;441,7,0,0,7,30;442,0,0,0,0,0;444,0,2,0,2,25;
+445,0,0,0,0,0;446,5,0,0,5,67;500,30,8,0,38,41;501,7,2,0,9,32;502,17,5,0,22,30;503,26,7,0,32,28;
+504,23,12,0,35,39;505,11,0,0,11,36;506,16,5,0,21,30;507,14,5,0,19,25;508,3,0,0,3,13;
+509,25,0,0,25,23;510,34,8,0,42,20;511,35,0,0,35,27;512,52,5,0,57,28;514,38,12,0,50,32;
+515,26,5,0,31,35;516,5,5,0,9,21;517,15,0,0,15,29;518,37,7,0,44,32;519,31,9,0,40,25;
+520,25,2,0,27,32;521,39,8,0,47,22;522,33,15,0,48,20;523,41,5,0,45,33;524,26,2,0,28,20;
+525,11,0,0,11,19;526,57,31,0,87,30;527,36,11,0,48,30;528,5,0,0,5,14;529,2,0,0,2,8;
+530,56,14,0,70,43;531,8,0,0,8,14;532,12,3,0,16,63;534,2,0,0,2,11;535,2,0,0,2,7;536,24,2,0,26,52;
+537,8,0,0,8,36;539,0,0,0,0,0;540,5,0,0,5,27;541,20,8,0,27,53;542,21,7,0,28,53;544,19,0,0,19,46;
+841,2,0,0,2,25`);
+
+const B21=P(`212,5,0,0,5,13;214,3,0,0,3,14;216,3,0,0,3,14;224,6,0,0,6,43;228,3,0,0,3,100;
+232,3,0,0,3,20;236,8,0,0,8,38;250,3,0,0,3,8;254,0,3,0,3,8;258,14,8,0,22,32;260,9,3,0,12,36;
+300,5,0,0,5,6;302,13,0,0,13,11;303,8,0,0,8,14;304,26,16,0,42,12;305,18,3,0,21,5;306,5,0,0,5,7;
+308,18,21,0,39,12;310,0,0,0,0,0;312,5,3,0,8,8;314,5,3,0,8,9;316,3,0,0,3,3;318,3,3,0,5,4;
+320,0,5,0,5,6;322,0,0,0,0,0;324,22,5,0,27,20;326,5,0,0,5,4;328,36,8,0,44,19;330,41,11,0,52,15;
+332,3,3,0,6,11;334,0,3,0,3,11;336,3,0,0,3,7;337,35,14,0,48,28;338,68,16,0,83,34;339,19,3,0,22,16;
+340,13,16,0,29,26;342,10,3,0,13,21;344,36,5,0,41,27;346,80,8,0,88,26;347,43,25,0,68,45;
+348,32,10,0,42,22;349,129,52,0,181,32;350,61,5,0,66,24;351,23,3,0,26,29;352,8,0,0,8,10;
+353,100,40,0,141,28;354,14,14,0,27,16;355,0,3,0,3,5;356,102,60,0,162,38;357,37,16,0,53,19;
+358,52,16,0,67,28;359,100,14,0,113,38;360,27,25,0,52,34;400,21,16,0,36,10;402,21,3,0,23,8;
+404,5,5,0,10,7;406,13,3,0,16,7;408,5,5,0,10,25;410,3,0,0,3,8;412,0,0,0,0,0;414,0,0,0,0,0;
+416,5,3,0,8,16;417,3,0,0,3,11;418,0,0,0,0,0;420,0,0,0,0,0;422,0,0,0,0,0;426,0,0,0,0,0;
+428,3,0,0,3,50;429,6,0,0,6,14;430,0,0,0,0,0;432,3,0,0,3,100;434,3,3,0,5,20;436,0,0,0,0,0;
+437,3,0,0,3,17;438,5,0,0,5,10;439,0,0,0,0,0;440,0,0,0,0,0;441,5,0,0,5,33;442,0,0,0,0,0;
+444,3,3,0,5,33;445,0,0,0,0,0;446,3,0,0,3,11;500,78,16,0,93,46;501,13,0,0,13,31;502,22,0,0,22,27;
+503,25,8,0,33,33;504,38,9,0,46,33;505,26,3,0,29,47;506,32,0,0,32,36;507,16,0,0,16,19;
+508,6,3,0,9,29;509,48,3,0,50,31;510,43,3,0,46,19;511,19,5,0,24,15;512,90,18,0,108,40;
+514,97,32,0,129,52;515,34,10,0,45,34;516,11,3,0,14,40;517,45,21,0,66,67;518,40,9,0,50,47;
+519,45,3,0,48,38;520,32,0,0,32,36;521,65,23,0,88,35;522,85,33,0,118,37;523,61,14,0,76,54;
+524,48,9,0,57,38;525,18,5,0,23,29;526,71,11,0,82,31;527,46,20,0,65,32;528,25,0,0,25,37;
+529,16,0,0,16,53;530,65,13,0,78,57;531,33,3,0,36,38;532,6,0,0,6,31;534,8,0,0,8,32;
+535,19,3,0,22,41;536,33,3,0,36,57;537,10,3,0,14,19;539,11,0,0,11,65;540,0,6,0,6,43;
+541,55,18,0,72,66;542,27,14,0,41,52;544,32,6,0,37,41;841,0,0,0,0,0`);
+
+const DATA={2025:B25,2024:B24,2023:B23,2022:B22,2021:B21};
+const YEARS=[2025,2024,2023,2022,2021];
+const PUB={2025:[1919,510,0,2431],2024:[1729,443,0,2172],2023:[1721,585,0,2306],
+           2022:[1822,536,0,2360],2021:[2861,809,0,3670]};
+
+/* baiting classification, 2026 regulations */
+const BAIT_FULL=new Set(["322","330","332","334","336","337","338","348","358","359","360",
+ "500","501","502","503","504","505","506","509","510","512","514","515","516","517","518","519","520",
+ "522","523","529","530","531","532","534","535","536","539","540","541","542","544"]);
+const BAIT_PART=new Set(["320","324","357","507","521","526","528"]);
+const baitOf=w=>BAIT_FULL.has(w)?"y":BAIT_PART.has(w)?"p":"n";
+const BAIT_LABEL={y:"permitted",p:"partial",n:"prohibited"};
+
+/* ============================================================
+   MODEL
+   ============================================================ */
+const C={bear:getComputedStyle(document.documentElement).getPropertyValue('--bear').trim()||"#e0904a",
+  bait:"#5fae7c",part:"#d8a52c",nobait:"#e0655c",grey:"#9aa4b2",cougar:"#7d92f0"};
+const BAIT_COL={y:C.bait,p:C.part,n:C.nobait};
+const ink=()=>getComputedStyle(document.documentElement).getPropertyValue("--ink-3").trim()||"#9aa4b2";
+const grid=()=>"rgba(255,255,255,.10)";
+const fmt=n=>n==null?"—":n.toLocaleString();
+const regionOf=w=>(w.length===3&&["2","3","4","5"].includes(w[0]))?w[0]:"other";
+const REGNAME={"2":"Parkland","3":"Foothills","4":"Mountain","5":"Boreal",other:"Other"};
+const hunters=(t,s)=>s>0?Math.round(t/(s/100)):null;
+
+function buildModel(y){
+  const rows=DATA[y].map(r=>({wmu:r[0],male:r[1],female:r[2],young:r[3],total:r[4],succ:r[5],
+    bait:baitOf(r[0]),region:regionOf(r[0]),regionName:REGNAME[regionOf(r[0])],
+    hunters:hunters(r[4],r[5]),
+    femaleShare:r[4]>0?Math.round(r[2]/r[4]*1000)/10:null}));
+  const by={}; rows.forEach(r=>by[r.wmu]=r);
+  return {rows,by};
+}
+const M={}; YEARS.forEach(y=>M[y]=buildModel(y));
+
+/* harvest-weighted success for a group */
+function groupSucc(rows){
+  const t=rows.reduce((a,r)=>a+r.total,0);
+  const h=rows.reduce((a,r)=>a+(r.succ>0?r.total/(r.succ/100):0),0);
+  return h?Math.round(t/h*1000)/10:0;
+}
+const BAIT_SERIES=YEARS.slice().reverse().map(y=>{
+  const rows=M[y].rows.filter(r=>r.total>0);
+  const g=k=>{const s=rows.filter(r=>r.bait===k);
+    return {units:s.length,harvest:s.reduce((a,r)=>a+r.total,0),succ:groupSucc(s),
+      female:s.reduce((a,r)=>a+r.female,0),male:s.reduce((a,r)=>a+r.male,0)}};
+  return {year:y,y:g("y"),p:g("p"),n:g("n")};
+});
+
+const statTile=(lab,val,sub,cls)=>`<div class="stat${cls?" "+cls:""}"><div class="lab">${lab}</div>
+  <div class="val">${val}</div><div class="sub">${sub||""}</div></div>`;
+const baseOpts=(xt,yt,extra)=>Object.assign({responsive:true,maintainAspectRatio:false,
+  plugins:{legend:{display:false}},
+  scales:{x:{title:{display:!!xt,text:xt,color:ink()},grid:{color:grid()},ticks:{color:ink()}},
+    y:{title:{display:!!yt,text:yt,color:ink()},grid:{color:grid()},ticks:{color:ink()}}}},extra||{});
+
+/* ============================================================
+   BAITING SECTION
+   ============================================================ */
+(function(){
+  const last=BAIT_SERIES[BAIT_SERIES.length-1];
+  const ratios=BAIT_SERIES.map(s=>s.y.succ/s.n.succ);
+  document.getElementById("baitStats").innerHTML=
+    statTile("Success where baiting is legal",last.y.succ+"%","2025, harvest-weighted","hero-stat")+
+    statTile("Where it is prohibited",last.n.succ+"%","2025, harvest-weighted")+
+    statTile("Ratio",(last.y.succ/last.n.succ).toFixed(2)+"×","baiting vs prohibited")+
+    statTile("Ratio range, 5 seasons",Math.min(...ratios).toFixed(2)+"–"+Math.max(...ratios).toFixed(2)+"×",
+      "never inverts")+
+    statTile("Partial units in between","5 of 5","seasons, no exceptions");
+
+  new Chart(document.getElementById("chBait"),{type:"line",
+    data:{labels:BAIT_SERIES.map(s=>s.year),datasets:[
+      {label:"Baiting permitted",data:BAIT_SERIES.map(s=>s.y.succ),borderColor:C.bait,
+        backgroundColor:C.bait,borderWidth:3,tension:.2,pointRadius:5},
+      {label:"Partial",data:BAIT_SERIES.map(s=>s.p.succ),borderColor:C.part,
+        backgroundColor:C.part,borderWidth:2.5,borderDash:[6,4],tension:.2,pointRadius:5},
+      {label:"Prohibited",data:BAIT_SERIES.map(s=>s.n.succ),borderColor:C.nobait,
+        backgroundColor:C.nobait,borderWidth:3,tension:.2,pointRadius:5}]},
+    options:baseOpts("Season","Hunter success (%)",{
+      plugins:{legend:{display:false},tooltip:{callbacks:{
+        label:c=>c.dataset.label+": "+c.parsed.y+"%"}}},
+      scales:{x:{grid:{display:false},ticks:{color:ink()}},
+        y:{beginAtZero:true,max:45,grid:{color:grid()},
+          title:{display:true,text:"Hunter success (%)",color:ink()},
+          ticks:{color:ink(),callback:v=>v+"%"}}}})});
+
+  document.getElementById("baitTable").innerHTML=
+    `<thead><tr><th style="text-align:left">Season</th>
+      <th>Units, bait</th><th>Harvest</th><th>Success</th>
+      <th>Units, partial</th><th>Harvest</th><th>Success</th>
+      <th>Units, no bait</th><th>Harvest</th><th>Success</th>
+      <th>Ratio</th></tr></thead><tbody>`+
+    BAIT_SERIES.map(s=>`<tr><td>${s.year}</td>
+      <td>${s.y.units}</td><td>${fmt(s.y.harvest)}</td>
+      <td style="color:${C.bait};font-weight:600">${s.y.succ}%</td>
+      <td>${s.p.units}</td><td>${fmt(s.p.harvest)}</td>
+      <td style="color:${C.part};font-weight:600">${s.p.succ}%</td>
+      <td>${s.n.units}</td><td>${fmt(s.n.harvest)}</td>
+      <td style="color:${C.nobait};font-weight:600">${s.n.succ}%</td>
+      <td><strong>${(s.y.succ/s.n.succ).toFixed(2)}×</strong></td></tr>`).join("")+"</tbody>";
+})();
+
+/* ============================================================
+   BAITING TILE MAP — which units allow bait
+   ============================================================ */
+(function(){
+  const groups=[["y","Baiting permitted"],["p","Permitted in part of the unit"],["n","Baiting prohibited"]];
+  const TW=46,TH=30,GX=4,GY=4,PER=14,PAD=18;
+  let y=0,html="";
+  groups.forEach(([k,name])=>{
+    const set=M[2025].rows.filter(r=>r.bait===k&&r.total>0).sort((a,b)=>+a.wmu-+b.wmu);
+    if(!set.length)return;
+    html+=`<text x="0" y="${y+12}" font-size="12.5" font-weight="600" fill="currentColor">${name} — ${
+      set.length} units</text>`;
+    y+=22;
+    set.forEach((r,i)=>{
+      const col=i%PER,row=Math.floor(i/PER);
+      const x=col*(TW+GX), ty=y+row*(TH+GY);
+      html+=`<g class="btile" data-wmu="${r.wmu}" style="cursor:pointer">
+        <rect x="${x}" y="${ty}" width="${TW}" height="${TH}" rx="4" fill="${BAIT_COL[k]}"
+          stroke="rgba(255,255,255,.16)" stroke-width="1"/>
+        <text x="${x+TW/2}" y="${ty+TH/2+4}" font-size="11.5" text-anchor="middle"
+          fill="#0d1017" font-weight="600" style="pointer-events:none">${r.wmu}</text></g>`;
+    });
+    y+=Math.ceil(set.length/PER)*(TH+GY)+PAD;
+  });
+  const W=PER*(TW+GX);
+  document.getElementById("baitMap").innerHTML=
+    `<svg viewBox="0 0 ${W} ${y}" width="100%" style="max-width:${W}px;color:var(--ink)"
+      xmlns="http://www.w3.org/2000/svg" role="img"
+      aria-label="Alberta wildlife management units grouped by whether bear baiting is permitted">${html}</svg>`;
+  document.querySelectorAll("#baitMap .btile").forEach(el=>{
+    el.addEventListener("mouseenter",()=>{
+      const r=M[2025].by[el.dataset.wmu];
+      document.getElementById("baitMapTip").innerHTML=
+        `<strong>WMU ${r.wmu}</strong> · ${r.regionName} · baiting ${BAIT_LABEL[r.bait]} — 2025: `+
+        `${r.total} bears at ${r.succ}% success (${r.male} male, ${r.female} female, `+
+        `~${fmt(r.hunters)} hunters)`;
+    });
+    el.addEventListener("click",()=>{
+      document.getElementById("fSearch").value=el.dataset.wmu;
+      sortKey=null; render(); showUnit(el.dataset.wmu);
+    });
+  });
+})();
+
+/* ============================================================
+   COMPOSITION + TREND
+   ============================================================ */
+(function(){
+  const ys=YEARS.slice().reverse();
+  new Chart(document.getElementById("chSex"),{type:"bar",
+    data:{labels:ys,datasets:[
+      {label:"Male",data:ys.map(y=>PUB[y][0]),backgroundColor:C.bear,borderRadius:4,maxBarThickness:44},
+      {label:"Female",data:ys.map(y=>PUB[y][1]),backgroundColor:C.cougar,borderRadius:4,maxBarThickness:44},
+      {label:"Young",data:ys.map(y=>PUB[y][2]),backgroundColor:C.grey,borderRadius:4,maxBarThickness:44}]},
+    options:baseOpts("Season","Bears",{
+      plugins:{legend:{display:true,labels:{color:ink(),usePointStyle:true,boxWidth:8}},
+        tooltip:{callbacks:{afterBody:c=>{const y=ys[c[0].dataIndex];const p=PUB[y];
+          return "male share "+(p[0]/p[3]*100).toFixed(1)+"%"}}}},
+      scales:{x:{stacked:true,grid:{display:false},ticks:{color:ink()}},
+        y:{stacked:true,beginAtZero:true,grid:{color:grid()},ticks:{color:ink()}}}})});
+
+  const maxY=ys.reduce((a,y)=>PUB[y][3]>PUB[a][3]?y:a,ys[0]);
+  const others=ys.filter(y=>y!==maxY).map(y=>PUB[y][3]);
+  const avgOther=Math.round(others.reduce((a,b)=>a+b,0)/others.length);
+  document.getElementById("trendStats").innerHTML=
+    statTile("Bears, 5 seasons",fmt(ys.reduce((a,y)=>a+PUB[y][3],0)),"2021–2025")+
+    statTile("Peak season",maxY,fmt(PUB[maxY][3])+" bears")+
+    statTile("Peak vs the rest","+"+Math.round((PUB[maxY][3]/avgOther-1)*100)+"%",
+      "against the "+others.length+"-season average")+
+    statTile("Male share range",
+      Math.min(...ys.map(y=>+(PUB[y][0]/PUB[y][3]*100).toFixed(1)))+"–"+
+      Math.max(...ys.map(y=>+(PUB[y][0]/PUB[y][3]*100).toFixed(1)))+"%","remarkably stable")+
+    statTile("Cubs taken","0","five seasons, every unit");
+
+  new Chart(document.getElementById("chTrend"),{type:"bar",
+    data:{labels:ys,datasets:[{data:ys.map(y=>PUB[y][3]),
+      backgroundColor:ys.map(y=>y===maxY?C.part:C.bear),borderRadius:4,maxBarThickness:56}]},
+    options:baseOpts("Season","Total harvest",{
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>fmt(c.parsed.y)+" bears"}}},
+      scales:{x:{grid:{display:false},ticks:{color:ink()}},
+        y:{beginAtZero:true,grid:{color:grid()},ticks:{color:ink()}}}})});
+
+  const regs=["2","3","4","5"];
+  const agg=regs.map(d=>{const s=M[2025].rows.filter(r=>r.region===d);
+    return {name:REGNAME[d],units:s.length,harvest:s.reduce((a,r)=>a+r.total,0),succ:groupSucc(s)}});
+  new Chart(document.getElementById("chRegion"),{type:"bar",
+    data:{labels:agg.map(a=>a.name+" ("+a.units+" units)"),datasets:[
+      {label:"Harvest",data:agg.map(a=>a.harvest),backgroundColor:C.bear,borderRadius:4,
+        maxBarThickness:34,yAxisID:"y"},
+      {label:"Success %",data:agg.map(a=>a.succ),backgroundColor:C.bait,borderRadius:4,
+        maxBarThickness:34,yAxisID:"y1"}]},
+    options:baseOpts("","",{
+      plugins:{legend:{display:true,labels:{color:ink(),usePointStyle:true,boxWidth:8}}},
+      scales:{x:{grid:{display:false},ticks:{color:ink()}},
+        y:{beginAtZero:true,position:"left",grid:{color:grid()},
+          title:{display:true,text:"Bears harvested",color:ink()},ticks:{color:ink()}},
+        y1:{beginAtZero:true,position:"right",grid:{display:false},max:40,
+          title:{display:true,text:"Success (%)",color:ink()},
+          ticks:{color:ink(),callback:v=>v+"%"}}}})});
+})();
+
+/* ============================================================
+   2026 OUTLOOK — recency-weighted trend with volatility shrinkage
+   ============================================================ */
+const OUT_YEARS=[2021,2022,2023,2024,2025];
+const OUT_W=[1,2,3,4,5], OUT_WSUM=15;
+function project(){
+  const rows=[];
+  M[2025].rows.forEach(base=>{
+    const w=base.wmu;
+    const series=OUT_YEARS.map(y=>{const r=M[y].by[w];return r?{t:r.total,s:r.succ}:null});
+    if(series.some(v=>v===null))return;            /* need all five seasons */
+    const t=series.map(v=>v.t), s=series.map(v=>v.s);
+    if(t.reduce((a,b)=>a+b,0)===0)return;
+    const baseT=t.reduce((a,v,i)=>a+v*OUT_W[i],0)/OUT_WSUM;
+    const baseS=s.reduce((a,v,i)=>a+v*OUT_W[i],0)/OUT_WSUM;
+    const mx=2, my=t.reduce((a,b)=>a+b,0)/5;       /* x = 0..4, mean 2 */
+    let num=0,den=0;
+    t.forEach((v,i)=>{num+=(i-mx)*(v-my);den+=(i-mx)**2});
+    const slope=den?num/den:0;
+    const mean=my||1;
+    let d=0; for(let i=1;i<t.length;i++)d+=Math.abs(t[i]-t[i-1]);
+    const vol=Math.min(2,(d/(t.length-1))/mean);
+    const wTrend=Math.max(0,Math.min(1,1-vol));
+    const proj=Math.max(0,Math.round(wTrend*(baseT+slope)+(1-wTrend)*t[4]));
+    const band=Math.round(proj*vol/2);
+    const conf=(t[4]>=25&&vol<0.35)?"high":(t[4]>=8&&vol<0.7)?"medium":"low";
+    rows.push({wmu:w,bait:base.bait,region:base.regionName,
+      t2021:t[0],t2022:t[1],t2023:t[2],t2024:t[3],t2025:t[4],
+      slope:Math.round(slope),proj,band,projS:Math.round(baseS),
+      vol:Math.round(vol*100),conf});
+  });
+  return rows;
+}
+const OUTROWS=project();
+const CONFCOL={high:C.bait,medium:C.part,low:C.grey};
+let oBait="all",oConf="all",oRank="proj",outChart=null;
+function renderOutlook(){
+  ["segOBait|ob|oBait","segOConf|oc|oConf","segORank|or|oRank"].forEach(spec=>{
+    const [id,attr]=spec.split("|");
+    const val={segOBait:oBait,segOConf:oConf,segORank:oRank}[id];
+    document.querySelectorAll("#"+id+" button").forEach(b=>
+      b.classList.toggle("on",b.dataset[attr]===val));
+  });
+  let rows=OUTROWS.slice();
+  if(oBait!=="all")rows=rows.filter(r=>r.bait===oBait);
+  if(oConf==="high")rows=rows.filter(r=>r.conf==="high");
+  if(oConf==="nolow")rows=rows.filter(r=>r.conf!=="low");
+  rows.sort((a,b)=>oRank==="proj"?b.proj-a.proj:b.projS-a.projS);
+
+  const hi=rows.filter(r=>r.conf==="high");
+  const rising=rows.filter(r=>r.slope>0).length;
+  const bestVol=rows.filter(r=>r.t2025>=25).sort((a,b)=>b.projS-a.projS)[0];
+  const totProj=rows.reduce((a,r)=>a+r.proj,0);
+  const tot2025=rows.reduce((a,r)=>a+r.t2025,0);
+  document.getElementById("outStats").innerHTML=
+    statTile("Units modelled",rows.length,"five full seasons each")+
+    statTile("High confidence",hi.length,"stable and substantial")+
+    statTile("Trending up",rising,"positive five-season slope")+
+    statTile("Best projected odds",bestVol?"WMU "+bestVol.wmu:"—",
+      bestVol?bestVol.projS+"% success · "+fmt(bestVol.proj)+" bears":"","hero-stat")+
+    statTile("Selection total",fmt(totProj),
+      tot2025?((totProj-tot2025)/tot2025*100>=0?"▲ ":"▼ ")+
+        Math.abs(Math.round((totProj-tot2025)/tot2025*100))+"% vs 2025":"");
+
+  document.getElementById("outTitle").textContent=
+    "Projected 2026 "+(oRank==="proj"?"harvest":"success")+" — top "+Math.min(20,rows.length)+" units";
+  const top=rows.slice(0,20);
+  if(outChart)outChart.destroy();
+  outChart=new Chart(document.getElementById("chOut"),{type:"bar",
+    data:{labels:top.map(r=>r.wmu),datasets:[
+      {label:"Actual 2025",data:top.map(r=>r.t2025),backgroundColor:"transparent",
+        borderColor:ink(),borderWidth:1.5,borderSkipped:false,borderRadius:3,maxBarThickness:11},
+      {label:"Projected 2026",data:top.map(r=>r.proj),
+        backgroundColor:top.map(r=>CONFCOL[r.conf]),borderRadius:3,maxBarThickness:11}]},
+    options:baseOpts("Bears","",{indexAxis:"y",
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>{const r=top[c.dataIndex];
+        return c.datasetIndex===1
+          ?["Projected 2026: "+fmt(r.proj)+"  (range "+fmt(Math.max(0,r.proj-r.band))+"–"+
+            fmt(r.proj+r.band)+")",
+            "actual: "+[r.t2021,r.t2022,r.t2023,r.t2024,r.t2025].join(" → "),
+            "baiting "+BAIT_LABEL[r.bait]+" · confidence "+r.conf+" · volatility "+r.vol+"%"]
+          :"Actual 2025: "+fmt(r.t2025)}}}},
+      onClick:(e,els)=>{if(els.length)showUnit(top[els[0].index].wmu)},
+      scales:{x:{beginAtZero:true,grid:{color:grid()},ticks:{color:ink()},
+        title:{display:true,text:"Bears",color:ink()}},
+        y:{grid:{display:false},ticks:{color:ink(),font:{size:10},autoSkip:false}}}})});
+
+  document.getElementById("outTable").innerHTML=
+    `<thead><tr><th style="text-align:left">WMU</th><th style="text-align:left">Baiting</th>
+      <th>2021</th><th>2022</th><th>2023</th><th>2024</th><th>2025</th><th>Slope</th>
+      <th>Projected 2026</th><th>Range</th><th>Proj. success</th><th>Volatility</th>
+      <th>Confidence</th></tr></thead><tbody>`+
+    rows.map(r=>`<tr><td>${r.wmu}</td>
+      <td style="text-align:left"><span class="pill ${r.bait==="y"?"bait":r.bait==="p"?"part":"no"}">${
+        BAIT_LABEL[r.bait]}</span></td>
+      <td>${fmt(r.t2021)}</td><td>${fmt(r.t2022)}</td><td>${fmt(r.t2023)}</td>
+      <td>${fmt(r.t2024)}</td><td>${fmt(r.t2025)}</td>
+      <td style="color:${r.slope>0?C.bait:r.slope<0?C.nobait:"var(--ink-3)"}">${
+        r.slope>0?"+":""}${r.slope}</td>
+      <td><strong>${fmt(r.proj)}</strong></td>
+      <td style="color:var(--ink-3)">${fmt(Math.max(0,r.proj-r.band))}–${fmt(r.proj+r.band)}</td>
+      <td>${r.projS}%</td><td>${r.vol}%</td>
+      <td><span class="pill ${r.conf==="high"?"bait":r.conf==="medium"?"part":"no"}">${r.conf}</span></td>
+      </tr>`).join("")+"</tbody>";
+
+  /* narrative built from the actual model output */
+  const all=OUTROWS.slice().sort((a,b)=>b.proj-a.proj);
+  const topAll=all[0];
+  const bestOdds=OUTROWS.filter(r=>r.t2025>=25).sort((a,b)=>b.projS-a.projS)[0];
+  const hiBait=OUTROWS.filter(r=>r.conf==="high"&&r.bait==="y").length;
+  const hiAll=OUTROWS.filter(r=>r.conf==="high").length;
+  document.getElementById("outNarrative").innerHTML=
+    `On projected volume the model puts <strong>WMU ${topAll.wmu}</strong> first at ${fmt(topAll.proj)} bears, `+
+    `and on projected success <strong>WMU ${bestOdds.wmu}</strong> leads among units of a workable size at `+
+    `${bestOdds.projS}%. Of the ${hiAll} units the model rates high-confidence, `+
+    `<strong>${hiBait}</strong> permit baiting — which is the baiting result reappearing from a different `+
+    `direction: the units stable enough to forecast are disproportionately the ones where hunters can use bait.`;
+}
+document.getElementById("segOBait").addEventListener("click",e=>{
+  const b=e.target.closest("button"); if(!b)return; oBait=b.dataset.ob; renderOutlook()});
+document.getElementById("segOConf").addEventListener("click",e=>{
+  const b=e.target.closest("button"); if(!b)return; oConf=b.dataset.oc; renderOutlook()});
+document.getElementById("segORank").addEventListener("click",e=>{
+  const b=e.target.closest("button"); if(!b)return; oRank=b.dataset.or; renderOutlook()});
+
+/* ============================================================
+   INTEGRITY
+   ============================================================ */
+(function(){
+  let rows="",bad=[];
+  YEARS.forEach(y=>{
+    const a=DATA[y],p=PUB[y];
+    const s=a.reduce((x,r)=>({m:x.m+r[1],f:x.f+r[2],y:x.y+r[3],t:x.t+r[4]}),{m:0,f:0,y:0,t:0});
+    const d=s.t-p[3], ok=d===0;
+    if(!ok)bad.push(y);
+    rows+=`<tr><td>${y}</td><td>${a.length}</td><td>${fmt(s.m)}</td><td>${fmt(s.f)}</td>
+      <td>${s.y}</td><td>${fmt(s.t)}</td><td>${fmt(p[3])}</td>
+      <td><span class="pill ${ok?"bait":"part"}">${ok?"exact match":(d>0?"+":"")+d}</span></td></tr>`;
+  });
+  document.getElementById("intTable").innerHTML=
+    `<thead><tr><th style="text-align:left">Season</th><th>Unit rows</th><th>Σ male</th><th>Σ female</th>
+      <th>Σ young</th><th>Σ total</th><th>Published</th><th>Check</th></tr></thead><tbody>${rows}</tbody>`;
+  document.getElementById("intNote").innerHTML=
+    `<strong style="color:var(--ink-2)">${YEARS.length} datasets verified.</strong> `+
+    (bad.length===0?"All row sums reconcile exactly to the published totals.":
+     `${bad.join(", ")} differs by a small margin. The 2021 report rounds unit values to multiples of three
+      and several of its own rows do not sum internally — for example WMU 318 lists 3 males and 3 females
+      against a total of 5. The gap is source rounding rather than transcription, and it is reported rather
+      than adjusted. Every other season reconciles exactly.`);
+})();
+
+/* ============================================================
+   DASHBOARD
+   ============================================================ */
+const el=id=>document.getElementById(id);
+let stYear=2025,stBait="all",stSex="total",stRegion="all",sortKey=null,sortDir=-1,openUnit=null;
+let topChart=null,scChart=null,compChart=null,unitChart=null;
+el("segYear").innerHTML=YEARS.map(y=>`<button data-year="${y}"${y===2025?' class="on"':""}>${y}</button>`).join("");
+
+const SEXFIELD={total:"total",male:"male",female:"female"};
+function currentSet(){
+  let s=M[stYear].rows.slice();
+  if(stBait!=="all")s=s.filter(r=>r.bait===stBait);
+  if(stRegion!=="all")s=s.filter(r=>r.region===stRegion);
+  s=s.map(r=>Object.assign({},r,{metric:r[SEXFIELD[stSex]]}));
+  const minH=+el("fH").value,minS=+el("fS").value;
+  s=s.filter(r=>r.metric>0&&r.metric>=minH&&r.succ>=minS);
+  const q=el("fSearch").value.trim();
+  if(q)s=s.filter(r=>r.wmu.includes(q));
+  const key={metric:"metric",succ:"succ",hunters:"hunters",femaleShare:"femaleShare",wmu:"wmu"}[el("fSort").value];
+  s.sort((a,b)=>key==="wmu"?(+a.wmu)-(+b.wmu):((b[key]==null?-1:b[key])-(a[key]==null?-1:a[key])));
+  if(sortKey){s.sort((a,b)=>{const x=a[sortKey],y=b[sortKey];
+    if(x==null&&y==null)return 0; if(x==null)return 1; if(y==null)return -1;
+    if(typeof x==="string")return sortDir===-1?y.localeCompare(x):x.localeCompare(y);
+    return sortDir===-1?y-x:x-y})}
+  return s;
+}
+function render(){
+  el("segYear").querySelectorAll("button").forEach(b=>b.classList.toggle("on",+b.dataset.year===stYear));
+  el("segBait").querySelectorAll("button").forEach(b=>b.classList.toggle("on",b.dataset.bait===stBait));
+  el("segSex").querySelectorAll("button").forEach(b=>b.classList.toggle("on",b.dataset.sex===stSex));
+  el("segRegion").querySelectorAll("button").forEach(b=>b.classList.toggle("on",b.dataset.region===stRegion));
+  el("lblH").textContent=el("fH").value; el("lblS").textContent=el("fS").value+"%";
+  const set=currentSet();
+  const tot=set.reduce((a,r)=>a+r.metric,0);
+  const hun=set.reduce((a,r)=>a+(r.hunters||0),0);
+  const male=set.reduce((a,r)=>a+r.male,0), fem=set.reduce((a,r)=>a+r.female,0);
+  const chips=[`<span class="fchip"><b>${stYear}</b> season</span>`,
+    `<span class="fchip">${stBait==="all"?"all baiting statuses":BAIT_LABEL[stBait]}</span>`,
+    `<span class="fchip">${stSex}</span>`];
+  if(stRegion!=="all")chips.push(`<span class="fchip">${REGNAME[stRegion]}</span>`);
+  if(+el("fH").value)chips.push(`<span class="fchip">≥ <b>${el("fH").value}</b> bears</span>`);
+  if(+el("fS").value)chips.push(`<span class="fchip">≥ <b>${el("fS").value}%</b></span>`);
+  if(el("fSearch").value.trim())chips.push(`<span class="fchip">“${el("fSearch").value.trim()}”</span>`);
+  el("chips").innerHTML=chips.join("");
+  el("dashStats").innerHTML=
+    statTile("Units matching",set.length,stYear+" season")+
+    statTile("Bears in selection",fmt(tot),stSex+" harvest")+
+    statTile("Est. hunters",fmt(hun),"derived from success")+
+    statTile("Group success",hun?(tot/hun*100).toFixed(1)+"%":"—","harvest-weighted")+
+    statTile("Female share",(male+fem)?(fem/(male+fem)*100).toFixed(1)+"%":"—","of the selection");
+  el("empty").hidden=set.length>0;
+  el("empty").innerHTML=set.length?"":"No units match these filters.<br>"+
+    '<span style="font-size:13px">Lower the sliders or clear the search.</span>';
+
+  /* table */
+  const cols=[["wmu","WMU"],["regionName","Region"],["bait","Baiting"],["total","Total"],
+    ["male","Male"],["female","Female"],["femaleShare","Female %"],["succ","Success"],
+    ["hunters","Est. hunters"]];
+  el("thead").innerHTML=cols.map(([k,l])=>`<th data-k="${k}"${k===sortKey?` data-dir="${sortDir}"`:""}>${l}</th>`).join("")
+    +`<th style="cursor:default" title="Total harvest 2021 to 2025">2021–25</th>`;
+  el("thead").querySelectorAll("th[data-k]").forEach(th=>th.addEventListener("click",()=>{
+    const k=th.dataset.k; sortDir=(sortKey===k&&sortDir===-1)?1:-1; sortKey=k; render()}));
+  const CAP=80, shown=set.slice(0,CAP);
+  el("tbl").querySelector("tbody").innerHTML=shown.map(r=>`<tr data-wmu="${r.wmu}">
+    <td>${r.wmu}</td><td style="text-align:left;color:var(--ink-3)">${r.regionName}</td>
+    <td><span class="pill ${r.bait==="y"?"bait":r.bait==="p"?"part":"no"}">${BAIT_LABEL[r.bait]}</span></td>
+    <td>${fmt(r.total)}</td><td>${fmt(r.male)}</td><td>${fmt(r.female)}</td>
+    <td>${r.femaleShare==null?"—":r.femaleShare+"%"}</td><td>${r.succ}%</td>
+    <td>${fmt(r.hunters)}</td><td style="padding:2px 8px">${spark(r.wmu)}</td></tr>`).join("");
+  el("tbl").querySelectorAll("tbody tr").forEach(tr=>
+    tr.addEventListener("click",()=>showUnit(tr.dataset.wmu)));
+  el("tblCount").textContent=(shown.length<set.length?`showing ${shown.length} of ${set.length} units`
+    :`${set.length} units`)+" · "+stYear;
+
+  /* charts */
+  const top=set.slice().sort((a,b)=>b.metric-a.metric).slice(0,22);
+  el("topTitle").textContent="Top "+top.length+" units — "+stSex+" harvest, "+stYear;
+  if(topChart)topChart.destroy();
+  topChart=new Chart(el("chTop"),{type:"bar",
+    data:{labels:top.map(r=>r.wmu),datasets:[{data:top.map(r=>r.metric),
+      backgroundColor:top.map(r=>BAIT_COL[r.bait]),borderRadius:3,maxBarThickness:16}]},
+    options:baseOpts("Bears","",{indexAxis:"y",
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>{const r=top[c.dataIndex];
+        return [r.total+" bears · "+r.succ+"% success",
+          "baiting "+BAIT_LABEL[r.bait]+" · "+r.regionName,
+          "M"+r.male+" / F"+r.female]}}}},
+      onClick:(e,els)=>{if(els.length)showUnit(top[els[0].index].wmu)},
+      scales:{x:{beginAtZero:true,grid:{color:grid()},ticks:{color:ink()}},
+        y:{grid:{display:false},ticks:{color:ink(),font:{size:10},autoSkip:false}}}})});
+
+  const sc=set.filter(r=>r.succ>0);
+  if(scChart)scChart.destroy();
+  scChart=new Chart(el("chScatter"),{type:"bubble",
+    data:{datasets:["y","p","n"].map(k=>({label:BAIT_LABEL[k],
+      data:sc.filter(r=>r.bait===k).map(r=>({x:r.total,y:r.succ,
+        r:Math.max(3,Math.sqrt(r.hunters||1)/3),w:r.wmu})),
+      backgroundColor:BAIT_COL[k]+"99",borderColor:BAIT_COL[k],borderWidth:1}))},
+    options:baseOpts("Bears harvested","Success (%)",{
+      plugins:{legend:{display:false},tooltip:{callbacks:{
+        label:c=>"WMU "+c.raw.w+" · "+c.raw.x+" bears · "+c.raw.y+"%"}}},
+      scales:{x:{beginAtZero:true,grid:{color:grid()},ticks:{color:ink()},
+        title:{display:true,text:"Bears harvested",color:ink()}},
+        y:{beginAtZero:true,grid:{color:grid()},ticks:{color:ink(),callback:v=>v+"%"},
+        title:{display:true,text:"Success (%)",color:ink()}}}})});
+
+  if(compChart)compChart.destroy();
+  compChart=new Chart(el("chComp"),{type:"bar",
+    data:{labels:["Selection"],datasets:[
+      {label:"Male",data:[male],backgroundColor:C.bear,borderRadius:3,maxBarThickness:60},
+      {label:"Female",data:[fem],backgroundColor:C.cougar,borderRadius:3,maxBarThickness:60}]},
+    options:baseOpts("","Bears",{indexAxis:"y",
+      plugins:{legend:{display:true,labels:{color:ink(),usePointStyle:true,boxWidth:8}}},
+      scales:{x:{stacked:true,beginAtZero:true,grid:{color:grid()},ticks:{color:ink()}},
+        y:{stacked:true,grid:{display:false},ticks:{color:ink()}}}})});
+
+  if(openUnit)showUnit(openUnit,true);
+}
+/* sparkline: five-season total for a unit */
+function spark(wmu){
+  const ys=YEARS.slice().reverse();
+  const v=ys.map(y=>{const r=M[y].by[wmu];return r?r.total:null});
+  const nums=v.filter(x=>x!=null);
+  if(!nums.length||nums.every(x=>x===0))return "";
+  const mx=Math.max(...nums),mn=Math.min(...nums),span=(mx-mn)||1;
+  const W=56,H=18,pad=2;
+  const pts=v.map((x,i)=>x==null?null:[pad+i*((W-2*pad)/(ys.length-1)),
+    H-pad-((x-mn)/span)*(H-2*pad)]).filter(Boolean);
+  const col=nums[nums.length-1]>nums[0]*1.05?C.bait:nums[nums.length-1]<nums[0]*0.95?C.nobait:C.grey;
+  const d=pts.map((p,i)=>(i?"L":"M")+p[0].toFixed(1)+" "+p[1].toFixed(1)).join(" ");
+  const e=pts[pts.length-1];
+  return `<svg width="${W}" height="${H}" aria-hidden="true" style="vertical-align:middle">
+    <path d="${d}" fill="none" stroke="${col}" stroke-width="1.6" stroke-linejoin="round"/>
+    <circle cx="${e[0].toFixed(1)}" cy="${e[1].toFixed(1)}" r="2.1" fill="${col}"/></svg>`;
+}
+function showUnit(wmu,keep){
+  openUnit=wmu;
+  const ys=YEARS.slice().reverse();
+  const any=M[2025].by[wmu]||M[stYear].by[wmu];
+  const p=el("unitPanel"); p.hidden=false;
+  p.innerHTML=`<button class="close" onclick="closeUnit()">close ✕</button>
+    <h3>WMU ${wmu}</h3>
+    <p style="font-size:13px;color:var(--ink-3);margin:0 0 14px">${any?any.regionName:""} ·
+    baiting <strong style="color:${BAIT_COL[baitOf(wmu)]}">${BAIT_LABEL[baitOf(wmu)]}</strong></p>
+    <div class="tbl-scroll" style="margin-bottom:14px"><table class="data"><thead><tr>
+      <th style="text-align:left">Season</th><th>Total</th><th>Male</th><th>Female</th>
+      <th>Female %</th><th>Success</th><th>Est. hunters</th></tr></thead><tbody>`+
+    ys.map(y=>{const r=M[y].by[wmu];
+      return r?`<tr><td>${y}</td><td>${fmt(r.total)}</td><td>${fmt(r.male)}</td><td>${fmt(r.female)}</td>
+        <td>${r.femaleShare==null?"—":r.femaleShare+"%"}</td><td>${r.succ}%</td>
+        <td>${fmt(r.hunters)}</td></tr>`
+        :`<tr><td>${y}</td><td colspan="6" style="text-align:left;color:var(--ink-3)">not listed</td></tr>`
+    }).join("")+`</tbody></table></div>
+    <div class="chart-box" style="height:250px;padding:12px"><canvas id="chUnit"></canvas></div>`;
+  if(unitChart)unitChart.destroy();
+  unitChart=new Chart(el("chUnit"),{type:"line",
+    data:{labels:ys,datasets:[
+      {label:"Total",data:ys.map(y=>{const r=M[y].by[wmu];return r?r.total:null}),
+        borderColor:C.bear,backgroundColor:C.bear,borderWidth:2.5,tension:.25,pointRadius:5,spanGaps:true},
+      {label:"Success %",data:ys.map(y=>{const r=M[y].by[wmu];return r?r.succ:null}),
+        borderColor:C.bait,backgroundColor:C.bait,borderWidth:2,borderDash:[5,4],tension:.25,
+        pointRadius:4,spanGaps:true,yAxisID:"y1"}]},
+    options:baseOpts("Season","Bears",{
+      plugins:{legend:{display:true,labels:{color:ink(),usePointStyle:true,boxWidth:8}}},
+      scales:{x:{grid:{display:false},ticks:{color:ink()}},
+        y:{beginAtZero:true,position:"left",grid:{color:grid()},ticks:{color:ink()},
+          title:{display:true,text:"Bears",color:ink()}},
+        y1:{beginAtZero:true,position:"right",grid:{display:false},ticks:{color:ink(),callback:v=>v+"%"},
+          title:{display:true,text:"Success",color:ink()}}}})});
+  if(!keep)p.scrollIntoView({behavior:"smooth",block:"nearest"});
+}
+function closeUnit(){openUnit=null;const p=el("unitPanel");p.hidden=true;p.innerHTML="";
+  if(unitChart){unitChart.destroy();unitChart=null}}
+
+const seg=(id,attr,fn)=>el(id).addEventListener("click",e=>{
+  const b=e.target.closest("button"); if(!b)return; fn(b.dataset[attr]); sortKey=null; render()});
+seg("segYear","year",v=>stYear=+v);
+seg("segBait","bait",v=>stBait=v);
+seg("segSex","sex",v=>stSex=v);
+seg("segRegion","region",v=>stRegion=v);
+["fSearch","fH","fS","fSort"].forEach(id=>el(id).addEventListener("input",()=>{sortKey=null;render()}));
+el("btnReset").addEventListener("click",()=>{stYear=2025;stBait="all";stSex="total";stRegion="all";
+  el("fSearch").value="";el("fH").value=0;el("fS").value=0;el("fSort").value="metric";
+  sortKey=null;closeUnit();render()});
+el("btnCsv").addEventListener("click",()=>{
+  const set=currentSet();
+  const head=["WMU","Region","Baiting","Total","Male","Female","Female %","Success %","Est hunters"];
+  const esc=v=>{const s=v==null?"":String(v);return /[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s};
+  const lines=[head.join(",")].concat(set.map(r=>[r.wmu,r.regionName,BAIT_LABEL[r.bait],r.total,
+    r.male,r.female,r.femaleShare,r.succ,r.hunters].map(esc).join(",")));
+  const blob=new Blob(["﻿"+lines.join("\r\n")],{type:"text/csv;charset=utf-8"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);
+  a.download="alberta-black-bear-"+stYear+"-"+stBait+"-"+stSex+".csv";
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+  const b=el("btnCsv");const t=b.textContent;b.textContent=set.length+" rows saved";
+  setTimeout(()=>b.textContent=t,1600);
+});
+function stateHash(){
+  const p=new URLSearchParams({y:stYear,b:stBait,x:stSex,r:stRegion});
+  if(el("fSearch").value.trim())p.set("q",el("fSearch").value.trim());
+  if(+el("fH").value)p.set("mh",el("fH").value);
+  if(+el("fS").value)p.set("ms",el("fS").value);
+  if(el("fSort").value!=="metric")p.set("s",el("fSort").value);
+  if(openUnit)p.set("u",openUnit);
+  return "#dashboard?"+p.toString();
+}
+el("btnLink").addEventListener("click",()=>{
+  const url=location.origin+location.pathname+stateHash();
+  const done=ok=>{const b=el("btnLink");const t=b.textContent;
+    b.textContent=ok?"link copied":"copy failed";setTimeout(()=>b.textContent=t,1600)};
+  if(navigator.clipboard&&window.isSecureContext)
+    navigator.clipboard.writeText(url).then(()=>done(true),()=>done(false));
+  else{const ta=document.createElement("textarea");ta.value=url;document.body.appendChild(ta);ta.select();
+    let ok=false;try{ok=document.execCommand("copy")}catch(e){}document.body.removeChild(ta);done(ok)}
+  history.replaceState(null,"",stateHash());
+});
+renderOutlook();
+(function restore(){
+  const h=location.hash,i=h.indexOf("?"); if(i<0){render();return}
+  const p=new URLSearchParams(h.slice(i+1));
+  const y=+p.get("y"); if(y&&M[y])stYear=y;
+  if(p.get("b"))stBait=p.get("b");
+  if(p.get("x")&&SEXFIELD[p.get("x")])stSex=p.get("x");
+  if(p.get("r"))stRegion=p.get("r");
+  el("fSearch").value=p.get("q")||"";
+  el("fH").value=p.get("mh")||0; el("fS").value=p.get("ms")||0;
+  el("fSort").value=p.get("s")||"metric";
+  if(p.get("u"))openUnit=p.get("u");
+  render();
+  if(openUnit)showUnit(openUnit);
+})();
+</script>
+</body>
+</html>
