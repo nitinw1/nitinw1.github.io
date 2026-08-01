@@ -65,6 +65,9 @@ nav .brand span{color:var(--ink-3);font-weight:400}
   flex-direction:column;gap:1px;box-shadow:0 14px 40px rgba(0,0,0,.4);z-index:60}
 .navmenu>.menu a{padding:8px 11px;border-radius:7px;font-size:13px;color:var(--ink-2)}
 .navmenu>.menu a:hover{background:var(--surface-2);color:var(--ink)}
+/* Keep dropdowns on-screen: the rightmost opens leftward, and no menu exceeds the viewport. */
+.navmenu:last-of-type>.menu{left:auto;right:0}
+.navmenu>.menu{max-width:calc(100vw - 20px)}
 nav>.wrap>.navlinks>a{font-size:13px;padding:6px 10px;border-radius:8px}
 nav>.wrap>.navlinks>a:hover{background:var(--surface-2)}
 nav a{font-size:13px;color:var(--ink-2);white-space:nowrap}
