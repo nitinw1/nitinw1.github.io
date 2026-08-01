@@ -271,6 +271,7 @@ table.data tbody tr{cursor:pointer}
       <a href="#regs">Regulations</a>
       <a href="#method">Method &amp; metrics</a>
       <a href="#limits">Limitations</a>
+      <a href="#integrity">Data integrity check</a>
     </div></details>
   </div>
   <a href="#dashboard" class="cta">Dashboard</a>
@@ -305,18 +306,19 @@ table.data tbody tr{cursor:pointer}
 
   <div class="cards">
     <div class="card">
-      <span class="badge elk">Sex selection</span>
-      <h3>A 22-point bias gap</h3>
-      <p style="font-size:14px;color:var(--ink-2);margin:0">Whitetail harvest is 69% male; elk harvest is
-      47% male. The difference is not biology — it is tag policy. Cow elk are pushed into the harvest by
-      draw allocation, while antlerless deer tags go unfilled even where they are unrestricted.</p>
+      <span class="badge elk">Ten-season finding</span>
+      <h3>Buck harvest is a constant; doe harvest is a dial</h3>
+      <p style="font-size:14px;color:var(--ink-2);margin:0">Male deer harvest sat between 22,000 and 30,000
+      every year for a decade with no trend. Meanwhile the antlerless share swung from 37% to 57% and back to
+      31%. Total harvest fell 40% from its 2023 peak almost entirely through that one lever.</p>
     </div>
     <div class="card">
       <span class="badge deer">Distribution</span>
-      <h3>The two species barely overlap</h3>
-      <p style="font-size:14px;color:var(--ink-2);margin:0">Across units with both species present, harvest
-      totals correlate weakly. WMU 350 produced 1,284 deer and 4 elk. WMU 522 produced 760 elk and 270 deer.
-      Very few units are genuinely productive for both.</p>
+      <h3>Elk and deer barely overlap</h3>
+      <p style="font-size:14px;color:var(--ink-2);margin:0">Across units holding both, harvest totals
+      correlate weakly. WMU 350 produced 1,284 deer and 4 elk. WMU 522 produced 760 elk and 270 deer. Very few
+      units are genuinely productive for both, so a unit's reputation for one species says little about the
+      other.</p>
     </div>
     <div class="card">
       <span class="badge gold">Pressure</span>
@@ -333,11 +335,11 @@ table.data tbody tr{cursor:pointer}
       dominate opportunity length.</p>
     </div>
     <div class="card">
-      <span class="badge elk">Antlerless gap</span>
-      <h3>Does are the unclaimed resource</h3>
-      <p style="font-size:14px;color:var(--ink-2);margin:0">In many foothills units, antlered deer outnumber
-      antlerless in the harvest by more than three to one despite both being available on a general licence.
-      This is the same surplus that drives agricultural crop damage complaints.</p>
+      <span class="badge ok">Same decline, opposite cause</span>
+      <h3>Moose is the control case</h3>
+      <p style="font-size:14px;color:var(--ink-2);margin:0">Moose harvest fell 33% from its 2020 peak — but
+      with both sexes down about 31% and a flat antlerless share all decade. Deer and elk fell because
+      antlerless tags were cut; moose fell across the board. Sex composition is what tells the two apart.</p>
     </div>
     <div class="card">
       <span class="badge deer">Outliers</span>
@@ -357,19 +359,14 @@ table.data tbody tr{cursor:pointer}
   <div class="two-col">
     <div class="prose">
       <h3>Source structure</h3>
-      <p>Each report gives, per Wildlife Management Unit (WMU): male, female and young harvest counts, a
-      total, and an estimated hunter success percentage. Totals are survey estimates, so rows do not always
-      sum exactly and small counts carry wide error bars.</p>
-      <p>Some rows describe <em>licence groupings</em> rather than single units — for example
-      <code>124/128/142/144/148/150</code> — where one special licence is valid across several WMUs. These
-      rows are retained for provincial totals but excluded from per-unit joins and correlations, since they
-      cannot be attributed to a single geography.</p>
+      <p>Each report gives, per Wildlife Management Unit: male, female and young counts, a total, and an
+      estimated hunter success percentage. These are survey estimates, so small counts carry wide error bars.</p>
+      <p>Some rows are <em>licence groupings</em> rather than single units — <code>124/128/142/144/148/150</code>,
+      for example, where one special licence spans several WMUs. They count toward provincial totals but are
+      excluded from per-unit joins, since they cannot be attributed to one geography.</p>
       <h3>Derived: estimated hunter count</h3>
-      <p>Success rate is defined as the share of hunters who harvested an animal. Inverting it gives an
-      approximate participant count:</p>
       <p><code>hunters ≈ harvest ÷ (success% ÷ 100)</code></p>
-      <p>This is a first-order estimate. It slightly understates participation wherever hunters take more
-      than one animal on a single licence — for example multi-tag antlerless deer licences.</p>
+      <p>A first-order estimate that understates participation wherever one licence carries multiple tags.</p>
     </div>
     <div class="prose">
       <h3>Derived: species tilt</h3>
@@ -377,45 +374,30 @@ table.data tbody tr{cursor:pointer}
       above 50% indicate an elk-dominant unit; below 50%, deer-dominant. Computed only for units where both
       species recorded harvest.</p>
       <h3>What "antlerless" counts</h3>
-      <p>The dashboard's antlerless class sums <strong>adult females plus young of either sex</strong>, not
-      females alone. That follows how Alberta defines the term: an antlerless licence authorises any animal
-      without antlers of legal length, so a male calf or a spike-less yearling bull is an antlerless animal.
-      Because the harvest reports publish male, female and young as three separate columns, and the young
-      column is not split by sex, female-plus-young is the closest available match to what an antlerless tag
-      actually permits. If you want females on their own, use the Female class — the two differ by about
-      6% for elk and 2% for deer province-wide.</p>
+      <p>Adult females <strong>plus young of either sex</strong>, not females alone. Alberta's antlerless
+      licence authorises any animal without antlers of legal length, so a male calf qualifies. Since the young
+      column is not split by sex, female-plus-young is the closest match to what the tag permits. Use the
+      Female class for females alone.</p>
       <h3>Derived: sex ratio</h3>
-      <p>Males harvested per 100 females, <code>(male ÷ female) × 100</code>. This is a <em>harvest</em>
-      ratio, not a population ratio — it reflects tag policy and hunter choice at least as much as herd
-      composition. Units with zero females recorded are excluded as undefined.</p>
+      <p>Males per 100 females, <code>(male ÷ female) × 100</code>. A <em>harvest</em> ratio, not a population
+      ratio — it reflects tag policy as much as herd composition. Units with zero females are undefined and
+      excluded.</p>
       <h3>Statistics</h3>
-      <p>Correlations are Pearson product-moment coefficients computed over units with non-zero harvest in
-      both species. Medians and quartiles are computed over units with harvest above a stated floor, to keep
-      near-zero units from dominating the distribution. All computation happens in the browser from the
-      embedded dataset — figures below are calculated live, not transcribed.</p>
+      <p>Correlations are Pearson coefficients over units with non-zero harvest in both species. Medians use a
+      stated harvest floor so near-empty units do not dominate. Everything is computed live in the browser
+      from the embedded data.</p>
     </div>
   </div>
   <div class="callout deer">
-    <h4>Data coverage and how seasons are added</h4>
-    <p>The dashboard is built on a season registry covering all nine combinations of three species — elk,
-    white-tailed deer and moose — and three seasons: 2023, 2024 and 2025, roughly 210,000 harvested animals.
-    The ten-season trend section uses a separate, longer series of provincial totals for 2016–2025, about
-    650,000 animals; those older reports were parsed for totals only, not per unit. Every report uses the
-    identical row shape
-    (<code>WMU, male, female, young, total, success%</code>), so a season is added by dropping one array into
-    its slot; the season selector, table columns, charts and summary tiles all rebuild themselves from
-    whatever is present, and the dashboard states which species and seasons are loaded rather than failing
-    silently. The narrative analysis outside the seasons section is pinned to 2025 throughout, so
-    single-season figures quoted in prose are always the most recent year.</p>
-  </div>
-
-  <div class="chart-block">
-    <div class="chart-title">Data integrity check</div>
-    <div class="chart-note">Every dataset on this page was transcribed from a published PDF, so each one is
-    verified in the browser at load time: the sum of all unit rows is compared against the
-    "estimated total" line printed in the source report. This table is generated live — if a figure were
-    mistyped, it would show up here rather than sitting silently in a chart.</div>
-    <div class="tbl-scroll"><table class="data" id="integrityTable"></table></div>
+    <h4>Data coverage</h4>
+    <p><strong>Per unit:</strong> three species × three seasons (2023–2025), ~210,000 animals. Drives the
+    dashboard, maps and every per-WMU figure. <strong>Provincial totals:</strong> three species × ten seasons
+    (2016–2025), ~650,000 animals. Drives the trend section only — the older reports were parsed for totals,
+    not per unit.</p>
+    <p>Every report shares one row shape (<code>WMU, male, female, young, total, success%</code>), so adding a
+    season means dropping in one array; the controls, columns and charts rebuild from whatever is loaded. Prose
+    figures outside the trends section are 2025. All nine datasets are reconciled against their published
+    totals in the <a href="#integrity">data integrity check</a>.</p>
   </div>
 
   <div class="callout gold">
@@ -430,15 +412,16 @@ table.data tbody tr{cursor:pointer}
 <section id="province"><div class="wrap">
   <div class="sec-head">
     <h2>Province-wide picture</h2>
-    <p>Two species, two entirely different harvest structures.</p>
+    <p>Three species, three entirely different harvest structures — and the sex composition is what separates
+    them.</p>
   </div>
 
   <div class="stats" id="provStats"></div>
 
   <div class="chart-block">
     <div class="chart-title">Harvest composition by sex</div>
-    <div class="chart-note">Share of total provincial harvest. Elk is close to an even split; deer is
-    strongly antlered-biased.</div>
+    <div class="chart-note">Share of total 2025 provincial harvest. Elk sits close to an even split, deer is
+    strongly antlered-biased, and moose sits between the two.</div>
     <div class="legend">
       <span class="k"><span class="sw" style="background:var(--deer)"></span>Male</span>
       <span class="k"><span class="sw" style="background:var(--elk)"></span>Female</span>
@@ -448,13 +431,18 @@ table.data tbody tr{cursor:pointer}
   </div>
 
   <div class="prose">
-    <p>The composition gap is the single most informative feature of these two datasets. Elk harvest arrives
-    at a near-even sex split because wildlife managers engineer it that way: antlerless elk almost always
-    requires a draw, and those draws are issued in the volumes needed to hit population targets. Deer harvest
-    is left largely to hunter preference, and hunter preference is overwhelmingly antlered.</p>
+    <p>The composition gap is the single most informative feature of these datasets. Elk harvest arrives at a
+    near-even sex split because wildlife managers engineer it that way: antlerless elk almost always requires a
+    draw, and those draws are issued in the volumes needed to hit population targets. Deer harvest in 2025 was
+    left far more to hunter preference, and hunter preference is overwhelmingly antlered. Moose sits in
+    between, at roughly one antlerless animal in three, because antlerless moose has been tightly drawn for
+    the entire decade.</p>
     <p>The young-animal share reinforces this. Calves make up a meaningfully larger fraction of elk harvest
     than fawns do of deer harvest, which is what you expect when whole family groups are being culled under
     antlerless authorizations rather than individual animals being selected for antlers.</p>
+    <p>One caution on reading this section: it is a snapshot of 2025 alone. The ten-season view above shows
+    that deer's antlered bias was far weaker two seasons earlier, so treat the deer bar as the current state
+    of tag policy rather than a fixed characteristic of the species.</p>
   </div>
 </div></section>
 
@@ -494,23 +482,17 @@ table.data tbody tr{cursor:pointer}
 
   <div class="callout">
     <h4>The antlerless cycle — and a correction to the single-season reading</h4>
-    <p>Looking at 2025 alone, the obvious conclusion is that hunters ignore antlerless deer: bucks were 69% of
-    the harvest despite doe tags being widely available. Ten seasons show that reading is wrong. The antlerless
-    share of the deer harvest ran at 37–45% through 2016–2019, was loosened to 49% in 2020, peaked at
-    <strong>57% in 2022 and 2023</strong>, then collapsed to <strong>31% in 2025 — the lowest in the
-    decade</strong>. Hunters were taking antlerless deer in enormous numbers as recently as two seasons ago.</p>
-    <p>Meanwhile male deer harvest sat between 22,000 and 30,000 every single year for ten years with no
-    trend at all. Buck harvest is essentially a constant; doe harvest is a policy dial. Total deer harvest fell
-    40% from its 2023 peak almost entirely through that dial.</p>
-    <p><strong>The three species separate cleanly, and this is the payoff of the long window.</strong> Elk
-    follows the same policy pattern — antlerless share swinging from 43% in 2019 to 63% in 2024 and back to
-    53%. Moose does not: its antlerless share has been flat at 34–37% for the entire decade because antlerless
-    moose has always been tightly drawn. Yet moose harvest still fell 33% from its 2020 peak, with male harvest
-    down 31% and female down 31% in lockstep. Same headline decline, opposite cause. Deer and elk declined
-    because fewer antlerless tags were issued; moose declined across the board, which is what a real
-    population or effort problem looks like.</p>
-    <p>No single season could tell those two stories apart. That is the entire argument for pulling ten years
-    of reports instead of one.</p>
+    <p>From 2025 alone you would conclude hunters ignore antlerless deer: bucks were 69% of the harvest. Ten
+    seasons say otherwise. The antlerless share ran 37–45% through 2016–19, was loosened to 49% in 2020, peaked
+    at <strong>57% in 2022–23</strong>, then collapsed to <strong>31% in 2025, the lowest in the
+    decade</strong>. Meanwhile male harvest sat between 22,000 and 30,000 every single year with no trend. Buck
+    harvest is a constant; doe harvest is a policy dial, and the 40% drop from the 2023 peak came almost
+    entirely through it.</p>
+    <p><strong>The species then separate cleanly.</strong> Elk follows the same pattern — antlerless share 43%
+    in 2019, 63% in 2024, 53% now. Moose does not: flat at 34–37% all decade, because antlerless moose has
+    always been tightly drawn. Yet moose still fell 33% from its 2020 peak, with both sexes down 31% in
+    lockstep. Same headline decline, opposite cause — one is allocation, the other is the herd or the effort.
+    No single season can tell those apart.</p>
   </div>
 
   <div class="prose">
@@ -524,33 +506,24 @@ table.data tbody tr{cursor:pointer}
 <section id="outlook"><div class="wrap">
   <div class="sec-head">
     <h2>2026 outlook</h2>
-    <p>Which units look strongest for the coming season — from a deliberately simple, fully auditable model
-    rather than a black box.</p>
+    <p>A prediction model for the coming season, built to be checked by hand rather than trusted.</p>
   </div>
 
   <div class="callout gold">
-    <h4>Why this is a projection and not machine learning</h4>
-    <p>There is no 2026 harvest data and there cannot be: the season opens in September 2026 and the Game
-    Harvest Survey is not published until roughly March 2027. So anything about 2026 is a forecast. The
-    honest constraint is that per-unit data exists for only three seasons — three points per unit per species.
-    Fitting a neural network or gradient-boosted model to three points would produce something that looks
-    sophisticated and means nothing; it would mostly memorise the 2025 value and dress it up. With n=3, a
-    transparent weighted trend is not a lesser method, it is the defensible one.</p>
-    <p>So the model below is one you can check by hand, in four steps:</p>
+    <h4>The model, in four steps</h4>
+    <p>No 2026 harvest data exists yet — the season opens in September 2026 and the survey publishes around
+    March 2027 — so this is a forecast, built on three seasons of per-unit data:</p>
     <ol style="font-size:14.5px;color:var(--ink-2);margin:0 0 12px;padding-left:22px">
       <li><strong>Recency-weighted baseline</strong> — 2025 weighted 3, 2024 weighted 2, 2023 weighted 1.</li>
       <li><strong>Fitted slope</strong> — ordinary least squares across the three seasons.</li>
       <li><strong>Volatility</strong> — mean absolute year-over-year change as a share of the mean.</li>
-      <li><strong>Volatility-weighted shrinkage</strong> — the projection blends the trend estimate with the
-      most recent actual season, weighted by <code>1 − volatility</code>. Stable units keep their trend;
-      noisy units get pulled back toward what actually happened in 2025.</li>
+      <li><strong>Volatility-weighted shrinkage</strong> — the projection blends the trend with the most
+      recent actual season, weighted by <code>1 − volatility</code>. Stable units keep their trend; noisy
+      units get pulled back toward what actually happened.</li>
     </ol>
-    <p>That fourth step matters, and testing is what forced it. WMU 357 elk ran 636 → 1,375 → 625. A plain
-    weighted-mean-plus-slope projected 871 for 2026 — higher than any of the three years except the one-off
-    spike, which is obviously wrong. Shrinking toward the latest season fixes it without adding any opacity:
-    a unit that bounces 85% year-over-year should not have its future dictated by a line drawn through three
-    points. The reported range is the projection ± half the volatility, so noisy units visibly carry wide
-    intervals instead of a falsely precise number.</p>
+    <p>Step four earns its place. WMU 357 elk ran 636 → 1,375 → 625; trend alone projected 871, above every
+    year but the spike. Shrinkage brings it to 663. The reported range is the projection ± half the
+    volatility, so unstable units carry visibly wide intervals rather than a falsely precise number.</p>
   </div>
 
   <div class="dash-bar" style="position:static">
@@ -604,12 +577,10 @@ table.data tbody tr{cursor:pointer}
 
   <div class="callout">
     <h4>What would actually change these numbers</h4>
-    <p>The ten-season record shows antlerless allocation moving by 20 percentage points inside three years.
-    That single lever swamps everything in this model. If you want to know what 2026 really holds for a given
-    unit, the draw booklet matters more than any trend line — check whether your unit's antlerless quota moved,
-    and treat the projection as a starting point rather than an answer. The units worth trusting here are the
-    high-confidence ones: large harvests, stable across all three seasons, general-licence structure that has
-    not changed.</p>
+    <p>The ten-season record shows antlerless allocation moving 20 percentage points inside three years. That
+    single lever swamps everything in this model, so the draw booklet tells you more about 2026 than any trend
+    line does. Trust the high-confidence rows — large, stable harvests on unchanged licence structure — and
+    treat the rest as a starting point.</p>
   </div>
 </div></section>
 
@@ -1136,14 +1107,30 @@ table.data tbody tr{cursor:pointer}
   </div>
 
   <div class="chart-block">
-    <div class="chart-title">Prevalence by species and sex</div>
-    <div class="chart-note">Males test positive at markedly higher rates in both deer species — consistent
-    with larger home ranges, rut-season contact and longer average time at risk.</div>
+    <div class="chart-title">Prevalence by sex — deer species only</div>
+    <div class="chart-note">Males test positive at markedly higher rates in both deer species: consistent with
+    larger home ranges, rut-season contact and longer average time at risk. This chart covers mule deer and
+    white-tailed deer only, because Alberta publishes sex-specific <em>tested</em> counts for those two but not
+    for elk or moose — and a prevalence rate needs a denominator. The elk and moose sex data that does exist is
+    in the next chart.</div>
     <div class="legend">
       <span class="k"><span class="sw" style="background:var(--deer)"></span>Male</span>
       <span class="k"><span class="sw" style="background:var(--elk)"></span>Female</span>
     </div>
     <div class="chart-box" style="height:330px"><canvas id="chCwdSex"></canvas></div>
+  </div>
+
+  <div class="chart-block">
+    <div class="chart-title">Sex split of positive cases — all four species</div>
+    <div class="chart-note">What can be shown for every species: how the confirmed positives divide by sex.
+    Both deer species are strongly male-skewed, as expected. Elk and moose invert it — and for elk that is
+    exactly what you would predict when the harvest feeding those samples is itself overwhelmingly female.
+    Note the sample sizes: 7 positive moose is far too few to draw a conclusion from.</div>
+    <div class="legend">
+      <span class="k"><span class="sw" style="background:var(--deer)"></span>Male</span>
+      <span class="k"><span class="sw" style="background:var(--elk)"></span>Female</span>
+    </div>
+    <div class="chart-box" style="height:330px"><canvas id="chCwdSexPos"></canvas></div>
   </div>
 
   <div class="chart-block">
@@ -1154,29 +1141,24 @@ table.data tbody tr{cursor:pointer}
   </div>
 
   <div class="callout">
-    <h4>The most important caveat in the entire CWD dataset</h4>
-    <p>Provincial prevalence dropped by six points in one year, and it would be badly wrong to read that as
-    the disease receding. Testing volume more than doubled, from 2,963 animals to 6,819, and the added samples
-    were overwhelmingly white-tailed deer taken along the western frontier of the known distribution — the
-    species and the geography least likely to return positives. Meanwhile the province states plainly that
-    prevalence continues to rise <em>within</em> individual units. The denominator changed, not the disease.
-    This is a textbook case of why aggregate rates need their sampling frame attached.</p>
+    <h4>The most important caveat in the CWD dataset</h4>
+    <p>Prevalence fell six points in one year, and that is not the disease receding. Testing more than doubled
+    — 2,963 animals to 6,819 — and the added samples were overwhelmingly white-tailed deer from the western
+    frontier: the species and geography least likely to test positive. The province states that prevalence
+    continues to rise <em>within</em> units. The denominator changed, not the disease.</p>
   </div>
 
   <div class="two-col">
     <div class="prose">
       <h3>Where the frontier moved</h3>
-      <p>Seven units recorded their first documented cases in 2025–26: <strong>222, 300, 316, 320, 322, 503
-      and 504</strong>. The previous season added <strong>221, 247, 306, 505 and 508</strong>. Read together,
-      those two lists trace a front advancing west and north — 316, 320 and 322 sit in the foothills, well
-      into country that was considered clean a few years ago.</p>
-      <p>For a hunter working the foothills band, the relevant fact is that CWD has now been documented in
-      units immediately adjacent to the highest-performing general-licence elk and deer country. 320 and 322
-      border 312 and 314.</p>
+      <p>Seven units recorded first cases in 2025–26: <strong>222, 300, 316, 320, 322, 503 and 504</strong>.
+      The previous season added <strong>221, 247, 306, 505 and 508</strong>. Together those trace a front
+      moving west and north — 316, 320 and 322 are foothills units, and 320 and 322 border 312 and 314, the
+      best general-licence country in the province.</p>
       <h3>Species risk ranking</h3>
-      <p>Alberta's own weighted occurrence figures rank risk as male mule deer 1.00, female mule deer 0.40,
-      male white-tailed deer 0.30, female white-tailed deer 0.10. A doe whitetail is the lowest-risk animal in
-      the province; a buck mule deer is the highest by an order of magnitude.</p>
+      <p>Alberta's weighted occurrence figures: male mule deer 1.00, female mule deer 0.40, male whitetail
+      0.30, female whitetail 0.10. A doe whitetail is the lowest-risk animal in the province; a buck mule deer
+      the highest by an order of magnitude.</p>
     </div>
     <div class="prose">
       <h3>What this means in the field</h3>
@@ -1215,31 +1197,24 @@ table.data tbody tr{cursor:pointer}
   </div>
 
   <div class="callout">
-    <h4>CFB Suffield — WMU 732 — and a caution about reading the elk figures</h4>
-    <p>Suffield is a controlled-access military base hunted by special draw on a handful of fixed dates, and it
-    behaves like nowhere else in the province. In 2025 it produced <strong>320 elk at 98% hunter success</strong>
-    — the highest rate in Alberta — and the composition is the giveaway: 18 bulls against 239 cows and 63
-    calves. That is not recreational hunting, it is a population reduction executed through hunters.</p>
-    <p>The disease picture needs more care than a first reading suggests. Alberta reports 30 CWD-positive elk
-    in 2025–26 from 308 elk tested, and notes that sample came <em>primarily from CFB Suffield</em>, including
-    the first-ever positive elk from CFB Wainwright. It is tempting to conclude Suffield is an elk-CWD hotspot.
-    But the longer record points the other way: of roughly 2,117 elk tested from WMU 732 since 2012, only two
-    were positive — about 0.1%. Suffield dominates the tested sample because a controlled base hunt produces
-    near-complete sampling, not necessarily because it dominates the positives.</p>
-    <p>So the 9.7% figure for elk should be read as "9.7% of a small, geographically concentrated sample",
-    and the published summary does not break those 30 positives down by unit. Whether this represents a genuine
-    change at Suffield or a shift in which elk get tested cannot be settled from the public data. It is worth
-    watching rather than concluding — and if you hunt there, submit the head.</p>
+    <h4>CFB Suffield — WMU 732 — and why the elk rate misleads</h4>
+    <p>Suffield is a controlled-access base hunted by draw on fixed dates. In 2025 it produced
+    <strong>320 elk at 98% success</strong>, from 18 bulls against 239 cows and 63 calves — a population
+    reduction executed through hunters, not recreational hunting.</p>
+    <p>Alberta reports 30 positive elk from 308 tested and notes that sample came primarily from Suffield.
+    Tempting to call it a hotspot — but of roughly 2,117 elk tested from WMU 732 since 2012, only two were
+    positive, about 0.1%. Suffield dominates the sample because a controlled hunt produces near-complete
+    sampling, not necessarily because it dominates the positives. Read the 9.7% as a small, geographically
+    concentrated sample. Worth watching, not concluding.</p>
   </div>
 
   <div class="callout gold">
-    <h4>An analytical link between the two datasets</h4>
-    <p>The harvest analysis found that antlerless deer are systematically underharvested while bucks are
-    taken at more than three times the rate. The CWD data shows males infected at roughly three times the
-    rate of females in white-tailed deer, and mule deer bucks highest of all. Hunter preference for antlers
-    therefore happens to remove the highest-risk animals from the population — an accidental alignment
-    between what hunters want and what disease management needs, and one of the few places where the two
-    datasets tell a mutually reinforcing story.</p>
+    <h4>Where the harvest and disease data meet</h4>
+    <p>Bucks were 69% of the 2025 deer harvest, and male whitetails test positive at roughly three times the
+    female rate. So hunter preference happens to remove the highest-risk animals.</p>
+    <p>The ten-season view complicates it: antlerless deer were 57% of the harvest in 2022–23 before allocation
+    was cut. The buck-heavy 2025 harvest is better targeted for disease control, but 2023 removed far more
+    animals overall. Which effect dominates is not something the public data can settle.</p>
   </div>
 </div></section>
 
@@ -1287,12 +1262,25 @@ table.data tbody tr{cursor:pointer}
       <li><strong>The long series is provincial, not per-unit.</strong> Ten seasons of totals support the
       trend analysis, but unit-level detail exists here for 2023–2025 only. So statements about Alberta as a
       whole rest on ten years; statements about an individual WMU rest on three.</li>
-      <li><strong>The 2026 projection is a projection.</strong> Three points per unit cannot support a real
-      predictive model, which is why the outlook uses a transparent recency-weighted trend with an explicit
-      confidence tier rather than a fitted algorithm. Its central assumption — that licence structure holds —
-      is exactly the thing the ten-season record shows changing by 20 percentage points inside three years.
-      Treat low-confidence rows as noise.</li>
+      <li><strong>The 2026 outlook is a forecast built on three points per unit.</strong> Its central
+      assumption — that licence structure holds — is exactly what the ten-season record shows changing by 20
+      percentage points inside three years. Treat low-confidence rows as noise.</li>
     </ul>
+  </div>
+</div></section>
+
+<section id="integrity"><div class="wrap">
+  <div class="sec-head">
+    <h2>Data integrity check</h2>
+    <p>Every dataset here was transcribed from a published PDF, so each one is verified in the browser at load
+    time rather than asked to be trusted.</p>
+  </div>
+  <div class="chart-block" style="margin-top:0">
+    <div class="chart-note">For each species and season, the sum of all unit rows is compared against the
+    "estimated total" line printed in the source report. This table is generated live from the embedded data —
+    if a figure were mistyped, it would surface here rather than sitting silently inside a chart.</div>
+    <div class="tbl-scroll"><table class="data" id="integrityTable"></table></div>
+    <p id="integrityNote" style="font-size:13px;color:var(--ink-3);line-height:1.65;margin:12px 0 0"></p>
   </div>
 </div></section>
 
@@ -1741,6 +1729,8 @@ const CWD_NEW24=["221","247","306","505","508"];
 const CWD={tested:6819,suitable:6768,positive:654,rate:9.7,
   species:[["Mule deer",25.1,1794],["Elk",9.7,308],["Moose",4.2,164],["White-tailed deer",3.7,4477]],
   sex:[["Mule deer",29.5,18.0],["White-tailed deer",4.1,2.4]],
+  /* positive cases by sex, all four species — [species, males, females] */
+  sexPos:[["Mule deer",329,122],["White-tailed deer",138,28],["Elk",8,22],["Moose",3,4]],
   prior:{tested:2963,positive:472,rate:16.2,mule:26.8,wt:8.8,elk:3.9,moose:3.8},
   cumulative:7289};
 
@@ -1905,18 +1895,16 @@ document.getElementById("compBars").innerHTML=compRow("Elk",PROV.elk)+
       <th style="cursor:default">Σ male</th><th style="cursor:default">Σ female</th>
       <th style="cursor:default">Σ young</th><th style="cursor:default">Σ total</th>
       <th style="cursor:default">Published total</th><th style="cursor:default">Check</th></tr></thead>
-     <tbody>${rows}</tbody>
-     <tfoot><tr><td colspan="9" style="text-align:left;padding:10px 12px;color:var(--ink-3);
-       line-height:1.6">
-       <strong style="color:var(--ink-2)">${checked} datasets verified.</strong>
-       ${bad===0?"All row sums reconcile exactly to the published totals.":
-       bad+" dataset differs, and the cause has been traced: the 2024 moose report prints 162 unit rows that "+
-       "sum to 6,354, but its own \"estimated total\" line reads 6,407. The gap is exactly 53 animals — "+
-       "WMU 228, which appears in the 2023 and 2025 moose reports but is omitted from the 2024 table while "+
-       "still being counted in that report's total. This was confirmed by re-parsing the source PDF directly: "+
-       "the row genuinely is not there. The discrepancy is in the published document, not in this "+
-       "transcription, so it is reported rather than silently patched."}
-     </td></tr></tfoot>`;
+     <tbody>${rows}</tbody>`;
+  document.getElementById("integrityNote").innerHTML=
+    `<strong style="color:var(--ink-2)">${checked} datasets verified.</strong> `+
+    (bad===0?"All row sums reconcile exactly to the published totals.":
+     bad+" dataset differs, and the cause has been traced: the 2024 moose report prints 162 unit rows that "+
+     "sum to 6,354, but its own “estimated total” line reads 6,407. The gap is exactly 53 animals — "+
+     "WMU 228, which appears in the 2023 and 2025 moose reports but is omitted from the 2024 table while "+
+     "still being counted in that report’s total. This was confirmed by re-parsing the source PDF directly: "+
+     "the row genuinely is not there. The discrepancy is in the published document, not in this "+
+     "transcription, so it is reported rather than silently patched.");
 })();
 
 /* ============================================================
@@ -2331,6 +2319,20 @@ new Chart(document.getElementById("chCwdSex"),{type:"bar",
     scales:{x:{grid:{display:false},ticks:{color:ink()}},
       y:{min:0,max:35,title:{display:true,text:"Share testing positive (%)",color:ink()},
       grid:{color:grid()},ticks:{color:ink(),callback:v=>v+"%"}}}})});
+new Chart(document.getElementById("chCwdSexPos"),{type:"bar",
+  data:{labels:CWD.sexPos.map(s=>s[0]+" (n="+(s[1]+s[2])+")"),datasets:[
+    {label:"Male",data:CWD.sexPos.map(s=>Math.round(s[1]/(s[1]+s[2])*1000)/10),
+      backgroundColor:C.deer,borderRadius:3,maxBarThickness:30},
+    {label:"Female",data:CWD.sexPos.map(s=>Math.round(s[2]/(s[1]+s[2])*1000)/10),
+      backgroundColor:C.elk,borderRadius:3,maxBarThickness:30}]},
+  options:baseOpts("","Share of positive cases (%)",{indexAxis:"y",
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>{const s=CWD.sexPos[c.dataIndex];
+      const n=c.datasetIndex===0?s[1]:s[2];
+      return c.dataset.label+": "+n+" of "+(s[1]+s[2])+" positives ("+c.parsed.x+"%)"}}}},
+    scales:{x:{stacked:true,min:0,max:100,title:{display:true,
+      text:"Share of confirmed positive cases (%)",color:ink()},
+      grid:{color:grid()},ticks:{color:ink(),callback:v=>v+"%"}},
+      y:{stacked:true,grid:{display:false},ticks:{color:ink()}}}})});
 new Chart(document.getElementById("chCwdTrend"),{type:"bar",
   data:{labels:["Mule deer","White-tailed deer","Elk","Moose","All species"],datasets:[
     {label:"2024–25",data:[CWD.prior.mule,CWD.prior.wt,CWD.prior.elk,CWD.prior.moose,CWD.prior.rate],
