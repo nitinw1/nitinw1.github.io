@@ -204,6 +204,34 @@ footer{padding:44px 0 60px;font-size:13px;color:var(--ink-3)}
 footer a{color:var(--ink-2)}
 .src-list{list-style:none;padding:0;margin:10px 0 0}
 .src-list li{margin-bottom:5px}
+.ask-box{background:var(--surface);border:1px solid var(--line-2);border-radius:12px;
+  padding:16px 18px;margin-bottom:18px}
+.ask-head{font-size:14px;font-weight:600;color:var(--ink);margin-bottom:12px}
+.ask-head .ask-sub{font-weight:400;color:var(--ink-3);font-size:12.5px}
+.ask-badge{display:inline-block;background:var(--bear);color:#0d1017;font-size:10.5px;font-weight:700;
+  letter-spacing:.04em;text-transform:uppercase;padding:2px 7px;border-radius:20px;vertical-align:1px;
+  margin-right:4px}
+.ask-row{display:flex;gap:8px;margin-bottom:10px}
+.ask-row input{flex:1;min-width:0;font-size:14px;padding:9px 12px;border:1px solid var(--line-2);
+  border-radius:var(--radius);background:var(--bg);color:var(--ink)}
+.ask-row input:focus{outline:none;border-color:var(--bear);box-shadow:0 0 0 3px color-mix(in srgb,var(--bear) 25%,transparent)}
+.ask-row button{flex:none;background:var(--bear);color:#0d1017;font-weight:600;border:none;
+  padding:9px 18px;border-radius:var(--radius);cursor:pointer}
+.ask-row button:hover{opacity:.9}
+.ask-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:4px}
+.ask-eg{font-size:12px;padding:5px 10px;border-radius:20px;background:var(--surface-2);
+  border:1px solid var(--line);color:var(--ink-2);cursor:pointer}
+.ask-eg:hover{border-color:var(--bear);color:var(--ink)}
+.ask-answer{margin:12px 0 8px;padding:14px 16px;background:var(--surface-2);border-radius:10px;
+  border-left:3px solid var(--bear);font-size:14px;line-height:1.6;color:var(--ink-2)}
+.ask-answer strong{color:var(--ink)}
+.ask-answer .ask-rank{margin:10px 0 0;border-collapse:collapse;width:100%;font-size:13px}
+.ask-answer .ask-rank td{padding:4px 8px;border-bottom:1px solid var(--line);
+  font-variant-numeric:tabular-nums}
+.ask-answer .ask-rank td:first-child{font-weight:600;color:var(--ink)}
+.ask-answer .ask-rank td:last-child{text-align:right}
+.ask-answer .ask-follow{margin-top:10px;font-size:12.5px;color:var(--ink-3)}
+.ask-note{font-size:11.5px;color:var(--ink-3);margin:8px 0 0}
 </style>
 </head>
 <body>
@@ -409,6 +437,29 @@ footer a{color:var(--ink-2)}
     <h2>Scout the units (WMUs)</h2>
     <p>Every unit and season, filterable. Click any row or bar for that unit's five-season history.
     Deep-link here with <code>#dashboard</code>.</p>
+  </div>
+
+  <div class="ask-box">
+    <div class="ask-head">
+      <span class="ask-badge">beta</span> Ask in plain English
+      <span class="ask-sub">— a question gets parsed into the filters below and answered from the data</span>
+    </div>
+    <div class="ask-row">
+      <input id="askInput" type="text" autocomplete="off"
+        placeholder="e.g. best bear success where baiting is permitted" aria-label="Ask about the units">
+      <button id="askBtn">Ask</button>
+    </div>
+    <div class="ask-chips">
+      <button class="ask-eg">best success where baiting is permitted</button>
+      <button class="ask-eg">most bears harvested in the foothills</button>
+      <button class="ask-eg">compare 336 and 400</button>
+      <button class="ask-eg">least crowded units where I can bait</button>
+      <button class="ask-eg">tell me about WMU 336</button>
+    </div>
+    <div id="askAnswer" class="ask-answer" hidden></div>
+    <p class="ask-note">Prototype: a rules-based parser, running entirely in your browser with no server. In
+    production the parser swaps for a language model behind a small serverless endpoint — the data layer stays
+    exactly as it is here.</p>
   </div>
 
   <div class="dash-bar">
@@ -813,8 +864,39 @@ const regionOf=w=>(w.length===3&&["2","3","4","5"].includes(w[0]))?w[0]:"other";
 const REGNAME={"2":"Parkland","3":"Foothills","4":"Mountain","5":"Boreal",other:"Other"};
 const hunters=(t,s)=>s>0?Math.round(t/(s/100)):null;
 
+/* Official WMU names, from the Alberta Guide to Hunting Regulations (Wildlife Regulation AR 143/97). */
+const NAMES={"200":"Sounding","202":"Neutral Hills","203":"Alliance","204":"Paintearth","206":"Buffalo Lake",
+ "208":"Big Valley","210":"Lonepine","212":"Calgary","214":"Dogpound","216":"Dickson","220":"Red Deer",
+ "221":"Sylvan Lake","222":"Chain Lakes","224":"Rimbey","226":"Hobbema","228":"Camrose","230":"Wavy",
+ "232":"Hardisty","234":"Ribstone","236":"Lloydminster","238":"Birch","240":"Vegreville","242":"Beaverhill",
+ "244":"Bittern","246":"Wizard Lake","247":"Edmonton West","248":"Edmonton East","250":"Redwater",
+ "252":"Whitford","254":"Vermilion","256":"Islay","258":"Elk Point","260":"Saddle Lake","300":"Mountain View",
+ "302":"Pincher Creek","303":"Crowsnest Pass","304":"North Porcupine Hills","305":"South Porcupine Hills",
+ "306":"Willow Valley","308":"Happy Valley","310":"Pekisko","312":"Priddis","314":"Little Red",
+ "316":"Harold Creek","318":"James","320":"Bearberry","322":"Horseguard","324":"Prairie Creek",
+ "326":"Baseline","328":"Schunda","330":"Chiese","332":"Alder Flats","334":"Strawberry","336":"Wabamun",
+ "337":"Bigoray River","338":"Carrot Creek","339":"Elk River","340":"Wolf River","342":"McLeod River",
+ "344":"Wildhay","346":"Shiningbank","347":"Marsh Head","348":"Chip Lake","349":"Swan Hills",
+ "350":"Saulteaux River","351":"Goose River North","352":"Berland","353":"Deep Valley","354":"Simonette",
+ "355":"Redrock Creek","356":"Cutbank","357":"Beaverlodge","358":"Saddle Hills","359":"Blueberry",
+ "360":"Snipe Lake","400":"Castle-Carbondale","402":"Livingstone","404":"Highwood","406":"Elbow",
+ "408":"Kananaskis River","410":"Bow Corridor","412":"Ghost","414":"Burnt Timber","416":"Corners",
+ "417":"Wilson","418":"Ha Tinda","420":"Clearwater","422":"Hummingbird","426":"Upper Saskatchewan",
+ "428":"Kiska","429":"Meadows","430":"Bighorn","432":"White Goat","434":"Blackstone","436":"Cardinal",
+ "437":"Red Cap","438":"Coalspur","439":"Solomon","440":"Adams Creek","441":"Joachim","442":"Sheep Creek",
+ "444":"Mount Hamell","445":"Narraway","446":"Kakwa River","500":"Frog Lake","501":"Cold Lake",
+ "502":"Beaver River","503":"Lac La Biche","504":"Amisk","505":"Shoal Creek","506":"Tawatinaw",
+ "507":"Thunder Lake","508":"Lac La Nonne","509":"Calling Lake","510":"Baptiste Lake","511":"Pelican Mountains",
+ "512":"Crow Lake","514":"Marie Lake","515":"Heart Lake","516":"Pelican Lake","517":"Winefred Lake",
+ "518":"Thickwood Hills","519":"Algar Lake","520":"Otter Lakes","521":"Puskwaskau","522":"Birch Hills",
+ "523":"Winagami Lakes","524":"Chinchaga River","525":"Clear Hills","526":"Upper Peace River",
+ "527":"Hotchkiss Rivers","528":"Buffalo Head Hills","529":"Gordon Lake","530":"Delta","531":"Birch Mountains",
+ "532":"Chipewyan","534":"Caribou Mountains","535":"La Crete","536":"Rainbow Lake","537":"Hawk Hills",
+ "539":"Bistcho Lake","540":"Lower Wabasca River","541":"Panny River","542":"Muskwa Lake","544":"Utikuma Lake",
+ "841":"Lakeland"};
+
 function buildModel(y){
-  const rows=DATA[y].map(r=>({wmu:r[0],male:r[1],female:r[2],young:r[3],total:r[4],succ:r[5],
+  const rows=DATA[y].map(r=>({wmu:r[0],name:NAMES[r[0]]||"",male:r[1],female:r[2],young:r[3],total:r[4],succ:r[5],
     bait:baitOf(r[0]),region:regionOf(r[0]),regionName:REGNAME[regionOf(r[0])],
     hunters:hunters(r[4],r[5]),
     femaleShare:r[4]>0?Math.round(r[2]/r[4]*1000)/10:null}));
@@ -923,7 +1005,7 @@ const baseOpts=(xt,yt,extra)=>Object.assign({responsive:true,maintainAspectRatio
     el.addEventListener("mouseenter",()=>{
       const r=M[2025].by[el.dataset.wmu];
       document.getElementById("baitMapTip").innerHTML=
-        `<strong>WMU ${r.wmu}</strong> · ${r.regionName} · baiting ${BAIT_LABEL[r.bait]} — 2025: `+
+        `<strong>WMU ${r.wmu}${r.name?" · "+r.name:""}</strong> · ${r.regionName} · baiting ${BAIT_LABEL[r.bait]} — 2025: `+
         `${r.total} bears at ${r.succ}% success (${r.male} male, ${r.female} female, `+
         `~${fmt(r.hunters)} hunters)`;
     });
@@ -1159,7 +1241,7 @@ function currentSet(){
   const minH=+el("fH").value,minS=+el("fS").value;
   s=s.filter(r=>r.metric>0&&r.metric>=minH&&r.succ>=minS);
   const q=el("fSearch").value.trim();
-  if(q)s=s.filter(r=>r.wmu.includes(q));
+  if(q)s=s.filter(r=>r.wmu.includes(q)||(r.name||"").toLowerCase().includes(q.toLowerCase()));
   const key={metric:"metric",succ:"succ",hunters:"hunters",femaleShare:"femaleShare",wmu:"wmu"}[el("fSort").value];
   s.sort((a,b)=>key==="wmu"?(+a.wmu)-(+b.wmu):((b[key]==null?-1:b[key])-(a[key]==null?-1:a[key])));
   if(sortKey){s.sort((a,b)=>{const x=a[sortKey],y=b[sortKey];
@@ -1206,7 +1288,8 @@ function render(){
     const k=th.dataset.k; sortDir=(sortKey===k&&sortDir===-1)?1:-1; sortKey=k; render()}));
   const CAP=80, shown=set.slice(0,CAP);
   el("tbl").querySelector("tbody").innerHTML=shown.map(r=>`<tr data-wmu="${r.wmu}">
-    <td>${r.wmu}</td><td style="text-align:left;color:var(--ink-3)">${r.regionName}</td>
+    <td>${r.wmu}${r.name?' <span style="color:var(--ink-3);font-weight:400">'+r.name+'</span>':''}</td>
+    <td style="text-align:left;color:var(--ink-3)">${r.regionName}</td>
     <td><span class="pill ${r.bait==="y"?"bait":r.bait==="p"?"part":"no"}">${BAIT_LABEL[r.bait]}</span></td>
     <td>${fmt(r.total)}</td><td>${fmt(r.male)}</td><td>${fmt(r.female)}</td>
     <td>${r.femaleShare==null?"—":r.femaleShare+"%"}</td><td>${r.succ}%</td>
@@ -1224,7 +1307,9 @@ function render(){
     data:{labels:top.map(r=>r.wmu),datasets:[{data:top.map(r=>r.metric),
       backgroundColor:top.map(r=>BAIT_COL[r.bait]),borderRadius:3,maxBarThickness:16}]},
     options:baseOpts("Bears","",{indexAxis:"y",
-      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>{const r=top[c.dataIndex];
+      plugins:{legend:{display:false},tooltip:{callbacks:{
+        title:items=>{const r=top[items[0].dataIndex];return "WMU "+r.wmu+(r.name?" · "+r.name:"");},
+        label:c=>{const r=top[c.dataIndex];
         return [r.total+" bears · "+r.succ+"% success",
           "baiting "+BAIT_LABEL[r.bait]+" · "+r.regionName,
           "M"+r.male+" / F"+r.female]}}}},
@@ -1282,9 +1367,9 @@ function showUnit(wmu,keep){
   const any=M[2025].by[wmu]||M[stYear].by[wmu];
   const p=el("unitPanel"); p.hidden=false;
   p.innerHTML=`<button class="close" onclick="closeUnit()">close ✕</button>
-    <h3>WMU ${wmu}</h3>
-    <p style="font-size:13px;color:var(--ink-3);margin:0 0 14px">${any?any.regionName:""} ·
-    baiting <strong style="color:${BAIT_COL[baitOf(wmu)]}">${BAIT_LABEL[baitOf(wmu)]}</strong></p>
+    <h3>WMU ${wmu}${any&&any.name?' · '+any.name:''}${any?' <span style="font-weight:400;color:var(--ink-3)">('+any.regionName+')</span>':''}</h3>
+    <p style="font-size:13px;color:var(--ink-3);margin:0 0 14px">baiting
+    <strong style="color:${BAIT_COL[baitOf(wmu)]}">${BAIT_LABEL[baitOf(wmu)]}</strong></p>
     <div class="tbl-scroll" style="margin-bottom:14px"><table class="data"><thead><tr>
       <th style="text-align:left">Season</th><th>Total</th><th>Male</th><th>Female</th>
       <th>Female %</th><th>Success</th><th>Est. hunters</th></tr></thead><tbody>`+
@@ -1327,9 +1412,9 @@ el("btnReset").addEventListener("click",()=>{stYear=2025;stBait="all";stSex="tot
   sortKey=null;closeUnit();render()});
 el("btnCsv").addEventListener("click",()=>{
   const set=currentSet();
-  const head=["WMU","Region","Baiting","Total","Male","Female","Female %","Success %","Est hunters"];
+  const head=["WMU","Name","Region","Baiting","Total","Male","Female","Female %","Success %","Est hunters"];
   const esc=v=>{const s=v==null?"":String(v);return /[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s};
-  const lines=[head.join(",")].concat(set.map(r=>[r.wmu,r.regionName,BAIT_LABEL[r.bait],r.total,
+  const lines=[head.join(",")].concat(set.map(r=>[r.wmu,r.name,r.regionName,BAIT_LABEL[r.bait],r.total,
     r.male,r.female,r.femaleShare,r.succ,r.hunters].map(esc).join(",")));
   const blob=new Blob(["﻿"+lines.join("\r\n")],{type:"text/csv;charset=utf-8"});
   const a=document.createElement("a");a.href=URL.createObjectURL(blob);
@@ -1371,6 +1456,193 @@ renderOutlook();
   if(p.get("u"))openUnit=p.get("u");
   render();
   if(openUnit)showUnit(openUnit);
+})();
+
+/* ============================================================
+   ASK IN PLAIN ENGLISH — rules-based NL query, bears
+   ============================================================ */
+const BAIT_WORD={y:"where baiting is permitted",p:"in partial-bait units",n:"where baiting is prohibited"};
+const REGION_LABEL_B={"2":"the parkland","3":"the foothills","4":"the mountains","5":"the boreal"};
+
+function parseAsk(text){
+  let t=" "+text.toLowerCase().replace(/[^a-z0-9%\s]/g," ").replace(/\s+/g," ")+" ";
+  const has=re=>re.test(t);
+  const p={wmus:[]};
+  const y=t.match(/\b(2021|2022|2023|2024|2025)\b/); if(y){p.year=+y[1];t=t.replace(y[0]," ");}
+  const ms=t.match(/(?:over|above|at least|more than|min(?:imum)?|>)\s*(\d{1,2})\s*%/);
+  if(ms){p.minSucc=+ms[1];t=t.replace(ms[0]," ");}
+  const mh=t.match(/(?:more than|over|at least|min(?:imum)?|>)\s*(\d{2,4})(?!\s*%)/);
+  if(mh){p.minHarvest=+mh[1];t=t.replace(mh[0]," ");}
+  (t.match(/\b\d{3}\b/g)||[]).forEach(n=>p.wmus.push(n));
+  /* region */
+  if(has(/foothill|\b300s\b/))p.region="3";
+  else if(has(/mountain|rocky|rockies|\b400s\b/))p.region="4";
+  else if(has(/boreal|far north|up north|northern|\b500s\b/))p.region="5";
+  else if(has(/parkland|\b200s\b/))p.region="2";
+  /* baiting status, with negation */
+  if(has(/no bait|without bait|bait.{0,8}(prohibit|banned|illegal|not)|prohibit|can.?t bait|no baiting|spot.?and.?stalk/))p.bait="n";
+  else if(has(/partial/))p.bait="p";
+  else if(has(/can.{0,5}bait|where.{0,8}bait|bait.{0,8}(permit|allow|legal)|permitted|baiting legal|legal to bait|over bait|with bait|baited/))p.bait="y";
+  /* class */
+  if(has(/\b(sows?|females?)\b/))p.sex="female";
+  else if(has(/\b(boars?|males?)\b/))p.sex="male";
+  /* intent — order matters */
+  if(p.wmus.length>=2||has(/\bvs\b|versus|compare|difference between|better than| or (?=\d)/))p.intent="compare";
+  else if(p.wmus.length===1&&!has(/best|top|most|highest|which/))p.intent="unit";
+  else if(has(/how many|total number|combined|altogether|sum of|on average|average|typical|overall/))p.intent="aggregate";
+  else if(has(/declin|dropp|falling|shrink|losing|down the most|worst trend|getting worse/))p.intent="declining";
+  else if(has(/growing|rising|increasing|improving|on the rise|gaining|best trend|getting better|bounce|recover/))p.intent="rising";
+  else if(has(/least crowd|fewest hunter|less pressure|uncrowded|quiet|low pressure|not crowded|avoid crowd/))p.intent="low-pressure";
+  else if(has(/sleeper|underrated|under.the.radar|best value|efficient|hidden gem|overlooked/))p.intent="value";
+  else p.intent="rank";
+  if(has(/success|odds|best chance|likely|hit rate|percentage/))p.metric="success";
+  else if(has(/most|highest harvest|number|volume|biggest|top harvest|abundan/))p.metric="harvest";
+  return p;
+}
+
+function askEcho(p,unitMode){
+  const bits=[];
+  if(p.intent==="compare")bits.push("compare units");
+  else if(p.intent==="aggregate")bits.push("total up");
+  else if(p.intent==="declining")bits.push("declining trend");
+  else if(p.intent==="rising")bits.push("rising trend");
+  else if(p.intent==="low-pressure")bits.push("least crowded");
+  else if(p.intent==="value")bits.push("best value");
+  if(!unitMode)bits.push("bear");
+  if(p.region)bits.push(REGION_LABEL_B[p.region].replace(/^the /,""));
+  if(p.bait)bits.push(BAIT_WORD[p.bait]);
+  if(p.sex)bits.push(p.sex);
+  if(p.minSucc)bits.push("≥"+p.minSucc+"% success");
+  if(p.minHarvest)bits.push("≥"+p.minHarvest+" bears");
+  if(p.metric)bits.push("by "+(p.metric==="success"?"success":"harvest"));
+  bits.push(((p.year&&M[p.year])?p.year:2025)+" season");
+  return `<div style="font-size:11.5px;color:var(--ink-3);margin-bottom:8px">Read as: `+bits.join(" · ")+`</div>`;
+}
+
+function askFilter(rows,p){
+  const crit=[];
+  let set=rows.filter(r=>r.total>0);
+  if(p.region){set=set.filter(r=>r.region===p.region);crit.push("in "+REGION_LABEL_B[p.region]);}
+  if(p.bait){set=set.filter(r=>r.bait===p.bait);crit.push(BAIT_WORD[p.bait]);}
+  if(p.minSucc){set=set.filter(r=>r.succ>=p.minSucc);crit.push("over "+p.minSucc+"% success");}
+  if(p.minHarvest){set=set.filter(r=>r.total>=p.minHarvest);crit.push("over "+p.minHarvest+" bears");}
+  return {set,crit};
+}
+const drive=(p,sort,minH,sex)=>{stYear=(p.year&&M[p.year])?p.year:2025;
+  stBait=p.bait||"all";stSex=sex||"total";stRegion=p.region||"all";el("fSort").value=sort;
+  el("fH").value=Math.max(minH||0,p.minHarvest||0);el("fS").value=p.minSucc||0;
+  el("fSearch").value="";sortKey=null;render();};
+
+function answerAsk(text){
+  const box=el("askAnswer");const p=parseAsk(text);
+  const yr=(p.year&&M[p.year])?p.year:2025;
+  const model=M[yr];const rows=model.rows.slice();
+  const mv=r=>p.sex?r[p.sex]:r.total;
+  const say=html=>{box.hidden=false;box.innerHTML=askEcho(p,p.intent==="unit"||p.intent==="compare")+html;};
+  const valid=p.wmus.filter(w=>model.by[w]);
+
+  /* ---- COMPARE ---- */
+  if(p.intent==="compare"&&valid.length>=2){
+    const head="<tr><td></td>"+valid.map(w=>`<td><strong>WMU ${w}</strong>${model.by[w].name?'<br><span style="font-weight:400;color:var(--ink-3)">'+model.by[w].name+'</span>':''}</td>`).join("")+"</tr>";
+    const row=(lab,fn)=>`<tr><td>${lab}</td>`+valid.map(w=>`<td>${fn(model.by[w])}</td>`).join("")+"</tr>";
+    const body=row("Bears",r=>fmt(r.total))+row("Success",r=>r.succ+"%")+
+      row("Male / Female",r=>r.male+" / "+r.female)+row("Baiting",r=>BAIT_LABEL[r.bait])+
+      row("Region",r=>r.regionName);
+    el("fSearch").value="";drive(p,"metric",0,"total");showUnit(valid[0]);
+    say(`Comparing ${valid.join(", ")} (${yr}):
+      <table class="ask-rank">${head}${body}</table>
+      <div class="ask-follow">${valid[0]} opened below; click the others in the table to swap.</div>`);
+    return;
+  }
+  /* ---- SINGLE UNIT ---- */
+  if(p.intent==="unit"&&valid.length===1){
+    const w=valid[0],r=model.by[w];
+    el("fSearch").value=w;sortKey=null;render();showUnit(w);
+    say(`<strong>WMU ${w}${r.name?" · "+r.name:""}</strong> — ${r.regionName} region, baiting ${BAIT_LABEL[r.bait]}, ${yr}.
+      ${fmt(r.total)} bears at ${r.succ}% success (${r.male} male, ${r.female} female,
+      ~${fmt(r.hunters)} estimated hunters).
+      <div class="ask-follow">Opened below with its five-season history.</div>`);
+    return;
+  }
+  if(p.wmus.length&&!valid.length){
+    say(`I don't have ${p.wmus.length>1?"those units":"a unit numbered "+p.wmus[0]} in the ${yr} data.`);return;}
+
+  /* ---- AGGREGATE ---- */
+  if(p.intent==="aggregate"){
+    const {set,crit}=askFilter(rows,p);
+    const tot=set.reduce((a,r)=>a+r.total,0);
+    const hun=set.reduce((a,r)=>a+(r.hunters||0),0);
+    const succ=hun?Math.round(tot/hun*1000)/10:0;
+    const male=set.reduce((a,r)=>a+r.male,0),fem=set.reduce((a,r)=>a+r.female,0);
+    drive(p,"metric",0,p.sex||"total");
+    say(`<strong>${fmt(tot)} bears</strong> harvested across ${set.length} units${
+      crit.length?" "+crit.join(", "):""} in ${yr}, from about ${fmt(hun)} estimated hunters
+      (${succ}% group success). Split roughly ${male+fem?Math.round(male/(male+fem)*100):0}% male /
+      ${male+fem?Math.round(fem/(male+fem)*100):0}% female.
+      <div class="ask-follow">Dashboard filtered to the same selection.</div>`);
+    return;
+  }
+  /* ---- TREND 2021 → 2025 ---- */
+  if(p.intent==="declining"||p.intent==="rising"){
+    const {set,crit}=askFilter(rows,p);
+    const wc=set.map(r=>{const a=M[2021].by[r.wmu],b=M[2025].by[r.wmu];
+      if(!a||!b||(a.total||0)<15)return null;
+      return {r,from:a.total,to:b.total,pct:Math.round((b.total-a.total)/a.total*100)};}).filter(Boolean);
+    wc.sort((x,y)=>p.intent==="declining"?x.pct-y.pct:y.pct-x.pct);
+    const topT=wc.slice(0,6);
+    drive(p,"metric",0,"total");
+    const rk=topT.map(o=>`<tr><td>${o.r.wmu}${o.r.name?" "+o.r.name:""}</td>
+      <td style="color:${o.pct>=0?'var(--bait)':'var(--nobait)'}">${o.pct>=0?"+":""}${o.pct}%</td>
+      <td>${o.from} → ${o.to}</td></tr>`).join("");
+    say(`Bear units ${p.intent==="declining"?"declining":"growing"} fastest 2021 → 2025${
+      crit.length?", "+crit.join(", "):""} (units with 15+ bears in 2021):
+      <table class="ask-rank">${rk}</table>
+      <div class="ask-follow">Harvest change tracks hunter effort and bait rules as much as bear numbers.</div>`);
+    return;
+  }
+  /* ---- LOW PRESSURE / VALUE ---- */
+  if(p.intent==="low-pressure"||p.intent==="value"){
+    const {set,crit}=askFilter(rows,p);
+    let pool=set.filter(r=>r.total>=10&&r.hunters);
+    if(p.intent==="low-pressure")pool.sort((a,b)=>a.hunters-b.hunters);
+    else pool.sort((a,b)=>(b.succ/Math.sqrt(b.hunters))-(a.succ/Math.sqrt(a.hunters)));
+    const topP=pool.slice(0,6);
+    drive(p,"succ",10,"total");
+    const rk=topP.map(r=>`<tr><td>${r.wmu}${r.name?" "+r.name:""}</td>
+      <td>${r.succ}% · ~${fmt(r.hunters)} hunters</td>
+      <td>${fmt(r.total)} bears · bait ${BAIT_LABEL[r.bait]}</td></tr>`).join("");
+    say(`${p.intent==="low-pressure"?"Least-crowded":"Best value (high odds, few hunters)"} bear units${
+      crit.length?", "+crit.join(", "):""} (${yr}):
+      <table class="ask-rank">${rk}</table>
+      <div class="ask-follow">Hunter counts are derived from success rate, so treat them as estimates.</div>`);
+    return;
+  }
+
+  /* ---- DEFAULT RANK ---- */
+  const {set,crit}=askFilter(rows,p);
+  const metric=p.metric||"success";
+  let ranked=set.slice();
+  if(metric==="success")ranked=ranked.filter(r=>r.total>=10);
+  ranked.sort((a,b)=>metric==="success"?b.succ-a.succ:mv(b)-mv(a));
+  const top=ranked.slice(0,6);
+  drive(p,metric==="success"?"succ":"metric",metric==="success"?10:0,p.sex||"total");
+  if(!top.length){say(`No bear units match ${crit.join(", ")||"that"} in ${yr}.
+    Try loosening the criteria — drop the region or the baiting filter.`);return;}
+  const rk=top.map(r=>`<tr><td>${r.wmu}${r.name?" "+r.name:""}</td>
+    <td>${r.succ}% success</td><td>${fmt(mv(r))} ${p.sex||"bears"} · bait ${BAIT_LABEL[r.bait]}</td></tr>`).join("");
+  say(`Top bear units by ${metric==="success"?"highest hunter success":"most harvested"}${
+    crit.length?", "+crit.join(", "):""} (${yr}):
+    <table class="ask-rank">${rk}</table>
+    <div class="ask-follow">Dashboard below filtered to match${
+      metric==="success"?" (units under 10 bears hidden so small-sample flukes don't top the list)":""}.</div>`);
+}
+
+(function wireAsk(){
+  const go=()=>{const v=el("askInput").value.trim();if(v)answerAsk(v);};
+  el("askBtn").addEventListener("click",go);
+  el("askInput").addEventListener("keydown",e=>{if(e.key==="Enter")go();});
+  document.querySelectorAll(".ask-eg").forEach(b=>b.addEventListener("click",()=>{
+    el("askInput").value=b.textContent;answerAsk(b.textContent);}));
 })();
 </script>
 </body>

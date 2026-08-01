@@ -1867,10 +1867,42 @@ const CALGARY=["212","214","216","224","232","234","300","302","303","304","305"
  "314","316","318","320","322","326","328","400","402","404","406","408","410","412","414","429"];
 
 /* named units — controlled-access and notable */
-const NAMES={"732":"CFB Suffield","728/730":"CFB Wainwright","936":"Cooking Lake–Blackfoot",
- "212":"Calgary fringe","312":"Sundre / Water Valley","314":"Jumpingpound / Sibbald",
- "402":"Livingstone","400":"Castle","304":"Chain Lakes","305":"Porcupine Hills","308":"Crowsnest",
- "310":"Highwood","318":"Caroline","320":"Ghost","322":"Cochrane east","841":"Cold Lake AWR"};
+/* Official WMU names, from the Alberta Guide to Hunting Regulations (Wildlife Regulation AR 143/97). */
+const NAMES={"102":"Pakowki","104":"Aden","106":"Verdigris","108":"Milk River Ridge","110":"Brocket",
+ "112":"Lethbridge","116":"Seven Persons","118":"Forty Mile","119":"South Irvine","124":"Whitla",
+ "128":"Vauxhall","130":"Keho","132":"Little Bow","134":"Travers","136":"Arrowwood","138":"Majorville",
+ "140":"Rainier","142":"Newell","144":"Tilley","148":"Schuler","150":"Jenner","151":"Alkali Creek",
+ "152":"Royal","156":"Rosebud River","158":"Three Hills","160":"Hand Hills","162":"Berry",
+ "163":"Grassy Island Lake","164":"Kirkpatrick","166":"Sullivan","200":"Sounding","202":"Neutral Hills",
+ "203":"Alliance","204":"Paintearth","206":"Buffalo Lake","208":"Big Valley","210":"Lonepine",
+ "212":"Calgary","214":"Dogpound","216":"Dickson","220":"Red Deer","221":"Sylvan Lake","222":"Chain Lakes",
+ "224":"Rimbey","226":"Hobbema","228":"Camrose","230":"Wavy","232":"Hardisty","234":"Ribstone",
+ "236":"Lloydminster","238":"Birch","240":"Vegreville","242":"Beaverhill","244":"Bittern","246":"Wizard Lake",
+ "247":"Edmonton West","248":"Edmonton East","250":"Redwater","252":"Whitford","254":"Vermilion",
+ "256":"Islay","258":"Elk Point","260":"Saddle Lake","300":"Mountain View","302":"Pincher Creek",
+ "303":"Crowsnest Pass","304":"North Porcupine Hills","305":"South Porcupine Hills","306":"Willow Valley",
+ "308":"Happy Valley","310":"Pekisko","312":"Priddis","314":"Little Red","316":"Harold Creek","318":"James",
+ "320":"Bearberry","322":"Horseguard","324":"Prairie Creek","326":"Baseline","328":"Schunda","330":"Chiese",
+ "332":"Alder Flats","334":"Strawberry","336":"Wabamun","337":"Bigoray River","338":"Carrot Creek",
+ "339":"Elk River","340":"Wolf River","342":"McLeod River","344":"Wildhay","346":"Shiningbank",
+ "347":"Marsh Head","348":"Chip Lake","349":"Swan Hills","350":"Saulteaux River","351":"Goose River North",
+ "352":"Berland","353":"Deep Valley","354":"Simonette","355":"Redrock Creek","356":"Cutbank",
+ "357":"Beaverlodge","358":"Saddle Hills","359":"Blueberry","360":"Snipe Lake","400":"Castle-Carbondale",
+ "402":"Livingstone","404":"Highwood","406":"Elbow","408":"Kananaskis River","410":"Bow Corridor",
+ "412":"Ghost","414":"Burnt Timber","416":"Corners","417":"Wilson","418":"Ha Tinda","420":"Clearwater",
+ "422":"Hummingbird","426":"Upper Saskatchewan","428":"Kiska","429":"Meadows","430":"Bighorn",
+ "432":"White Goat","434":"Blackstone","436":"Cardinal","437":"Red Cap","438":"Coalspur","439":"Solomon",
+ "440":"Adams Creek","441":"Joachim","442":"Sheep Creek","444":"Mount Hamell","445":"Narraway",
+ "446":"Kakwa River","500":"Frog Lake","501":"Cold Lake","502":"Beaver River","503":"Lac La Biche",
+ "504":"Amisk","505":"Shoal Creek","506":"Tawatinaw","507":"Thunder Lake","508":"Lac La Nonne",
+ "509":"Calling Lake","510":"Baptiste Lake","511":"Pelican Mountains","512":"Crow Lake","514":"Marie Lake",
+ "515":"Heart Lake","516":"Pelican Lake","517":"Winefred Lake","518":"Thickwood Hills","519":"Algar Lake",
+ "520":"Otter Lakes","521":"Puskwaskau","522":"Birch Hills","523":"Winagami Lakes","524":"Chinchaga River",
+ "525":"Clear Hills","526":"Upper Peace River","527":"Hotchkiss Rivers","528":"Buffalo Head Hills",
+ "529":"Gordon Lake","530":"Delta","531":"Birch Mountains","532":"Chipewyan","534":"Caribou Mountains",
+ "535":"La Crete","536":"Rainbow Lake","537":"Hawk Hills","539":"Bistcho Lake","540":"Lower Wabasca River",
+ "541":"Panny River","542":"Muskwa Lake","544":"Utikuma Lake","728":"West Wainwright","730":"East Wainwright",
+ "728/730":"CFB Wainwright","732":"CFB Suffield","841":"Lakeland","936":"Cooking Lake-Blackfoot"};
 /* units whose success rate reflects controlled access rather than habitat */
 const CONTROLLED=["732","728/730","936","841"];
 
@@ -2283,13 +2315,20 @@ new Chart(document.getElementById("chTilt"),{type:"bar",
 });
 (function(){
   const elkSide=tiltAll.filter(r=>r.lean>0),deerSide=tiltAll.filter(r=>r.lean<0);
-  const extreme=tiltAll.reduce((a,r)=>Math.abs(r.lean)>Math.abs(a.lean)?r:a,tiltAll[0]);
-  const balanced=tiltAll.reduce((a,r)=>Math.abs(r.lean)<Math.abs(a.lean)?r:a,tiltAll[0]);
+  /* Real dual-species units only: both species genuinely huntable (≥10 taken) and no access-limited base,
+     so a lopsided split reflects hunter behaviour, not a regulation like elk-only Suffield. */
+  const real=tiltAll.filter(r=>(r.eTotal||0)>=10&&(r.wTotal||0)>=10&&!CONTROLLED.includes(r.wmu));
+  const eShare=r=>Math.round((r.eTotal||0)/((r.eTotal||0)+(r.wTotal||0))*100);
+  const leanTxt=r=>{const e=eShare(r);return e>=50?e+"% elk":(100-e)+"% deer";};
+  const extreme=real.reduce((a,r)=>Math.abs(r.lean)>Math.abs(a.lean)?r:a,real[0]);
+  const balanced=real.reduce((a,r)=>Math.abs(r.lean)<Math.abs(a.lean)?r:a,real[0]);
   document.getElementById("tiltStats").innerHTML=
     statTile("Deer-dominant",deerSide.length+" units","of "+tiltAll.length+" analysed")+
     statTile("Elk-dominant",elkSide.length+" units","more elk than deer")+
-    statTile("Most lopsided","WMU "+extreme.wmu,(extreme.eTotal||0)+" elk vs "+(extreme.wTotal||0)+" deer")+
-    statTile("Most balanced","WMU "+balanced.wmu,(balanced.eTotal||0)+" elk vs "+(balanced.wTotal||0)+" deer");
+    statTile("Most one-sided (both legal)","WMU "+extreme.wmu+(extreme.name?" "+extreme.name:""),
+      leanTxt(extreme)+" — "+(extreme.wTotal||0)+" deer vs "+(extreme.eTotal||0)+" elk")+
+    statTile("Most balanced","WMU "+balanced.wmu+(balanced.name?" "+balanced.name:""),
+      leanTxt(balanced)+" — "+(balanced.eTotal||0)+" elk vs "+(balanced.wTotal||0)+" deer");
 })();
 
 /* ============================================================
@@ -2309,13 +2348,15 @@ new Chart(document.getElementById("chSexRatio"),{type:"bar",
       y:{type:"logarithmic",min:40,max:1400,title:{display:true,
         text:"Males per 100 females harvested (log)",color:ink()},grid:{color:grid()},ticks:{color:ink()}}}})
 });
-const eRatios=PURE.filter(r=>r.eRatio!=null&&r.eTotal>=30).map(r=>r.eRatio);
-const wRatios=PURE.filter(r=>r.wRatio!=null&&r.wTotal>=30).map(r=>r.wRatio);
+/* Require a stable female (denominator) sample and drop access-limited bases, so ratios reflect
+   real tag policy rather than a one-cow fluke or a draw-only base. */
+const eRatios=PURE.filter(r=>r.eRatio!=null&&r.eTotal>=30&&(r.eFemale||0)>=15&&!CONTROLLED.includes(r.wmu)).map(r=>r.eRatio);
+const wRatios=PURE.filter(r=>r.wRatio!=null&&r.wTotal>=30&&(r.wFemale||0)>=15&&!CONTROLLED.includes(r.wmu)).map(r=>r.wRatio);
 document.getElementById("sexStats").innerHTML=
   statTile("Median elk ratio",Math.round(median(eRatios)),"bulls per 100 cows")+
   statTile("Median deer ratio",Math.round(median(wRatios)),"bucks per 100 does")+
-  statTile("Elk range",Math.min(...eRatios)+"–"+Math.max(...eRatios),"widest policy spread")+
-  statTile("Deer range",Math.min(...wRatios)+"–"+Math.max(...wRatios),"hunter preference");
+  statTile("Elk range",Math.min(...eRatios)+"–"+Math.max(...eRatios),"units with 15+ cows taken")+
+  statTile("Deer range",Math.min(...wRatios)+"–"+Math.max(...wRatios),"units with 15+ does taken");
 
 /* ============================================================
    PRESSURE
@@ -2880,8 +2921,8 @@ function showUnit(wmu,keep){
   const nm=(any&&any.name)?" · "+any.name:"";
   const reg=any?any.regionName:"";
   let html=`<button class="close" onclick="closeUnit()">close ✕</button>
-    <h3>WMU ${wmu}${nm}</h3>
-    <p style="font-size:13px;color:var(--ink-3);margin:0 0 14px">${reg} region · every loaded season and
+    <h3>WMU ${wmu}${nm}${reg?' <span style="font-weight:400;color:var(--ink-3)">('+reg+')</span>':""}</h3>
+    <p style="font-size:13px;color:var(--ink-3);margin:0 0 14px">Every loaded season and
     species · elk licence: ${TAG_LABELS[any?any.eTag:"none"]} · deer licence: ${
     TAG_LABELS[any?any.wTag:"none"]} · CWD: ${CWD_LABELS[any?any.cwd:"none"]}</p>
     <div class="tbl-scroll" style="margin-bottom:16px"><table class="data"><thead><tr>
