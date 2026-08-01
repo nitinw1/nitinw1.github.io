@@ -84,7 +84,7 @@
             body { padding-bottom: 84px; }
             .dock {
                 display: flex; gap: 4px; align-items: center;
-                position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%);
+                position: fixed; top: auto; bottom: 16px; left: 50%; transform: translateX(-50%);
                 z-index: 100; padding: 7px 9px; border-radius: 999px;
                 background: color-mix(in srgb, var(--surface) 88%, transparent);
                 backdrop-filter: saturate(180%) blur(14px);
@@ -94,6 +94,7 @@
             .dock a:active { transform: scale(.9); }
             .dock a.active { background: var(--accent); }
         }
+        @media (max-width: 470px) { .brand-name { display: none; } }
 
         /* HERO */
         .hero { padding: 96px 0 72px; position: relative; overflow: hidden; }
@@ -203,7 +204,7 @@
 <body>
     <nav id="nav">
         <div class="wrap nav-inner">
-            <a href="#top" class="brand"><span class="dot">NW</span> Nitin Wadhwani</a>
+            <a href="#top" class="brand"><span class="dot">NW</span> <span class="brand-name">Nitin Wadhwani</span></a>
             <div class="nav-links">
                 <a href="#about">About</a>
                 <a href="#skills">Skills</a>
@@ -487,14 +488,15 @@
         });
 
         const dockLinks = document.querySelectorAll('.dock a');
-        const spy = new IntersectionObserver((entries) => {
-            entries.forEach(e => {
-                if (e.isIntersecting) {
-                    dockLinks.forEach(a => a.classList.toggle('active', a.dataset.sec === e.target.id));
-                }
-            });
-        }, { rootMargin: '-45% 0px -45% 0px' });
-        document.querySelectorAll('section[id]').forEach(s => spy.observe(s));
+        const spySections = [...document.querySelectorAll('section[id]')];
+        function updateActive() {
+            const mid = window.scrollY + window.innerHeight / 2;
+            let cur = null;
+            spySections.forEach(s => { if (s.offsetTop <= mid) cur = s.id; });
+            dockLinks.forEach(a => a.classList.toggle('active', a.dataset.sec === cur));
+        }
+        window.addEventListener('scroll', updateActive, { passive: true });
+        updateActive();
 
         const io = new IntersectionObserver((entries) => {
             entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('show'); io.unobserve(e.target); } });
