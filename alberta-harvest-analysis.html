@@ -1,0 +1,2829 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Alberta Big Game Harvest Analysis — Elk, Deer &amp; Moose, 2016–2025</title>
+<meta name="description" content="An interactive data analysis of Alberta's resident hunter harvest for elk, white-tailed deer and moose: ten seasons of provincial totals (2016–2025) plus unit-level detail for 2023–2025 across 300+ Wildlife Management Units. Success rates, hunter-pressure modelling, species distribution, sex-selection bias, licence mapping, CWD surveillance and a 2026 outlook.">
+<meta property="og:title" content="Alberta Big Game Harvest Analysis — Elk, Deer &amp; Moose, 2016–2025">
+<meta property="og:description" content="650,000 harvested animals across ten seasons and three species: success rates, hunter pressure, species tilt, sex-ratio analysis, zone maps, chronic wasting disease and a 2026 outlook.">
+<meta property="og:type" content="article">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+:root{
+  --bg:#fbfbfa; --surface:#ffffff; --surface-2:#f4f3ef;
+  --ink:#14140f; --ink-2:#4a4943; --ink-3:#7c7b74;
+  --line:rgba(20,20,15,.10); --line-2:rgba(20,20,15,.20);
+  --elk:#c25a2c; --deer:#2a6fb8; --gold:#b4820c; --ok:#2f7a4a;
+  --radius:8px; --maxw:1060px;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Helvetica,Arial,sans-serif;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+}
+[data-theme="dark"]{
+  --bg:#0d1017; --surface:#151a23; --surface-2:#1c2230;
+  --ink:#eef1f6; --ink-2:#c2c9d4; --ink-3:#9aa4b2;
+  --line:rgba(255,255,255,.12); --line-2:rgba(255,255,255,.22);
+  --elk:#e07a4a; --deer:#7d92f0; --gold:#d8a52c; --ok:#5fae7c;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);
+  font-size:16px;line-height:1.7;-webkit-font-smoothing:antialiased}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+h1,h2,h3,h4{font-weight:600;line-height:1.25;margin:0}
+h1{font-size:clamp(28px,5vw,44px);letter-spacing:-.02em}
+h2{font-size:clamp(21px,3vw,28px);letter-spacing:-.01em;margin:0 0 6px}
+h3{font-size:18px;margin:0 0 6px}
+h4{font-size:15px;margin:0 0 4px}
+p{margin:0 0 1rem}
+a{color:var(--deer);text-decoration:none;border-bottom:1px solid transparent}
+a:hover{border-bottom-color:currentColor}
+code{font-family:var(--mono);font-size:.88em;background:var(--surface-2);padding:1px 5px;border-radius:4px}
+
+/* nav */
+nav{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 92%,transparent);
+  backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+nav .wrap{display:flex;align-items:center;gap:14px;min-height:52px;flex-wrap:wrap;padding:6px 24px}
+nav .brand{font-weight:600;font-size:14px;white-space:nowrap;flex:none}
+nav .brand span{color:var(--ink-3);font-weight:400}
+.navlinks{flex:1;min-width:0;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.navmenu{position:relative}
+.navmenu>summary{list-style:none;cursor:pointer;font-size:13px;color:var(--ink-2);white-space:nowrap;
+  padding:6px 10px;border-radius:8px;display:flex;align-items:center;gap:5px}
+.navmenu>summary::-webkit-details-marker{display:none}
+.navmenu>summary::after{content:"⌄";font-size:13px;line-height:1;opacity:.65;transform:translateY(-2px)}
+.navmenu>summary:hover{background:var(--surface-2);color:var(--ink)}
+.navmenu[open]>summary{background:var(--surface-2);color:var(--ink)}
+.navmenu>.menu{position:absolute;top:100%;left:0;margin-top:6px;background:var(--surface);
+  border:1px solid var(--line-2);border-radius:11px;padding:6px;min-width:186px;display:flex;
+  flex-direction:column;gap:1px;box-shadow:0 14px 40px rgba(0,0,0,.4);z-index:60}
+.navmenu>.menu a{padding:8px 11px;border-radius:7px;font-size:13px;color:var(--ink-2)}
+.navmenu>.menu a:hover{background:var(--surface-2);color:var(--ink)}
+nav>.wrap>.navlinks>a{font-size:13px;padding:6px 10px;border-radius:8px}
+nav>.wrap>.navlinks>a:hover{background:var(--surface-2)}
+nav a{font-size:13px;color:var(--ink-2);white-space:nowrap}
+nav a:hover{color:var(--ink)}
+nav a.cta{flex:none;background:var(--elk);color:#0d1017;font-weight:600;padding:6px 13px;
+  border-radius:20px;border:none}
+nav a.cta:hover{opacity:.88;color:#0d1017}
+@media (max-width:620px){nav .brand span{display:none}}
+
+/* hero */
+header.hero{padding:72px 0 40px;border-bottom:1px solid var(--line)}
+.kicker{font-size:12px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3);
+  font-weight:600;margin-bottom:14px}
+.lede{font-family:var(--serif);font-size:clamp(17px,2.2vw,20px);line-height:1.6;
+  color:var(--ink-2);max-width:64ch;margin:18px 0 0}
+.byline{font-size:13px;color:var(--ink-3);margin-top:22px;padding-top:16px;border-top:1px solid var(--line)}
+
+section{padding:52px 0;border-bottom:1px solid var(--line)}
+.sec-head{margin-bottom:26px;max-width:70ch}
+.sec-head p{color:var(--ink-2);margin:8px 0 0}
+.prose{max-width:68ch}
+.prose p{color:var(--ink-2)}
+.prose strong{color:var(--ink);font-weight:600}
+
+/* stat grid */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:24px 0}
+.stat{background:var(--surface-2);border-radius:var(--radius);padding:16px 18px}
+.stat .lab{font-size:12px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+.stat .val{font-family:var(--serif);font-size:30px;line-height:1.1;margin:6px 0 2px;
+  font-variant-numeric:tabular-nums lining-nums}
+.stat .sub{font-size:12.5px;color:var(--ink-3)}
+
+/* cards */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:24px 0}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px 20px}
+.card.hi{border:2px solid var(--elk)}
+.card table{width:100%;font-size:13.5px;border-collapse:collapse}
+.card td{padding:4px 0}
+.card td:last-child{text-align:right;font-variant-numeric:tabular-nums;font-weight:500}
+.card td:first-child{color:var(--ink-3)}
+.badge{display:inline-block;font-size:11.5px;font-weight:600;padding:3px 9px;border-radius:20px;
+  letter-spacing:.03em;margin-bottom:10px}
+.badge.elk{background:color-mix(in srgb,var(--elk) 16%,transparent);color:var(--elk)}
+.badge.deer{background:color-mix(in srgb,var(--deer) 16%,transparent);color:var(--deer)}
+.badge.ok{background:color-mix(in srgb,var(--ok) 16%,transparent);color:var(--ok)}
+.badge.gold{background:color-mix(in srgb,var(--gold) 18%,transparent);color:var(--gold)}
+
+/* charts */
+.chart-block{margin:30px 0}
+.chart-title{font-size:14.5px;font-weight:600;margin-bottom:2px}
+.chart-note{font-size:12.5px;color:var(--ink-3);margin-bottom:12px}
+.chart-box{position:relative;width:100%;background:var(--surface);border:1px solid var(--line);
+  border-radius:12px;padding:16px}
+.legend{display:flex;flex-wrap:wrap;gap:16px;font-size:12.5px;color:var(--ink-2);margin-bottom:10px}
+.legend span.k{display:inline-flex;align-items:center;gap:6px}
+.sw{width:11px;height:11px;border-radius:3px;display:inline-block}
+
+/* composition bars */
+.comp{margin:0 0 26px}
+.comp-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:7px}
+.comp-bar{display:flex;gap:2px;height:32px;border-radius:var(--radius);overflow:hidden}
+.comp-keys{display:flex;flex-wrap:wrap;gap:18px;margin-top:8px;font-size:13px;color:var(--ink-3)}
+
+/* table */
+.tbl-tools{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:12px}
+input[type=search],select{font:inherit;font-size:13.5px;padding:7px 10px;border:1px solid var(--line-2);
+  border-radius:var(--radius);background:var(--surface);color:var(--ink)}
+input[type=search]{min-width:180px}
+.tbl-scroll{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+table.data{width:100%;border-collapse:collapse;font-size:13px}
+table.data th{position:sticky;top:0;background:var(--surface-2);text-align:right;padding:9px 10px;
+  font-weight:600;font-size:12px;white-space:nowrap;cursor:pointer;border-bottom:1px solid var(--line);
+  color:var(--ink-2);user-select:none}
+table.data th:first-child{text-align:left}
+table.data th:hover{color:var(--ink)}
+table.data th[data-dir]:after{content:'';margin-left:4px}
+table.data th[data-dir="1"]:after{content:'\25B4'}
+table.data th[data-dir="-1"]:after{content:'\25BE'}
+table.data td{padding:7px 10px;text-align:right;font-variant-numeric:tabular-nums;
+  border-bottom:1px solid var(--line);white-space:nowrap}
+table.data td:first-child{text-align:left;font-weight:500}
+table.data tr:hover td{background:var(--surface-2)}
+table.data tr.mark td:first-child{color:var(--elk)}
+.pill{display:inline-block;padding:1px 7px;border-radius:20px;font-size:11.5px;font-weight:600}
+
+/* misc */
+.callout{background:var(--surface-2);border-left:3px solid var(--elk);border-radius:0;
+  padding:16px 18px;margin:22px 0}
+.callout h4{margin-bottom:4px}
+.callout p{margin:0;font-size:14.5px;color:var(--ink-2)}
+.callout.deer{border-left-color:var(--deer)}
+.callout.gold{border-left-color:var(--gold)}
+ul.tight{margin:0 0 1rem;padding-left:20px;color:var(--ink-2)}
+ul.tight li{margin-bottom:6px}
+.two-col{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:26px}
+figure{margin:26px 0}
+figcaption{font-size:12.5px;color:var(--ink-3);margin-top:8px}
+footer{padding:44px 0 60px;font-size:13px;color:var(--ink-3)}
+footer a{color:var(--ink-2)}
+.src-list{list-style:none;padding:0;margin:10px 0 0}
+.src-list li{margin-bottom:5px}
+button{font:inherit;font-size:13px;padding:6px 12px;border:1px solid var(--line-2);
+  border-radius:var(--radius);background:var(--surface);color:var(--ink);cursor:pointer;
+  transition:background .12s}
+button:hover{background:var(--surface-2)}
+button:active{transform:scale(.98)}
+button.mode.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.chip{display:inline-block;font-size:12px;font-family:var(--mono);padding:3px 8px;border-radius:5px;
+  background:var(--surface-2);border:1px solid var(--line)}
+.chip.hot{background:color-mix(in srgb,var(--elk) 20%,transparent);border-color:var(--elk);color:var(--elk);
+  font-weight:600}
+.tile{cursor:pointer}
+.tile:hover rect{stroke:var(--ink);stroke-width:2}
+
+/* ---- dashboard ---- */
+.dash-bar{background:var(--surface);border:1px solid var(--line);border-radius:12px;
+  margin-bottom:16px;position:sticky;top:52px;z-index:30}
+.dash-row{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;padding:11px 14px;
+  border-bottom:1px solid var(--line)}
+.ctl-group{display:flex;align-items:center;gap:8px;min-width:0;max-width:100%}
+.ctl-label{font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3);
+  font-weight:600;flex:none}
+.seg{display:flex;background:var(--surface-2);border-radius:9px;padding:3px;gap:2px;
+  overflow-x:auto;scrollbar-width:none;max-width:100%}
+.seg::-webkit-scrollbar{display:none}
+.seg button{border:none;background:transparent;padding:5px 11px;border-radius:7px;font-size:13px;
+  color:var(--ink-2);font-weight:500;flex:none;white-space:nowrap}
+.seg button:hover{background:var(--bg);color:var(--ink)}
+.seg button.on{background:var(--elk);color:#0d1017;font-weight:600}
+.seg button.on.deer{background:var(--deer)}
+.seg button.on.moose{background:var(--ok)}
+.seg button:disabled{opacity:.35;cursor:not-allowed}
+.seg button:disabled:hover{background:transparent;color:var(--ink-2)}
+button.mini{font-size:12px;padding:5px 10px}
+.slider-ctl{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--ink-3);
+  white-space:nowrap;flex:none}
+.slider-ctl b{color:var(--ink);font-variant-numeric:tabular-nums;min-width:34px;font-weight:600}
+.slider-ctl input[type=range]{width:96px}
+#fSearch{flex:1 1 190px;min-width:140px}
+#fSort{flex:none}
+.tgl{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;color:var(--ink-2);cursor:pointer;
+  white-space:nowrap;flex:0 0 auto;position:relative;line-height:1.2}
+.tgl:hover{color:var(--ink)}
+.tgl input{position:absolute;opacity:0;width:0;height:0;margin:0}
+.tgl input:focus-visible+i{box-shadow:0 0 0 3px color-mix(in srgb,var(--elk) 35%,transparent)}
+.tgl i{width:32px;height:18px;border-radius:20px;background:var(--surface-2);display:block;
+  border:1px solid var(--line-2);position:relative;transition:background .15s;flex:0 0 32px}
+.tgl i::after{content:"";position:absolute;top:2px;left:2px;width:12px;height:12px;border-radius:50%;
+  background:var(--ink-3);transition:transform .15s,background .15s}
+.tgl input:checked+i{background:color-mix(in srgb,var(--elk) 35%,transparent);border-color:var(--elk)}
+.tgl input:checked+i::after{transform:translateX(14px);background:var(--elk)}
+.empty{text-align:center;padding:40px 20px;color:var(--ink-3);font-size:14px;
+  background:var(--surface-2);border-radius:12px;margin-bottom:20px}
+.delta{font-size:12px;font-weight:600}
+.delta.up{color:var(--ok)} .delta.down{color:var(--elk)}
+.chip-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;min-height:1px}
+.fchip{font-size:12px;padding:3px 9px;border-radius:20px;background:var(--surface-2);
+  border:1px solid var(--line);color:var(--ink-2)}
+.fchip b{color:var(--ink);font-weight:600}
+.data-status{font-size:12.5px;color:var(--ink-3);margin:0 0 18px}
+.dash-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:22px;
+  margin-bottom:20px}
+.dash-grid>*{min-width:0}
+.stats>*,.cards>*{min-width:0}
+@media (max-width:820px){.dash-grid{grid-template-columns:minmax(0,1fr)}.dash-bar{position:static}}
+@media (max-width:620px){
+  .wrap{padding:0 16px}
+  section{padding:38px 0}
+  .chart-box{padding:10px}
+  .chart-box[style*="720px"],.chart-box[style*="860px"],.chart-box[style*="900px"]{height:560px!important}
+  .stat .val{font-size:25px}
+  .dash-row{padding:9px 10px;gap:8px 10px}
+  .ctl-label{font-size:10px}
+  .seg button{padding:5px 9px;font-size:12.5px}
+  table.data{font-size:12px}
+  table.data td,table.data th{padding:6px 8px}
+  .navmenu>.menu{min-width:170px}
+}
+.unit-panel{background:var(--surface);border:1px solid var(--elk);border-radius:12px;
+  padding:18px 20px;margin-bottom:20px}
+.unit-panel .close{float:right;font-size:12px;padding:3px 9px}
+.unit-panel h3{margin-bottom:2px}
+table.data tbody tr{cursor:pointer}
+@media print{nav{display:none}section{break-inside:avoid}}
+</style>
+</head>
+<body>
+
+<nav><div class="wrap">
+  <span class="brand">Alberta Big Game <span>· 2016–2025</span></span>
+  <div class="navlinks">
+    <a href="#findings">Findings</a>
+    <details class="navmenu"><summary>Analysis</summary><div class="menu">
+      <a href="#trends">Ten seasons of harvest</a>
+      <a href="#outlook">2026 outlook</a>
+      <a href="#province">Harvest composition</a>
+      <a href="#distribution">Species distribution</a>
+      <a href="#sex">Sex ratios</a>
+      <a href="#pressure">Hunter pressure</a>
+      <a href="#regional">Regional breakdown</a>
+    </div></details>
+    <details class="navmenu"><summary>Places</summary><div class="menu">
+      <a href="#calgary">Calgary case study</a>
+      <a href="#units">Three-unit comparison</a>
+      <a href="#maps">Zone maps</a>
+    </div></details>
+    <a href="#cwd">Disease</a>
+    <details class="navmenu"><summary>Reference</summary><div class="menu">
+      <a href="#regs">Regulations</a>
+      <a href="#method">Method &amp; metrics</a>
+      <a href="#limits">Limitations</a>
+    </div></details>
+  </div>
+  <a href="#dashboard" class="cta">Dashboard</a>
+</div></nav>
+
+<header class="hero"><div class="wrap">
+  <div class="kicker">Wildlife data analysis · Alberta, Canada</div>
+  <h1>What 650,000 harvested animals reveal about Alberta's big game</h1>
+  <p class="lede">Three species — elk, white-tailed deer and moose — across ten hunting seasons. Modelling
+  hunter pressure, species distribution, sex-selection bias, disease surveillance, and the gap between where
+  animals are abundant and where hunters actually succeed.</p>
+  <div class="byline">
+    <strong>Scope, precisely.</strong> Provincial totals cover <strong>2016–2025</strong> for all three species
+    — about 650,000 animals — and drive the ten-season trend analysis. Unit-level detail, which drives the
+    dashboard, maps and every per-WMU figure, covers <strong>2023, 2024 and 2025</strong> for all three species
+    across more than 300 Wildlife Management Units — about 210,000 animals. Disease figures are the
+    <strong>2025–26</strong> CWD surveillance season, compared against 2024–25. Season structure and licence
+    classification come from the <strong>2026</strong> regulations. The 2026 outlook is a projection: no 2026
+    harvest data exists yet.
+    <br><br>
+    Sources: Alberta Forestry and Parks, <em>Hunter harvest reports</em> 2016–2025 · Environment and Protected
+    Areas, <em>CWD surveillance update</em>, April 2026 · <em>2026 Alberta Guide to Hunting Regulations</em>.
+    All harvest figures are estimated resident harvest combining general and special licences.
+  </div>
+</div></header>
+
+<section id="findings"><div class="wrap">
+  <div class="sec-head">
+    <h2>Headline findings</h2>
+    <p>Six results that are not obvious from reading the harvest tables directly.</p>
+  </div>
+
+  <div class="cards">
+    <div class="card">
+      <span class="badge elk">Sex selection</span>
+      <h3>A 22-point bias gap</h3>
+      <p style="font-size:14px;color:var(--ink-2);margin:0">Whitetail harvest is 69% male; elk harvest is
+      47% male. The difference is not biology — it is tag policy. Cow elk are pushed into the harvest by
+      draw allocation, while antlerless deer tags go unfilled even where they are unrestricted.</p>
+    </div>
+    <div class="card">
+      <span class="badge deer">Distribution</span>
+      <h3>The two species barely overlap</h3>
+      <p style="font-size:14px;color:var(--ink-2);margin:0">Across units with both species present, harvest
+      totals correlate weakly. WMU 350 produced 1,284 deer and 4 elk. WMU 522 produced 760 elk and 270 deer.
+      Very few units are genuinely productive for both.</p>
+    </div>
+    <div class="card">
+      <span class="badge gold">Pressure</span>
+      <h3>Big harvest ≠ good odds</h3>
+      <p style="font-size:14px;color:var(--ink-2);margin:0">Dividing harvest by success rate estimates
+      hunter numbers. The highest-harvest units near Calgary are also the most crowded, and post
+      below-median success. Volume measures crowds as much as animals.</p>
+    </div>
+    <div class="card">
+      <span class="badge ok">Efficiency</span>
+      <h3>Season length doesn't buy success</h3>
+      <p style="font-size:14px;color:var(--ink-2);margin:0">WMU 402 offers a 75-day general rifle season for
+      bull elk and returns 7% success. WMU 312 offers 37 days and returns 26%. Access difficulty and terrain
+      dominate opportunity length.</p>
+    </div>
+    <div class="card">
+      <span class="badge elk">Antlerless gap</span>
+      <h3>Does are the unclaimed resource</h3>
+      <p style="font-size:14px;color:var(--ink-2);margin:0">In many foothills units, antlered deer outnumber
+      antlerless in the harvest by more than three to one despite both being available on a general licence.
+      This is the same surplus that drives agricultural crop damage complaints.</p>
+    </div>
+    <div class="card">
+      <span class="badge deer">Outliers</span>
+      <h3>Two units break every rule</h3>
+      <p style="font-size:14px;color:var(--ink-2);margin:0">WMU 732 — CFB Suffield — posted 98% elk success on
+      320 animals, and WMU 728/730 — CFB Wainwright — posted 73% deer success. Both are controlled
+      military-base draws: statistical artifacts of restricted access, not habitat quality.</p>
+    </div>
+  </div>
+</div></section>
+
+<section id="method"><div class="wrap">
+  <div class="sec-head">
+    <h2>Method and derived metrics</h2>
+    <p>What the source data contains, what it does not, and how each derived figure is calculated.</p>
+  </div>
+  <div class="two-col">
+    <div class="prose">
+      <h3>Source structure</h3>
+      <p>Each report gives, per Wildlife Management Unit (WMU): male, female and young harvest counts, a
+      total, and an estimated hunter success percentage. Totals are survey estimates, so rows do not always
+      sum exactly and small counts carry wide error bars.</p>
+      <p>Some rows describe <em>licence groupings</em> rather than single units — for example
+      <code>124/128/142/144/148/150</code> — where one special licence is valid across several WMUs. These
+      rows are retained for provincial totals but excluded from per-unit joins and correlations, since they
+      cannot be attributed to a single geography.</p>
+      <h3>Derived: estimated hunter count</h3>
+      <p>Success rate is defined as the share of hunters who harvested an animal. Inverting it gives an
+      approximate participant count:</p>
+      <p><code>hunters ≈ harvest ÷ (success% ÷ 100)</code></p>
+      <p>This is a first-order estimate. It slightly understates participation wherever hunters take more
+      than one animal on a single licence — for example multi-tag antlerless deer licences.</p>
+    </div>
+    <div class="prose">
+      <h3>Derived: species tilt</h3>
+      <p>Elk share of combined harvest, <code>elk ÷ (elk + deer)</code>, expressed as a percentage. Values
+      above 50% indicate an elk-dominant unit; below 50%, deer-dominant. Computed only for units where both
+      species recorded harvest.</p>
+      <h3>What "antlerless" counts</h3>
+      <p>The dashboard's antlerless class sums <strong>adult females plus young of either sex</strong>, not
+      females alone. That follows how Alberta defines the term: an antlerless licence authorises any animal
+      without antlers of legal length, so a male calf or a spike-less yearling bull is an antlerless animal.
+      Because the harvest reports publish male, female and young as three separate columns, and the young
+      column is not split by sex, female-plus-young is the closest available match to what an antlerless tag
+      actually permits. If you want females on their own, use the Female class — the two differ by about
+      6% for elk and 2% for deer province-wide.</p>
+      <h3>Derived: sex ratio</h3>
+      <p>Males harvested per 100 females, <code>(male ÷ female) × 100</code>. This is a <em>harvest</em>
+      ratio, not a population ratio — it reflects tag policy and hunter choice at least as much as herd
+      composition. Units with zero females recorded are excluded as undefined.</p>
+      <h3>Statistics</h3>
+      <p>Correlations are Pearson product-moment coefficients computed over units with non-zero harvest in
+      both species. Medians and quartiles are computed over units with harvest above a stated floor, to keep
+      near-zero units from dominating the distribution. All computation happens in the browser from the
+      embedded dataset — figures below are calculated live, not transcribed.</p>
+    </div>
+  </div>
+  <div class="callout deer">
+    <h4>Data coverage and how seasons are added</h4>
+    <p>The dashboard is built on a season registry covering all nine combinations of three species — elk,
+    white-tailed deer and moose — and three seasons: 2023, 2024 and 2025, roughly 210,000 harvested animals.
+    The ten-season trend section uses a separate, longer series of provincial totals for 2016–2025, about
+    650,000 animals; those older reports were parsed for totals only, not per unit. Every report uses the
+    identical row shape
+    (<code>WMU, male, female, young, total, success%</code>), so a season is added by dropping one array into
+    its slot; the season selector, table columns, charts and summary tiles all rebuild themselves from
+    whatever is present, and the dashboard states which species and seasons are loaded rather than failing
+    silently. The narrative analysis outside the seasons section is pinned to 2025 throughout, so
+    single-season figures quoted in prose are always the most recent year.</p>
+  </div>
+
+  <div class="chart-block">
+    <div class="chart-title">Data integrity check</div>
+    <div class="chart-note">Every dataset on this page was transcribed from a published PDF, so each one is
+    verified in the browser at load time: the sum of all unit rows is compared against the
+    "estimated total" line printed in the source report. This table is generated live — if a figure were
+    mistyped, it would show up here rather than sitting silently in a chart.</div>
+    <div class="tbl-scroll"><table class="data" id="integrityTable"></table></div>
+  </div>
+
+  <div class="callout gold">
+    <h4>A note on what success rate does and does not mean</h4>
+    <p>The published rate blends general-licence and special-licence (draw) hunting. In units where cow elk
+    draws are generous, overall elk success is pulled upward well above what a hunter carrying only a
+    general antlered licence should expect. Comparisons in this analysis flag that distortion wherever the
+    male share of harvest indicates it.</p>
+  </div>
+</div></section>
+
+<section id="province"><div class="wrap">
+  <div class="sec-head">
+    <h2>Province-wide picture</h2>
+    <p>Two species, two entirely different harvest structures.</p>
+  </div>
+
+  <div class="stats" id="provStats"></div>
+
+  <div class="chart-block">
+    <div class="chart-title">Harvest composition by sex</div>
+    <div class="chart-note">Share of total provincial harvest. Elk is close to an even split; deer is
+    strongly antlered-biased.</div>
+    <div class="legend">
+      <span class="k"><span class="sw" style="background:var(--deer)"></span>Male</span>
+      <span class="k"><span class="sw" style="background:var(--elk)"></span>Female</span>
+      <span class="k"><span class="sw" style="background:var(--gold)"></span>Young</span>
+    </div>
+    <div id="compBars"></div>
+  </div>
+
+  <div class="prose">
+    <p>The composition gap is the single most informative feature of these two datasets. Elk harvest arrives
+    at a near-even sex split because wildlife managers engineer it that way: antlerless elk almost always
+    requires a draw, and those draws are issued in the volumes needed to hit population targets. Deer harvest
+    is left largely to hunter preference, and hunter preference is overwhelmingly antlered.</p>
+    <p>The young-animal share reinforces this. Calves make up a meaningfully larger fraction of elk harvest
+    than fawns do of deer harvest, which is what you expect when whole family groups are being culled under
+    antlerless authorizations rather than individual animals being selected for antlers.</p>
+  </div>
+</div></section>
+
+<section id="trends"><div class="wrap">
+  <div class="sec-head">
+    <h2>Ten seasons of harvest</h2>
+    <p>Provincial totals for all three species from 2016 to 2025, extracted from ten years of annual reports.
+    Long enough to separate a policy cycle from a one-off — and it reframes what a single season appears to
+    say.</p>
+  </div>
+
+  <div class="stats" id="trendStats"></div>
+
+  <div class="chart-block">
+    <div class="chart-title">Total harvest by species, 2016–2025</div>
+    <div class="chart-note">Deer harvest is roughly five times elk and moose, so a linear axis would flatten
+    the smaller two into nothing. This uses a <strong>logarithmic vertical axis</strong> so all three shapes
+    stay readable — read the direction and steepness of each line, not the vertical gaps between them.
+    Every species peaks between 2020 and 2023 and declines afterward.</div>
+    <div class="chart-box" style="height:360px"><canvas id="chTrendTotal"></canvas></div>
+  </div>
+
+  <div class="chart-block">
+    <div class="chart-title">Male vs female harvest, ten seasons</div>
+    <div class="chart-note">Solid lines are males, dashed are females. Male harvest is remarkably stable
+    across a decade. Female harvest swings violently — and that is the signature of tag policy, not
+    biology.</div>
+    <div class="chart-box" style="height:400px"><canvas id="chTrendSex"></canvas></div>
+  </div>
+
+  <div class="chart-block">
+    <div class="chart-title">Antlerless share of harvest</div>
+    <div class="chart-note">Female plus young as a percentage of each species' total. This is the cleanest
+    single view of how much antlerless opportunity managers released each year.</div>
+    <div class="chart-box" style="height:340px"><canvas id="chTrendShare"></canvas></div>
+  </div>
+
+  <div class="callout">
+    <h4>The antlerless cycle — and a correction to the single-season reading</h4>
+    <p>Looking at 2025 alone, the obvious conclusion is that hunters ignore antlerless deer: bucks were 69% of
+    the harvest despite doe tags being widely available. Ten seasons show that reading is wrong. The antlerless
+    share of the deer harvest ran at 37–45% through 2016–2019, was loosened to 49% in 2020, peaked at
+    <strong>57% in 2022 and 2023</strong>, then collapsed to <strong>31% in 2025 — the lowest in the
+    decade</strong>. Hunters were taking antlerless deer in enormous numbers as recently as two seasons ago.</p>
+    <p>Meanwhile male deer harvest sat between 22,000 and 30,000 every single year for ten years with no
+    trend at all. Buck harvest is essentially a constant; doe harvest is a policy dial. Total deer harvest fell
+    40% from its 2023 peak almost entirely through that dial.</p>
+    <p><strong>The three species separate cleanly, and this is the payoff of the long window.</strong> Elk
+    follows the same policy pattern — antlerless share swinging from 43% in 2019 to 63% in 2024 and back to
+    53%. Moose does not: its antlerless share has been flat at 34–37% for the entire decade because antlerless
+    moose has always been tightly drawn. Yet moose harvest still fell 33% from its 2020 peak, with male harvest
+    down 31% and female down 31% in lockstep. Same headline decline, opposite cause. Deer and elk declined
+    because fewer antlerless tags were issued; moose declined across the board, which is what a real
+    population or effort problem looks like.</p>
+    <p>No single season could tell those two stories apart. That is the entire argument for pulling ten years
+    of reports instead of one.</p>
+  </div>
+
+  <div class="prose">
+    <p>This matters for anyone reading a single year's report as a measure of animal abundance. A unit whose
+    harvest halved between 2024 and 2025 most likely lost its cow or doe draws, not its animals. The dashboard
+    below lets you check any unit across all three seasons at once — click any row or bar to open its
+    multi-season history.</p>
+  </div>
+</div></section>
+
+<section id="outlook"><div class="wrap">
+  <div class="sec-head">
+    <h2>2026 outlook</h2>
+    <p>Which units look strongest for the coming season — from a deliberately simple, fully auditable model
+    rather than a black box.</p>
+  </div>
+
+  <div class="callout gold">
+    <h4>Why this is a projection and not machine learning</h4>
+    <p>There is no 2026 harvest data and there cannot be: the season opens in September 2026 and the Game
+    Harvest Survey is not published until roughly March 2027. So anything about 2026 is a forecast. The
+    honest constraint is that per-unit data exists for only three seasons — three points per unit per species.
+    Fitting a neural network or gradient-boosted model to three points would produce something that looks
+    sophisticated and means nothing; it would mostly memorise the 2025 value and dress it up. With n=3, a
+    transparent weighted trend is not a lesser method, it is the defensible one.</p>
+    <p>So the model below is one you can check by hand, in four steps:</p>
+    <ol style="font-size:14.5px;color:var(--ink-2);margin:0 0 12px;padding-left:22px">
+      <li><strong>Recency-weighted baseline</strong> — 2025 weighted 3, 2024 weighted 2, 2023 weighted 1.</li>
+      <li><strong>Fitted slope</strong> — ordinary least squares across the three seasons.</li>
+      <li><strong>Volatility</strong> — mean absolute year-over-year change as a share of the mean.</li>
+      <li><strong>Volatility-weighted shrinkage</strong> — the projection blends the trend estimate with the
+      most recent actual season, weighted by <code>1 − volatility</code>. Stable units keep their trend;
+      noisy units get pulled back toward what actually happened in 2025.</li>
+    </ol>
+    <p>That fourth step matters, and testing is what forced it. WMU 357 elk ran 636 → 1,375 → 625. A plain
+    weighted-mean-plus-slope projected 871 for 2026 — higher than any of the three years except the one-off
+    spike, which is obviously wrong. Shrinking toward the latest season fixes it without adding any opacity:
+    a unit that bounces 85% year-over-year should not have its future dictated by a line drawn through three
+    points. The reported range is the projection ± half the volatility, so noisy units visibly carry wide
+    intervals instead of a falsely precise number.</p>
+  </div>
+
+  <div class="dash-bar" style="position:static">
+    <div class="dash-row" style="border-bottom:none">
+      <div class="ctl-group"><span class="ctl-label">Species</span>
+        <div class="seg" id="segOutlook" role="group" aria-label="Outlook species">
+          <button data-osp="elk" class="on">Elk</button>
+          <button data-osp="deer" class="deer">Deer</button>
+          <button data-osp="moose" class="moose">Moose</button>
+        </div></div>
+      <div class="ctl-group"><span class="ctl-label">Region</span>
+        <div class="seg" id="segOutRegion" role="group" aria-label="Outlook region">
+          <button data-oreg="all" class="on">All Alberta</button>
+          <button data-oreg="calgary">Calgary catchment</button>
+        </div></div>
+      <div class="ctl-group"><span class="ctl-label">Confidence</span>
+        <div class="seg" id="segOutConf" role="group" aria-label="Confidence filter">
+          <button data-oconf="all" class="on">All</button>
+          <button data-oconf="high">High only</button>
+          <button data-oconf="nolow">Exclude low</button>
+        </div></div>
+      <input type="search" id="oSearch" placeholder="Filter by unit or name…"
+        aria-label="Filter outlook by unit" style="flex:1 1 170px;min-width:130px">
+      <label class="tgl"><input type="checkbox" id="oCtrl" checked><i></i>
+        Exclude military bases</label>
+    </div>
+  </div>
+
+  <div class="stats" id="outlookStats"></div>
+
+  <div class="chart-block">
+    <div class="chart-title" id="outlookTitle">Projected 2026 harvest — top 20 units</div>
+    <div class="chart-note">The hollow outlined bar is the actual 2025 harvest, for reference. The solid bar
+    is the 2026 projection, coloured by confidence. Click any bar for that unit's season-by-season detail.</div>
+    <div class="legend">
+      <span class="k"><span class="sw" style="background:transparent;border:1.5px solid var(--ink-3)"></span>actual 2025</span>
+      <span class="k"><span class="sw" style="background:var(--ok)"></span>projected — high confidence</span>
+      <span class="k"><span class="sw" style="background:var(--gold)"></span>medium</span>
+      <span class="k"><span class="sw" style="background:var(--ink-3)"></span>low — treat as noise</span>
+    </div>
+    <div class="chart-box" style="height:640px"><canvas id="chOutlook"></canvas></div>
+  </div>
+
+  <div class="tbl-scroll" style="max-height:560px;overflow-y:auto">
+    <table class="data" id="outlookTable"></table>
+  </div>
+  <p style="font-size:12.5px;color:var(--ink-3);margin-top:12px">Projected success is the recency-weighted
+  average success rate, which assumes licence structure holds. That assumption is the model's biggest
+  weakness — a single change to a unit's antlerless draw can move its harvest by more than this projection
+  ever would.</p>
+
+  <div class="callout">
+    <h4>What would actually change these numbers</h4>
+    <p>The ten-season record shows antlerless allocation moving by 20 percentage points inside three years.
+    That single lever swamps everything in this model. If you want to know what 2026 really holds for a given
+    unit, the draw booklet matters more than any trend line — check whether your unit's antlerless quota moved,
+    and treat the projection as a starting point rather than an answer. The units worth trusting here are the
+    high-confidence ones: large harvests, stable across all three seasons, general-licence structure that has
+    not changed.</p>
+  </div>
+</div></section>
+
+<section id="distribution"><div class="wrap">
+  <div class="sec-head">
+    <h2>Species distribution: elk country and deer country</h2>
+    <p>Testing whether a good elk unit is also a good deer unit. Mostly, it is not.</p>
+  </div>
+
+  <div class="stats" id="corrStats"></div>
+
+  <div class="chart-block">
+    <div class="chart-title">Elk harvest vs white-tailed deer harvest by WMU</div>
+    <div class="chart-note">Logarithmic on both axes. The dashed diagonal marks equal harvest of both
+    species — points above it are elk-dominant units, points below are deer-dominant.</div>
+    <div class="chart-box" style="height:480px"><canvas id="chScatterLogLog"></canvas></div>
+  </div>
+
+  <div class="chart-block">
+    <div class="chart-title">Species tilt — which animal actually comes out of each unit</div>
+    <div class="chart-note">Each bar shows how far a unit leans from an even split. Bars to the right are
+    elk country; bars to the left are deer country. A bar reaching the far edge means essentially all of one
+    species and none of the other. Units with at least 150 combined animals; hover for real counts.</div>
+    <div class="legend">
+      <span class="k"><span class="sw" style="background:var(--elk)"></span>elk-dominant →</span>
+      <span class="k"><span class="sw" style="background:var(--deer)"></span>← deer-dominant</span>
+      <span>centre line = 50 / 50 split</span>
+    </div>
+    <div class="chart-box" style="height:860px"><canvas id="chTilt"></canvas></div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;
+      margin-top:14px" id="tiltStats"></div>
+  </div>
+
+  <div class="prose">
+    <p>The Peace region and the Grande Prairie units form a contiguous block of elk-dominant country. The
+    Rocky Mountain House belt is the mirror image — enormous deer harvests with almost no elk taken at all,
+    despite sharing similar latitude and forest cover.</p>
+    <p>The practical implication for anyone planning a hunt: a unit's reputation for one species carries
+    almost no information about the other. Units that are genuinely strong for both are rare enough to be
+    identified individually rather than assumed.</p>
+  </div>
+</div></section>
+
+<section id="sex"><div class="wrap">
+  <div class="sec-head">
+    <h2>Sex-ratio analysis</h2>
+    <p>Males harvested per 100 females — a direct readout of tag policy and hunter selection.</p>
+  </div>
+
+  <div class="chart-block">
+    <div class="chart-title">Males per 100 females harvested, selected units</div>
+    <div class="chart-note">Logarithmic scale. 100 is an even split. Elk ratios swing wildly by unit
+    because draws dictate them; deer ratios cluster high almost everywhere.</div>
+    <div class="legend">
+      <span class="k"><span class="sw" style="background:var(--elk)"></span>Elk (bulls per 100 cows)</span>
+      <span class="k"><span class="sw" style="background:var(--deer)"></span>Deer (bucks per 100 does)</span>
+      <span class="k"><span class="sw" style="background:var(--ok)"></span>Moose (bulls per 100 cows)</span>
+    </div>
+    <div class="chart-box" style="height:420px"><canvas id="chSexRatio"></canvas></div>
+  </div>
+
+  <div class="stats" id="sexStats"></div>
+
+  <div class="callout">
+    <h4>The management signal hidden in the ratios</h4>
+    <p>Where elk ratios fall below 100, cow draws are doing heavy lifting to suppress population growth.
+    Where they climb into the hundreds, the unit is effectively antlered-only and the herd is being allowed
+    to grow. Deer ratios show no such variation, because antlerless deer tags are broadly available and
+    simply go unused — the harvest is shaped by hunter choice rather than by policy.</p>
+  </div>
+</div></section>
+
+<section id="pressure"><div class="wrap">
+  <div class="sec-head">
+    <h2>Hunter pressure model</h2>
+    <p>Inverting success rate to estimate participation, then testing whether crowded units perform.</p>
+  </div>
+
+  <div class="chart-block">
+    <div class="chart-title">Estimated hunters vs success rate</div>
+    <div class="chart-note">Bubble area is total harvest. If harvest volume simply tracked animal abundance,
+    the busiest units would also be the most successful. They are not.</div>
+    <div class="chart-box" style="height:460px"><canvas id="chPressure"></canvas></div>
+  </div>
+
+  <div class="chart-block">
+    <div class="chart-title">Distribution of success rates</div>
+    <div class="chart-note">Units with harvest above 50 animals, binned in 5-point intervals. Deer success
+    is centred markedly higher than elk. The lone elk unit above 95% is a controlled military-base draw.</div>
+    <div class="legend">
+      <span class="k"><span class="sw" style="background:var(--elk)"></span>Elk</span>
+      <span class="k"><span class="sw" style="background:var(--deer)"></span>Deer</span>
+    </div>
+    <div class="chart-box" style="height:340px"><canvas id="chHist"></canvas></div>
+  </div>
+
+  <div class="stats" id="pressureStats"></div>
+</div></section>
+
+<section id="regional"><div class="wrap">
+  <div class="sec-head">
+    <h2>Regional breakdown</h2>
+    <p>Alberta's WMU numbering encodes ecoregion: 100s prairie, 200s parkland, 300s foothills,
+    400s mountain, 500s boreal.</p>
+  </div>
+
+  <div class="chart-block">
+    <div class="chart-title">Total harvest by region and species</div>
+    <div class="chart-note">Single-unit rows only; multi-unit licence groupings excluded.</div>
+    <div class="legend">
+      <span class="k"><span class="sw" style="background:var(--elk)"></span>Elk</span>
+      <span class="k"><span class="sw" style="background:var(--deer)"></span>Deer</span>
+    </div>
+    <div class="chart-box" style="height:340px"><canvas id="chRegional"></canvas></div>
+  </div>
+
+  <div class="chart-block">
+    <div class="chart-title">Aggregate success rate by region</div>
+    <div class="chart-note">Harvest-weighted: total regional harvest divided by total estimated regional
+    hunters, rather than a mean of unit percentages.</div>
+    <div class="chart-box" style="height:340px"><canvas id="chRegionalSucc"></canvas></div>
+  </div>
+
+  <div class="tbl-scroll" style="margin-top:20px">
+    <table class="data" id="regionalTable"></table>
+  </div>
+</div></section>
+
+<section id="calgary"><div class="wrap">
+  <div class="sec-head">
+    <h2>Case study: the Calgary catchment</h2>
+    <p>Applying the analysis to a practical question — which units within roughly two and a half hours of a
+    major city actually reward the drive.</p>
+  </div>
+
+  <div class="chart-block">
+    <div class="chart-title">Deer success vs elk success, units near Calgary</div>
+    <div class="chart-note">Bubble area is combined harvest. The upper-right quadrant is what a
+    multi-species hunter is looking for, and it is nearly empty.</div>
+    <div class="chart-box" style="height:440px"><canvas id="chCalgary"></canvas></div>
+  </div>
+
+  <figure>
+    <div class="chart-title">Habitat and movement schematic — WMU 312</div>
+    <div class="chart-note">Illustrative geography of the highest-performing nearby unit. Not to survey
+    scale; concentration areas are inferred from terrain, drainage and forest-edge structure rather than
+    from telemetry.</div>
+    <svg viewBox="0 0 560 660" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="mTitle mDesc"
+      style="width:100%;height:auto;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:8px">
+      <title id="mTitle">Schematic habitat map of WMU 312</title>
+      <desc id="mDesc">Forest reserve on the western edge, three inferred ungulate concentration areas along
+      the forest fringe, and the road and river network around Sundre and Water Valley.</desc>
+      <rect x="0" y="20" width="108" height="600" rx="4" fill="#639922" opacity=".22"/>
+      <line x1="108" y1="20" x2="108" y2="620" stroke="#6f9e3a" stroke-width="1.5" stroke-dasharray="6 4"/>
+      <text x="54" y="320" font-size="11" fill="#8fc45a" text-anchor="middle"
+        transform="rotate(-90 54 320)">Forest reserve — public land, bedding cover</text>
+      <ellipse cx="162" cy="118" rx="66" ry="56" fill="#BA7517" opacity=".3"/>
+      <ellipse cx="192" cy="372" rx="86" ry="130" fill="#BA7517" opacity=".3"/>
+      <ellipse cx="186" cy="548" rx="76" ry="50" fill="#BA7517" opacity=".3"/>
+      <text x="162" y="104" font-size="11.5" fill="#e0a94a" text-anchor="middle">Bearberry valley</text>
+      <text x="193" y="300" font-size="11.5" fill="#e0a94a" text-anchor="middle">Fallentimber corridor</text>
+      <text x="186" y="566" font-size="11.5" fill="#e0a94a" text-anchor="middle">West of Water Valley</text>
+      <path d="M0,150 C60,158 120,172 200,192 C260,206 300,200 322,196 C368,188 418,150 560,122"
+        fill="none" stroke="#378ADD" stroke-width="2.5"/>
+      <text x="66" y="140" font-size="10.5" fill="#7fb6ea">Red Deer River</text>
+      <path d="M378,620 C388,520 396,410 416,272 C428,184 448,108 468,54"
+        fill="none" stroke="#378ADD" stroke-width="2"/>
+      <path d="M114,382 C158,362 218,320 278,276 C328,240 358,208 378,180"
+        fill="none" stroke="#378ADD" stroke-width="1.4" stroke-dasharray="1 3"/>
+      <text x="250" y="258" font-size="10.5" fill="#7fb6ea"
+        transform="rotate(-32 250 258)">Fallentimber Creek</text>
+      <path d="M466,620 L452,492 C436,410 392,262 326,194" fill="none" stroke="#888780" stroke-width="2.5"/>
+      <text x="448" y="440" font-size="10.5" fill="#9aa4b2">Hwy 22</text>
+      <path d="M326,192 L560,186" fill="none" stroke="#888780" stroke-width="2.5"/>
+      <text x="486" y="178" font-size="10.5" fill="#9aa4b2">Hwy 27</text>
+      <path d="M324,192 C286,166 218,116 158,74" fill="none" stroke="#888780" stroke-width="2"/>
+      <text x="236" y="114" font-size="10.5" fill="#9aa4b2" transform="rotate(28 236 114)">Hwy 584</text>
+      <path d="M452,492 C396,516 298,544 238,546 L128,542" fill="none" stroke="#888780" stroke-width="2"/>
+      <text x="266" y="532" font-size="10.5" fill="#9aa4b2">Hwy 579</text>
+      <g fill="#9aa4b2">
+        <circle cx="326" cy="192" r="5.5"/><circle cx="340" cy="540" r="5.5"/>
+        <circle cx="452" cy="492" r="4.5"/><circle cx="254" cy="288" r="4.5"/><circle cx="158" cy="72" r="4.5"/>
+      </g>
+      <g font-size="11.5" fill="currentColor">
+        <text x="338" y="187">Sundre</text><text x="352" y="546">Water Valley</text>
+        <text x="462" y="486">Cremona</text><text x="264" y="284">Bergen</text><text x="168" y="68">Bearberry</text>
+      </g>
+      <g stroke="#BA7517" stroke-width="1.5">
+        <line x1="114" y1="340" x2="158" y2="332"/><line x1="114" y1="424" x2="160" y2="434"/>
+        <line x1="114" y1="500" x2="156" y2="510"/>
+      </g>
+      <text x="120" y="326" font-size="10.5" fill="#e0a94a">dawn / dusk feeding movement →</text>
+      <g transform="translate(300,600)" font-size="10.5" fill="currentColor">
+        <rect x="0" y="0" width="12" height="12" rx="3" fill="#BA7517" opacity=".3"/>
+        <text x="18" y="10">inferred concentration area</text>
+        <rect x="0" y="20" width="12" height="12" rx="3" fill="#639922" opacity=".22"/>
+        <text x="18" y="30">forest reserve</text>
+      </g>
+    </svg>
+    <figcaption>The productive band in this unit is the interface between public forest cover to the west and
+    agricultural feed to the east — animals bed in timber and move onto hay meadows and cutlines at first and
+    last light. Harvest concentrates along that seam rather than deep in either land type.</figcaption>
+  </figure>
+</div></section>
+
+<section id="units"><div class="wrap">
+  <div class="sec-head">
+    <h2>Three-unit comparison</h2>
+    <p>A foothills unit, a mountain unit and an urban-fringe unit — chosen because they fail and succeed for
+    completely different reasons.</p>
+  </div>
+
+  <div class="cards">
+    <div class="card hi">
+      <span class="badge elk">Best combined odds</span>
+      <h3>WMU 312 — Sundre / Water Valley</h3>
+      <table>
+        <tr><td>Elk harvest</td><td>292 @ 26%</td></tr>
+        <tr><td>Deer harvest</td><td>648 @ 40%</td></tr>
+        <tr><td>Elk male share</td><td>60%</td></tr>
+        <tr><td>General rifle, elk</td><td>37 days</td></tr>
+        <tr><td>Land tenure</td><td>lease + private</td></tr>
+        <tr><td>Limiting factor</td><td>access permission</td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <span class="badge ok">Unrestricted access</span>
+      <h3>WMU 402 — Livingstone</h3>
+      <table>
+        <tr><td>Elk harvest</td><td>56 @ 7%</td></tr>
+        <tr><td>Deer harvest</td><td>94 @ 16%</td></tr>
+        <tr><td>Elk male share</td><td>95%</td></tr>
+        <tr><td>General rifle, elk</td><td>75 days</td></tr>
+        <tr><td>Land tenure</td><td>public</td></tr>
+        <tr><td>Limiting factor</td><td>terrain, elevation</td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <span class="badge gold">Archery only</span>
+      <h3>WMU 212 — Calgary fringe</h3>
+      <table>
+        <tr><td>Elk harvest</td><td>135 @ 20%</td></tr>
+        <tr><td>Deer harvest</td><td>107 @ 22%</td></tr>
+        <tr><td>Elk male share</td><td>49%</td></tr>
+        <tr><td>General rifle, elk</td><td>none</td></tr>
+        <tr><td>Land tenure</td><td>private</td></tr>
+        <tr><td>Limiting factor</td><td>permission density</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="chart-block">
+    <div class="chart-title">Normalised comparison</div>
+    <div class="chart-note">Success rates, male share of harvest, and estimated participation, side by
+    side.</div>
+    <div class="chart-box" style="height:400px"><canvas id="chUnitStudy"></canvas></div>
+  </div>
+
+  <div class="prose">
+    <p><strong>WMU 402's 7% is not comparable to WMU 312's 26%.</strong> Ninety-five percent of the elk taken
+    in 402 were bulls, because antlerless there is draw-restricted — so that figure approximates a pure
+    bull-hunting success rate. In 312, bulls were only 60% of harvest, meaning cow draws inflate the headline
+    number. Adjusting roughly for that composition narrows the gap from nearly four-fold to closer to
+    two-fold.</p>
+    <p><strong>WMU 212 is the structural outlier.</strong> It is archery-only, which suppresses participation,
+    yet returns 20% elk success — high for bowhunting. Its 49% male share confirms that antlerless elk are
+    being taken freely on general licences rather than draws. The constraint is not animals or regulation but
+    land: it is the ring of private property around a million-person city.</p>
+    <p><strong>Season length is a weak predictor of outcome.</strong> 402 offers double the general rifle
+    window of 312 and produces a fifth of the elk. Terrain, elevation and animal dispersion outweigh calendar
+    access, which is a useful corrective to the common assumption that a longer season means a better hunt.</p>
+  </div>
+</div></section>
+
+<section id="regs"><div class="wrap">
+  <div class="sec-head">
+    <h2>Regulatory context</h2>
+    <p>Harvest data cannot be interpreted without knowing which tags were available. Selected 2026 season
+    structure for the units discussed above.</p>
+  </div>
+  <div class="tbl-scroll">
+    <table class="data">
+      <thead><tr>
+        <th style="cursor:default">WMU</th><th style="cursor:default;text-align:left">Species / class</th>
+        <th style="cursor:default;text-align:left">Archery</th><th style="cursor:default;text-align:left">General</th>
+        <th style="cursor:default;text-align:left">Licence</th>
+      </tr></thead>
+      <tbody>
+        <tr><td>302–314</td><td style="text-align:left">Elk, antlered 3-point+</td><td style="text-align:left">Sep 1 – Oct 24</td><td style="text-align:left">Oct 25 – Nov 30</td><td style="text-align:left">General</td></tr>
+        <tr><td>312, 314</td><td style="text-align:left">Elk, antlerless</td><td style="text-align:left">Sep 1 – Oct 24</td><td style="text-align:left">Oct 25 – Feb 28</td><td style="text-align:left">Draw</td></tr>
+        <tr><td>310–348</td><td style="text-align:left">White-tailed deer, antlered + antlerless</td><td style="text-align:left">Sep 1 – Oct 31</td><td style="text-align:left">Nov 1 – Nov 30</td><td style="text-align:left">General</td></tr>
+        <tr><td>400, 402</td><td style="text-align:left">Elk, antlered 3-point+</td><td style="text-align:left">Sep 1 – Sep 16</td><td style="text-align:left">Sep 17 – Nov 30</td><td style="text-align:left">General</td></tr>
+        <tr><td>400, 402</td><td style="text-align:left">Elk, antlerless</td><td style="text-align:left">Sep 1 – Sep 16</td><td style="text-align:left">Sep 17 – Nov 30</td><td style="text-align:left">Draw</td></tr>
+        <tr><td>400, 402</td><td style="text-align:left">White-tailed deer, antlerless</td><td style="text-align:left">Sep 1 – Sep 23</td><td style="text-align:left">Nov 1 – Nov 15</td><td style="text-align:left">General</td></tr>
+        <tr><td>212</td><td style="text-align:left">Elk, antlered + antlerless</td><td style="text-align:left">Sep 1 – Nov 30</td><td style="text-align:left">—</td><td style="text-align:left">General</td></tr>
+        <tr><td>212</td><td style="text-align:left">White-tailed deer, antlered + antlerless</td><td style="text-align:left">Sep 1 – Nov 30</td><td style="text-align:left">—</td><td style="text-align:left">General</td></tr>
+        <tr><td>214</td><td style="text-align:left">Elk, antlered 3-point+</td><td style="text-align:left">Sep 1 – Oct 24</td><td style="text-align:left">Oct 25 – Nov 30</td><td style="text-align:left">General</td></tr>
+        <tr><td>216, 221, 224</td><td style="text-align:left">Elk, antlered 3-point+</td><td style="text-align:left">Sep 1 – Oct 31</td><td style="text-align:left">Nov 1 – Nov 30</td><td style="text-align:left">General</td></tr>
+        <tr><td>404–408</td><td style="text-align:left">Elk, antlered 6-point+</td><td style="text-align:left">Sep 9 – Sep 16</td><td style="text-align:left">Sep 17 – Nov 30</td><td style="text-align:left">Draw</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout deer">
+    <h4>Why the 6-point rule matters to the data</h4>
+    <p>Mountain units immediately west of the foothills require a six-point minimum on bull elk rather than
+    three. That single regulatory difference explains a large share of the success-rate collapse between
+    adjacent 300-series and 400-series units — the animals are present, but far fewer of them are legal.</p>
+  </div>
+</div></section>
+
+<section id="dashboard"><div class="wrap">
+  <div class="sec-head">
+    <h2>Harvest dashboard</h2>
+    <p>Every unit, every loaded species and season, filterable on every dimension — species, sex class,
+    region, season, harvest floor, success floor, and unit search. All summary figures, both charts and the
+    table recalculate live. Deep-link straight here with
+    <code>alberta-harvest-analysis.html#dashboard</code>.</p>
+  </div>
+  <div id="data"></div>
+
+  <div class="dash-bar">
+    <div class="dash-row">
+      <div class="ctl-group"><span class="ctl-label">Season</span>
+        <div class="seg" id="segYear" role="group" aria-label="Season"></div>
+        <span style="font-size:11.5px;color:var(--ink-3)" title="Unit-level tables were transcribed for the three most recent seasons. The ten-season series in the trends section is provincial totals only.">unit-level data: 2023–2025</span></div>
+      <div class="ctl-group"><span class="ctl-label">Species</span>
+        <div class="seg" id="segSpecies" role="group" aria-label="Species"></div></div>
+    </div>
+    <div class="dash-row">
+      <div class="ctl-group"><span class="ctl-label">Class</span>
+        <div class="seg" id="segSex" role="group" aria-label="Sex or age class">
+          <button data-sex="total" class="on" aria-pressed="true">Total</button>
+          <button data-sex="male" aria-pressed="false">Male</button>
+          <button data-sex="female" aria-pressed="false">Female</button>
+          <button data-sex="young" aria-pressed="false">Young</button>
+          <button data-sex="antlerless" aria-pressed="false"
+            title="Antlerless = adult females plus young of either sex, matching how the harvest reports and Alberta regulations define it">Antlerless</button>
+        </div></div>
+      <div class="ctl-group"><span class="ctl-label">Region</span>
+        <div class="seg" id="segRegion" role="group" aria-label="Region">
+          <button data-region="all" class="on" aria-pressed="true">All</button>
+          <button data-region="1" aria-pressed="false">100s</button>
+          <button data-region="2" aria-pressed="false">200s</button>
+          <button data-region="3" aria-pressed="false">300s</button>
+          <button data-region="4" aria-pressed="false">400s</button>
+          <button data-region="5" aria-pressed="false">500s</button>
+          <button data-region="calgary" aria-pressed="false">Calgary</button>
+        </div></div>
+    </div>
+    <div class="dash-row">
+      <input type="search" id="fSearch" placeholder="Search unit or name…" aria-label="Search unit or name">
+      <label class="slider-ctl">Min harvest <b id="lblHarvest">0</b>
+        <input type="range" id="fHarvest" min="0" max="800" step="10" value="0"></label>
+      <label class="slider-ctl">Min success <b id="lblSuccess">0%</b>
+        <input type="range" id="fSuccess" min="0" max="90" step="1" value="0"></label>
+      <select id="fSort" aria-label="Sort by">
+        <option value="metric">Sort: harvest</option>
+        <option value="success">Sort: success</option>
+        <option value="hunters">Sort: hunters</option>
+        <option value="maleshare">Sort: male share</option>
+        <option value="ratio">Sort: M per 100 F</option>
+        <option value="tilt">Sort: elk share</option>
+        <option value="wmu">Sort: WMU</option>
+      </select>
+    </div>
+    <div class="dash-row" style="border-bottom:none">
+      <div class="ctl-group" style="gap:18px;flex-wrap:wrap">
+        <label class="tgl"><input type="checkbox" id="fZero" checked><i></i>Hide empty units</label>
+        <label class="tgl"><input type="checkbox" id="fGroup" checked><i></i>Hide combined licences</label>
+        <label class="tgl"><input type="checkbox" id="fCtrl"><i></i>Hide military bases</label>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-left:auto">
+        <button data-preset="reset" class="mini">Reset</button>
+        <button data-preset="trophy" class="mini">Best odds</button>
+        <button data-preset="volume" class="mini">Highest volume</button>
+        <button data-preset="antlerless" class="mini">Antlerless surplus</button>
+        <button data-preset="calgary" class="mini">Calgary</button>
+        <button data-preset="elkcountry" class="mini">Elk country</button>
+        <button data-preset="suffield" class="mini">Suffield</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="activeChips" class="chip-row"></div>
+  <div class="stats" id="explorerStats"></div>
+  <div id="dataStatus" class="data-status"></div>
+  <div id="emptyState" class="empty" hidden></div>
+
+  <div class="dash-grid">
+    <div>
+      <div class="chart-title" id="topChartTitle">Top units</div>
+      <div class="chart-note">Click any bar to open that unit's multi-season detail. With several species
+      selected, each bar is coloured by whichever species dominates that unit; red marks controlled-access
+      military-base draws.</div>
+      <div class="legend">
+        <span class="k"><span class="sw" style="background:var(--elk)"></span>elk-dominant</span>
+        <span class="k"><span class="sw" style="background:var(--deer)"></span>deer-dominant</span>
+        <span class="k"><span class="sw" style="background:var(--ok)"></span>moose-dominant</span>
+      </div>
+      <div class="chart-box" style="height:720px"><canvas id="chExplorerTop"></canvas></div>
+    </div>
+    <div>
+      <div class="chart-title">Harvest vs success</div>
+      <div class="chart-note">Bubble area is estimated hunter count. Upper-left is the efficient
+      quadrant — good odds without heavy participation.</div>
+      <div class="chart-box" style="height:340px;margin-bottom:18px">
+        <canvas id="chExplorerScatter"></canvas></div>
+      <div class="chart-title">Composition of selection</div>
+      <div class="chart-note">Male, female and young split across every unit currently matching.</div>
+      <div class="chart-box" style="height:300px"><canvas id="chExplorerComp"></canvas></div>
+    </div>
+  </div>
+
+  <div id="unitPanel" class="unit-panel" hidden></div>
+
+  <div class="tbl-tools">
+    <span style="font-size:13px;color:var(--ink-3)" id="tblCount"></span>
+    <span style="font-size:13px;color:var(--ink-3);margin-left:auto">Click a column to sort · click a row
+    for unit detail</span>
+  </div>
+  <div class="tbl-scroll" style="max-height:640px;overflow-y:auto">
+    <table class="data" id="dataTable">
+      <thead><tr id="dataHead"></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+  <p style="font-size:12.5px;color:var(--ink-3);margin-top:12px">
+    Hunter counts are derived as harvest ÷ success rate and rounded. Blank cells indicate no recorded harvest
+    or an undefined ratio. Multi-unit licence groupings are hidden by default.</p>
+</div></section>
+
+<section id="maps"><div class="wrap">
+  <div class="sec-head">
+    <h2>Zone maps — licence type and disease status</h2>
+    <p>Alberta has no published geospatial layer for Wildlife Management Units on any open CDN, so rather
+    than invent coordinates, the province is rendered here two ways: as a regional tile map covering every
+    unit, and as a hand-built geographic schematic for the Calgary catchment.</p>
+  </div>
+
+  <div class="card" style="margin-bottom:18px">
+    <h4 style="margin-bottom:10px">Colour the tile map by</h4>
+    <div style="display:flex;flex-wrap:wrap;gap:8px">
+      <button data-mode="elkTag" class="mode on">Elk licence type</button>
+      <button data-mode="deerTag" class="mode">Deer licence type</button>
+      <button data-mode="deerAntlerless" class="mode">Antlerless deer type</button>
+      <button data-mode="cwd" class="mode">CWD status</button>
+      <button data-mode="elkSucc" class="mode">Elk success</button>
+      <button data-mode="deerSucc" class="mode">Deer success</button>
+      <button data-mode="mooseSucc" class="mode">Moose success</button>
+      <button data-mode="elkHarvest" class="mode">Elk harvest</button>
+      <button data-mode="deerHarvest" class="mode">Deer harvest</button>
+      <button data-mode="mooseHarvest" class="mode">Moose harvest</button>
+      <button data-mode="tilt" class="mode">Species tilt</button>
+    </div>
+    <div id="mapLegend" class="legend" style="margin:14px 0 0"></div>
+  </div>
+
+  <div class="chart-block">
+    <div class="chart-title" id="tileMapTitle">Every Wildlife Management Unit, grouped by ecoregion</div>
+    <div class="chart-note">Tiles are grouped by WMU series and sorted numerically — this is a schematic
+    index, not a geographic projection. Hover any tile for detail; click one to filter the data explorer to
+    that unit.</div>
+    <div id="tileMap" style="background:var(--surface);border:1px solid var(--line);border-radius:12px;
+      padding:18px"></div>
+    <div id="tileTip" style="font-size:13px;color:var(--ink-2);margin-top:10px;min-height:22px"></div>
+  </div>
+
+  <figure>
+    <div class="chart-title">Geographic schematic — the Calgary catchment</div>
+    <div class="chart-note">Approximate relative positions of units within roughly three hours of Calgary,
+    coloured by licence type for the selected species and labelled with that species' 2025 harvest and
+    success. Dashed arcs are rough drive-time bands. Not to survey scale.</div>
+    <div class="seg" id="segMapSp" role="group" aria-label="Map species"
+      style="margin:0 0 12px;display:inline-flex">
+      <button data-msp="elk" class="on">Elk</button>
+      <button data-msp="deer" class="deer">Deer</button>
+      <button data-msp="moose" class="moose">Moose</button>
+    </div>
+    <div id="calgaryMap" style="background:var(--surface);border:1px solid var(--line);border-radius:12px;
+      padding:12px"></div>
+    <figcaption>The pattern is structural: general-licence bull elk hunting forms a continuous north–south
+    band through the foothills, flanked to the west by draw-only six-point mountain units and to the east by
+    parkland units where the rifle season requires a special licence. A hunter unwilling to enter a draw is
+    effectively confined to that middle band.</figcaption>
+  </figure>
+
+  <div class="two-col" style="margin-top:8px">
+    <div class="prose">
+      <h3>Reading the licence categories</h3>
+      <ul class="tight">
+        <li><strong>General</strong> — buy over the counter, rifle season available.</li>
+        <li><strong>General, archery only</strong> — no draw required, but no rifle season exists. WMUs 212,
+        247 and 248 are the notable elk examples.</li>
+        <li><strong>Archery general, rifle by draw</strong> — the dominant parkland pattern. You may hunt with
+        a bow on a general licence, but the November rifle season requires a special licence.</li>
+        <li><strong>Draw only</strong> — no general opportunity at all; priority points required.</li>
+      </ul>
+    </div>
+    <div class="prose">
+      <h3>Why this matters to the harvest numbers</h3>
+      <p>Licence structure explains most of the variance in the harvest data. Units where antlerless animals
+      are draw-restricted show male-dominated harvests and lower headline success. Units with liberal
+      antlerless general tags show balanced sex ratios and inflated success. Any comparison of raw success
+      rates that ignores licence type is comparing different games.</p>
+    </div>
+  </div>
+</div></section>
+
+<section id="cwd"><div class="wrap">
+  <div class="sec-head">
+    <h2>Chronic wasting disease</h2>
+    <p>A prion disease of deer, elk and moose, always fatal to the animal, spreading westward across Alberta
+    since the first wild case in 2005. It reshapes both the harvest data and the practical decisions a hunter
+    makes with a carcass.</p>
+  </div>
+
+  <div class="stats" id="cwdStats"></div>
+
+  <div class="chart-block">
+    <div class="chart-title">Prevalence by species, 2025–26 surveillance season</div>
+    <div class="chart-note">Share of tested animals returning a positive result, with sample size. Mule deer
+    carry the disease at roughly seven times the rate of white-tailed deer.</div>
+    <div class="chart-box" style="height:330px"><canvas id="chCwdSpecies"></canvas></div>
+  </div>
+
+  <div class="chart-block">
+    <div class="chart-title">Prevalence by species and sex</div>
+    <div class="chart-note">Males test positive at markedly higher rates in both deer species — consistent
+    with larger home ranges, rut-season contact and longer average time at risk.</div>
+    <div class="legend">
+      <span class="k"><span class="sw" style="background:var(--deer)"></span>Male</span>
+      <span class="k"><span class="sw" style="background:var(--elk)"></span>Female</span>
+    </div>
+    <div class="chart-box" style="height:330px"><canvas id="chCwdSex"></canvas></div>
+  </div>
+
+  <div class="chart-block">
+    <div class="chart-title">Two seasons compared</div>
+    <div class="chart-note">Provincial prevalence fell from 16.2% to 9.7% between the 2024–25 and 2025–26
+    seasons — but this is a sampling artifact, not recovery. See the note below.</div>
+    <div class="chart-box" style="height:330px"><canvas id="chCwdTrend"></canvas></div>
+  </div>
+
+  <div class="callout">
+    <h4>The most important caveat in the entire CWD dataset</h4>
+    <p>Provincial prevalence dropped by six points in one year, and it would be badly wrong to read that as
+    the disease receding. Testing volume more than doubled, from 2,963 animals to 6,819, and the added samples
+    were overwhelmingly white-tailed deer taken along the western frontier of the known distribution — the
+    species and the geography least likely to return positives. Meanwhile the province states plainly that
+    prevalence continues to rise <em>within</em> individual units. The denominator changed, not the disease.
+    This is a textbook case of why aggregate rates need their sampling frame attached.</p>
+  </div>
+
+  <div class="two-col">
+    <div class="prose">
+      <h3>Where the frontier moved</h3>
+      <p>Seven units recorded their first documented cases in 2025–26: <strong>222, 300, 316, 320, 322, 503
+      and 504</strong>. The previous season added <strong>221, 247, 306, 505 and 508</strong>. Read together,
+      those two lists trace a front advancing west and north — 316, 320 and 322 sit in the foothills, well
+      into country that was considered clean a few years ago.</p>
+      <p>For a hunter working the foothills band, the relevant fact is that CWD has now been documented in
+      units immediately adjacent to the highest-performing general-licence elk and deer country. 320 and 322
+      border 312 and 314.</p>
+      <h3>Species risk ranking</h3>
+      <p>Alberta's own weighted occurrence figures rank risk as male mule deer 1.00, female mule deer 0.40,
+      male white-tailed deer 0.30, female white-tailed deer 0.10. A doe whitetail is the lowest-risk animal in
+      the province; a buck mule deer is the highest by an order of magnitude.</p>
+    </div>
+    <div class="prose">
+      <h3>What this means in the field</h3>
+      <ul class="tight">
+        <li><strong>Submission is mandatory in 48 units</strong>, including nearly the whole foothills band —
+        302 through 316, plus 320, 322, 334, 402 and 404. Hunting those units means planning for a head
+        submission, not deciding afterward.</li>
+        <li><strong>Do not shoot a deer in the head</strong> if you intend to submit it. The lymph nodes and
+        obex are the test tissues and a head shot can destroy both.</li>
+        <li><strong>Record precise kill location</strong> — GPS or section/township/range, not just the unit.
+        The submission is rejected as surveillance data without it.</li>
+        <li><strong>Results arrive by email</strong> through an AlbertaRELM account. Heads submitted after
+        mid-November are generally not tested until January or February, which is a long time to leave meat
+        in a freezer undecided.</li>
+        <li><strong>Freezers are seasonal</strong>, roughly mid-October to mid-December, and were removed
+        after the 2025 season in some areas — call the local office ahead rather than assuming.</li>
+        <li><strong>Carcass disposal matters.</strong> Debone at the kill site where practical and leave the
+        remainder there; if you transport it, the remains should be burned, buried or landfilled rather than
+        scattered in a new area.</li>
+      </ul>
+      <h3>Human health</h3>
+      <p>There are no known human cases of CWD. Health authorities nonetheless recommend not consuming meat
+      from an animal that tests positive, and both Alberta and Health Canada advise waiting for a result
+      before eating an animal taken in a surveillance area.</p>
+    </div>
+  </div>
+
+  <div class="chart-block">
+    <div class="chart-title">Mandatory deer head submission units</div>
+    <div class="chart-note">All 48 units where submission was mandatory in the most recent published
+    programme. Note this list governs <strong>deer</strong> specifically — elk and moose heads are accepted
+    from anywhere in the province but are not covered by the mandatory WMU list, which is why WMU 732 does not
+    appear here despite Suffield elk being systematically sampled through the base's own controlled hunt.
+    Switch the tile map above to "CWD status" to see these in regional context.</div>
+    <div id="cwdChips" style="display:flex;flex-wrap:wrap;gap:6px"></div>
+  </div>
+
+  <div class="callout">
+    <h4>CFB Suffield — WMU 732 — and a caution about reading the elk figures</h4>
+    <p>Suffield is a controlled-access military base hunted by special draw on a handful of fixed dates, and it
+    behaves like nowhere else in the province. In 2025 it produced <strong>320 elk at 98% hunter success</strong>
+    — the highest rate in Alberta — and the composition is the giveaway: 18 bulls against 239 cows and 63
+    calves. That is not recreational hunting, it is a population reduction executed through hunters.</p>
+    <p>The disease picture needs more care than a first reading suggests. Alberta reports 30 CWD-positive elk
+    in 2025–26 from 308 elk tested, and notes that sample came <em>primarily from CFB Suffield</em>, including
+    the first-ever positive elk from CFB Wainwright. It is tempting to conclude Suffield is an elk-CWD hotspot.
+    But the longer record points the other way: of roughly 2,117 elk tested from WMU 732 since 2012, only two
+    were positive — about 0.1%. Suffield dominates the tested sample because a controlled base hunt produces
+    near-complete sampling, not necessarily because it dominates the positives.</p>
+    <p>So the 9.7% figure for elk should be read as "9.7% of a small, geographically concentrated sample",
+    and the published summary does not break those 30 positives down by unit. Whether this represents a genuine
+    change at Suffield or a shift in which elk get tested cannot be settled from the public data. It is worth
+    watching rather than concluding — and if you hunt there, submit the head.</p>
+  </div>
+
+  <div class="callout gold">
+    <h4>An analytical link between the two datasets</h4>
+    <p>The harvest analysis found that antlerless deer are systematically underharvested while bucks are
+    taken at more than three times the rate. The CWD data shows males infected at roughly three times the
+    rate of females in white-tailed deer, and mule deer bucks highest of all. Hunter preference for antlers
+    therefore happens to remove the highest-risk animals from the population — an accidental alignment
+    between what hunters want and what disease management needs, and one of the few places where the two
+    datasets tell a mutually reinforcing story.</p>
+  </div>
+</div></section>
+
+<section id="limits"><div class="wrap">
+  <div class="sec-head">
+    <h2>Limitations</h2>
+    <p>What this analysis cannot support.</p>
+  </div>
+  <div class="prose">
+    <ul class="tight">
+      <li><strong>Harvest is not abundance.</strong> These are counts of animals killed, mediated by tag
+      allocation, access, terrain and hunter effort. A unit with low harvest may hold many animals that are
+      simply hard to reach or largely illegal to shoot.</li>
+      <li><strong>Success rates blend licence types.</strong> General and special-licence hunting are pooled,
+      so units with generous antlerless draws show inflated overall success relative to what a general-licence
+      hunter experiences.</li>
+      <li><strong>Small samples are noisy.</strong> Several units report success rates above 30% on fewer than
+      ten animals. These are survey estimates with wide confidence intervals and should not be ranked against
+      units with hundreds of animals.</li>
+      <li><strong>Derived hunter counts are approximations.</strong> The inversion assumes one animal per
+      successful hunter, which understates participation wherever multi-tag licences are issued.</li>
+      <li><strong>Controlled-access units distort comparisons.</strong> Military base draws and similar
+      restricted hunts produce success rates that reflect exclusivity rather than habitat, and should be
+      excluded from any ranking intended to guide unit selection.</li>
+      <li><strong>Spatial inference is coarse.</strong> WMUs are large and internally heterogeneous. The
+      habitat schematic in this analysis is interpretive: no sub-unit animal location data is published, so
+      concentration areas are inferred from terrain and land cover rather than observed.</li>
+      <li><strong>CWD prevalence is sampling-dependent.</strong> Provincial rates move with testing volume
+      and species mix as much as with the disease itself, as the 2024–25 to 2025–26 comparison shows. Unit-level
+      prevalence is not published in a form that can be joined to this harvest dataset.</li>
+      <li><strong>Licence classification is simplified.</strong> Each unit is assigned one category per species
+      based on the primary antlered season. Real regulations include sub-area boundaries, weapon-specific
+      windows and multi-unit licences that a single label cannot capture. Always verify against the current
+      guide.</li>
+      <li><strong>Published sex columns do not always sum to the published total.</strong> Male, female and
+      young are each estimated independently by the survey, so they can miss the reported total by a few dozen
+      animals — elk 2025 is 36 short, moose 2025 is 10 short, deer 2025 is 5 over. Any percentage on this page
+      built from the sex columns therefore carries a fraction of a point of imprecision. Unit row sums
+      <em>do</em> reconcile to the published totals, which is what the integrity check verifies.</li>
+      <li><strong>Some published success rates exceed 100%.</strong> Several multi-unit elk licence rows and
+      the CFB Suffield draw report rates above 100% — 131% and 134% in the 2024 and 2023 elk reports. These are
+      survey-estimation artifacts: the modelled harvest exceeds the modelled number of licence holders, which
+      happens with small samples and multi-tag authorizations. The figures are reproduced exactly as published
+      rather than silently capped, but they make the derived hunter counts for those rows meaningless.</li>
+      <li><strong>The long series is provincial, not per-unit.</strong> Ten seasons of totals support the
+      trend analysis, but unit-level detail exists here for 2023–2025 only. So statements about Alberta as a
+      whole rest on ten years; statements about an individual WMU rest on three.</li>
+      <li><strong>The 2026 projection is a projection.</strong> Three points per unit cannot support a real
+      predictive model, which is why the outlook uses a transparent recency-weighted trend with an explicit
+      confidence tier rather than a fitted algorithm. Its central assumption — that licence structure holds —
+      is exactly the thing the ten-season record shows changing by 20 percentage points inside three years.
+      Treat low-confidence rows as noise.</li>
+    </ul>
+  </div>
+</div></section>
+
+<footer><div class="wrap">
+  <p style="color:var(--ink-2)">Built as a data-analysis exercise on public wildlife-management records. All
+  harvest figures are survey estimates published by the Government of Alberta; all regulatory and disease
+  figures are quoted from the sources below. Nothing here substitutes for the current regulations — season
+  dates, licence classes and disease requirements change annually and must be verified before hunting.</p>
+  <p style="margin-top:14px;color:var(--ink-3)"><strong style="color:var(--ink-2)">Sources</strong></p>
+  <ul class="src-list">
+    <li><a href="https://mywildalberta.ca/hunting/hunters-harvest.aspx">Alberta hunter harvest surveys</a>
+      — 2025 reports for elk and white-tailed deer, Forestry and Parks, March 2026</li>
+    <li><a href="https://albertaregulations.ca/huntingregs/">2026 Alberta Guide to Hunting Regulations</a>
+      — prairie, parkland, foothills, mountain and boreal season tables</li>
+    <li><a href="https://www.alberta.ca/chronic-wasting-disease-updates">Chronic Wasting Disease updates</a>
+      — surveillance results, Environment and Protected Areas, April 2026</li>
+    <li><a href="https://www.alberta.ca/chronic-wasting-disease-information-for-hunters">CWD information for
+      hunters</a> — submission requirements and mandatory unit list</li>
+    <li><a href="https://www.alberta.ca/preventing-wildlife-damage">Preventing wildlife damage</a> and the
+      Wildlife Management Responder Program — agricultural conflict context</li>
+  </ul>
+  <p style="margin-top:20px;font-size:12px;color:var(--ink-3)">Charts rendered with Chart.js. No analytics,
+  no cookies, no tracking. All computation runs client-side from the embedded dataset.</p>
+  <p style="margin-top:26px;padding-top:20px;border-top:1px solid var(--line);text-align:center;
+    font-size:14px;color:var(--ink-2)">
+    © <span id="yr"></span> Nitin Wadhwani · Built by me in Calgary, Alberta ·
+    <a href="index.html">back to portfolio</a>
+  </p>
+</div></footer>
+<script>
+document.getElementById("yr").textContent=new Date().getFullYear();
+/* nav menus: one open at a time, close on outside click, Escape, or choosing a link */
+const menus=[...document.querySelectorAll("details.navmenu")];
+menus.forEach(d=>{
+  d.addEventListener("toggle",()=>{if(d.open)menus.forEach(o=>{if(o!==d)o.open=false})});
+  d.querySelectorAll("a").forEach(a=>a.addEventListener("click",()=>{d.open=false}));
+});
+document.addEventListener("click",e=>{
+  if(!e.target.closest("details.navmenu"))menus.forEach(d=>d.open=false);
+});
+document.addEventListener("keydown",e=>{if(e.key==="Escape")menus.forEach(d=>d.open=false)});
+</script>
+
+<script>
+/* ============================================================
+   DATASET — 2025 estimated resident harvest
+   [WMU, male, female, young, total, successPct]
+   ============================================================ */
+const ELK=[["102",6,24,4,35,34],["104",6,3,0,9,46],["106",0,0,0,0,0],["108",22,90,6,120,72],
+["110",0,2,1,4,19],["112",0,0,0,0,0],["116",7,0,0,7,14],["116/118/119",2,16,0,18,29],
+["116/118/119/624",4,24,3,35,22],["118",22,0,0,22,27],["119",5,0,0,5,9],
+["124/128/142/144/148/150",27,25,13,65,46],["130",0,0,0,0,0],["132",0,0,0,0,0],
+["132/136/138",4,6,0,10,77],["134",0,0,0,0,0],["136",0,0,0,0,0],["138",2,0,0,2,20],
+["140",0,0,0,0,0],["151",4,0,0,4,22],["151/152",11,16,4,31,56],["152",2,4,0,5,12],
+["156",2,0,0,2,20],["156/158/160",0,2,0,2,21],["158",0,0,0,0,0],["160",4,0,0,4,5],
+["162",0,0,0,0,0],["162/163/164/166",13,24,0,37,41],["163",2,0,0,2,7],["164",4,2,2,7,20],
+["166",9,2,0,11,8],["200",13,0,0,13,14],["200/202/203/232/234",41,176,23,240,41],
+["202",20,2,0,22,31],["203",2,0,0,2,10],["204",0,0,0,0,0],["204/228/230",0,1,0,1,33],
+["206",0,2,0,2,7],["206/222/226/244/246",1,0,0,1,50],["208",20,2,0,22,14],
+["208/210/220",8,16,2,25,30],["210",0,2,0,2,5],["212",66,50,19,135,20],["214",33,5,0,38,14],
+["214/314",0,126,5,132,41],["216",27,2,0,29,13],["216/320",0,68,5,73,48],["220",5,5,2,13,9],
+["221",2,0,0,2,2],["221/322",0,11,1,12,29],["222",0,0,0,0,0],["224",20,16,0,36,15],
+["226",0,0,0,0,0],["228",0,0,0,0,0],["230",0,0,0,0,0],["232",13,2,0,15,11],
+["234",36,13,4,53,23],["236",5,4,0,9,9],["236/238/256",11,22,4,37,34],["238",7,0,0,7,18],
+["240",0,0,0,0,0],["240/242",4,11,0,14,39],["242",9,0,0,9,10],["244",2,0,0,2,33],
+["246",11,9,0,20,31],["247",0,0,0,0,0],["248",5,5,0,11,14],["250",1,9,4,14,17],
+["252",4,2,0,5,19],["252/254/258/260",4,21,6,30,28],["254",15,2,0,16,15],["256",0,0,0,0,0],
+["258",2,0,0,2,5],["260",0,0,0,0,0],["300A",11,27,2,41,34],["300B",12,18,1,31,23],
+["302",53,82,6,141,23],["303",4,25,0,29,27],["304",120,127,14,261,16],["305",137,105,4,249,15],
+["306",47,43,2,93,19],["308",87,90,7,184,18],["310",29,65,3,97,14],["312",175,111,6,292,26],
+["314",102,9,0,111,17],["316",0,0,0,0,0],["318",25,4,0,29,7],["320",60,0,0,60,12],
+["322",16,2,0,18,10],["324",4,0,0,4,2],["326",2,0,0,2,1],["328",13,0,0,13,5],
+["330",4,0,0,4,2],["332",62,43,10,115,14],["334",13,9,5,27,10],["336",49,36,4,89,17],
+["337",5,8,3,17,7],["338",22,7,1,30,9],["339",18,0,0,18,6],["340",18,2,0,20,6],
+["342",2,2,0,3,3],["344",55,1,0,56,10],["346",95,30,0,124,14],["347",20,0,0,20,8],
+["348",42,14,1,57,9],["349",11,0,0,11,5],["350",4,0,0,4,2],["351",11,0,0,11,12],
+["352",22,12,0,34,10],["353",44,19,3,65,9],["354",51,9,0,60,13],["355",11,5,1,17,9],
+["356",144,25,2,171,15],["357",262,317,41,625,26],["358",219,188,17,426,24],
+["359",293,364,60,720,34],["360",149,253,50,455,34],["400",47,0,0,47,7],["402",53,2,2,56,7],
+["404",7,0,0,7,10],["406",5,0,0,5,5],["408",0,0,0,0,0],["410",7,2,0,9,6],["412",0,0,0,0,0],
+["414",0,0,0,0,0],["416",0,0,0,0,0],["417",0,0,0,0,0],["418",3,0,0,3,50],["420",1,0,0,1,33],
+["422",0,0,0,0,0],["426",0,0,0,0,0],["428",0,0,0,0,0],["429",4,0,0,4,5],["430",0,0,0,0,0],
+["432",0,0,0,0,0],["434",0,0,0,0,0],["436",0,0,0,0,0],["437",5,0,0,5,12],["438",5,2,0,7,6],
+["439",2,4,0,6,8],["440",13,0,0,13,9],["441",2,2,2,5,7],["442",5,0,0,5,21],["444",5,1,0,6,7],
+["445",5,0,0,5,21],["446",5,0,0,5,6],["500",2,0,0,2,3],["501",2,3,0,5,12],["502",4,3,0,6,18],
+["503",2,0,0,2,6],["504",4,1,0,5,5],["505",16,9,0,25,16],["506",18,11,2,33,13],
+["507",38,18,2,58,13],["508",24,25,0,49,17],["509",7,16,2,26,15],["510",36,34,12,83,11],
+["511",0,1,0,2,2],["512",2,0,0,2,13],["514",0,0,0,0,0],["515",0,0,0,0,0],["516",0,0,0,0,0],
+["517",0,0,0,0,0],["520",33,12,0,45,18],["521",253,201,24,482,30],["522",271,430,57,760,26],
+["523",151,224,27,405,27],["524",4,0,0,4,6],["525",11,0,0,11,15],["526",206,191,24,423,23],
+["527",168,190,34,393,25],["528",16,5,1,23,18],["535",25,8,0,34,21],["537",22,14,0,36,31],
+["544",9,0,2,11,17],["728/730",3,7,3,13,38],["732",18,239,63,320,98],["936",7,12,0,19,31]];
+
+const WT=[["102",70,7,0,76,20],["104",68,30,2,100,27],["106",125,52,1,178,37],["108",434,63,5,502,38],
+["110",378,121,15,514,48],["112",131,44,3,177,33],["116",93,13,0,106,18],["118",50,2,0,53,8],
+["119",80,20,0,100,20],["124",75,25,0,99,33],["128",121,32,4,158,37],["130",119,34,1,154,37],
+["132",135,27,1,164,41],["134",80,18,0,99,37],["136",61,26,1,88,37],["138",52,14,0,66,38],
+["140",41,22,1,65,31],["142",25,7,1,34,22],["144",16,9,0,25,25],["148",51,19,0,70,19],
+["150",17,0,0,17,11],["151",16,1,0,17,11],["152",113,19,1,133,23],["156",134,24,0,158,27],
+["158",53,8,0,61,21],["160",115,22,0,137,25],["162",31,3,0,34,17],["163",37,5,0,42,15],
+["164",56,13,2,71,19],["166",166,19,2,187,19],["200",48,22,2,72,11],["202",71,66,9,146,19],
+["203",84,17,4,106,18],["204",145,95,4,243,26],["206",118,73,7,198,23],["208",197,123,4,324,23],
+["210",168,14,1,184,30],["212",97,10,0,107,22],["214",309,174,14,497,34],["216",179,39,3,222,29],
+["220",319,202,18,539,25],["221",115,43,3,161,24],["222",107,61,3,170,26],["224",281,136,11,428,28],
+["226",130,49,2,181,32],["228",169,86,11,266,24],["230",170,63,9,241,25],["232",112,46,0,158,17],
+["234",91,29,5,125,12],["236",121,40,0,161,18],["238",118,54,7,179,21],["240",97,46,0,144,29],
+["242",263,169,14,446,27],["243",0,0,0,0,0],["244",98,41,12,151,29],["246",159,86,8,253,34],
+["247",78,3,0,81,27],["248",47,36,3,86,15],["250",278,47,2,326,28],["252",129,25,2,156,31],
+["254",161,43,0,204,24],["256",160,23,2,184,32],["258",285,249,34,568,34],["260",246,154,7,407,40],
+["300",254,379,16,649,47],["302",207,63,2,272,34],["303",35,22,0,57,33],["304",199,209,32,440,19],
+["305",121,161,18,300,16],["306",96,24,5,125,26],["308",138,67,8,213,24],["310",132,59,2,192,27],
+["312",491,148,9,648,40],["314",533,188,12,733,35],["316",155,73,2,230,29],["318",467,192,5,664,40],
+["320",235,70,10,316,25],["322",210,62,4,276,30],["324",415,112,0,527,46],["326",181,75,3,260,34],
+["328",317,119,5,441,48],["330",568,180,15,764,47],["332",681,716,61,1458,38],["334",242,179,18,439,28],
+["336",534,127,11,672,38],["337",539,126,5,669,39],["338",495,101,7,603,43],["339",164,52,2,217,34],
+["340",194,43,2,239,42],["342",88,13,0,101,34],["344",174,47,2,223,36],["346",520,98,2,620,41],
+["347",94,23,2,118,34],["348",746,229,11,986,47],["349",276,65,7,348,33],["350",476,751,56,1284,45],
+["351",63,104,3,169,33],["352",58,81,0,139,23],["353",174,363,30,567,36],["354",59,21,2,82,25],
+["355",20,19,2,41,17],["356",167,40,2,209,25],["357",551,341,13,905,33],["358",126,152,5,284,24],
+["359",183,170,5,359,36],["360",430,300,16,746,48],["400",139,31,2,171,25],["402",68,25,2,94,16],
+["404",13,6,0,19,19],["406",36,18,0,54,29],["408",5,0,0,5,17],["410",16,5,0,21,17],
+["412",89,31,2,121,30],["414",29,9,0,39,21],["416",28,9,0,37,29],["417",50,20,0,70,38],
+["418",18,3,0,21,35],["420",30,0,0,30,28],["422",2,2,0,3,15],["426",0,2,0,2,20],
+["428",2,2,0,3,20],["429",82,31,2,115,48],["430",7,2,0,8,34],["432",0,0,0,0,0],
+["434",2,0,0,2,8],["436",0,0,0,0,0],["437",12,8,0,20,31],["438",32,3,2,37,31],
+["439",24,0,0,24,30],["440",13,36,3,52,24],["441",25,15,3,43,28],["442",2,3,0,4,27],
+["444",11,19,0,30,31],["445",0,0,0,0,0],["446",23,11,0,34,29],["500",167,54,0,221,38],
+["501",253,60,3,315,43],["502",419,93,9,520,45],["503",335,62,0,397,36],["504",147,31,4,182,24],
+["505",154,18,0,172,31],["506",224,62,0,286,30],["507",624,96,14,734,43],["508",379,42,6,427,34],
+["509",295,67,2,363,43],["510",518,166,7,691,33],["511",316,93,3,412,46],["512",254,65,3,322,39],
+["514",197,66,7,269,38],["515",315,81,3,399,56],["516",66,39,2,107,41],["517",56,18,0,74,51],
+["518",63,17,0,80,26],["519",167,31,0,198,32],["520",42,20,0,62,26],["521",371,92,0,463,40],
+["522",211,59,0,270,28],["523",354,60,2,416,45],["524",13,3,0,16,15],["525",31,9,0,39,29],
+["526",329,91,0,420,40],["527",305,57,4,367,43],["528",49,12,0,62,37],["529",47,20,0,67,45],
+["530",22,7,0,30,20],["531",9,7,0,17,28],["532",0,0,0,0,0],["534",9,2,0,11,28],
+["535",108,30,2,140,42],["536",13,3,0,16,17],["537",30,2,3,34,41],["539",0,0,0,0,0],
+["540",14,2,2,18,37],["541",8,3,0,11,41],["542",29,9,0,38,40],["544",76,16,0,92,36],
+["728/730",148,135,0,283,73],["841",30,7,0,37,43],["936",8,0,2,10,10]];
+
+/* additional seasons, stored compactly as "wmu,m,f,y,total,success;" and parsed at load */
+const P=s=>s.trim().split(";").map(r=>r.trim()).filter(Boolean).map(r=>{
+  const a=r.split(",").map(x=>x.trim());
+  return [a[0],+a[1],+a[2],+a[3],+a[4],+a[5]]});
+
+const MOOSE25=P(`102,0,2,0,2,100;116,3,4,0,7,73;118,1,0,0,1,33;119,0,0,0,0,0;124,0,0,0,0,0;
+148,0,1,0,1,33;150,2,0,0,2,40;151,7,9,0,17,54;152,2,4,0,6,11;156,5,8,2,14,82;158,3,4,0,7,45;
+160,16,8,5,28,49;162,5,6,0,12,84;163,14,21,0,35,86;164,17,28,5,50,90;166,38,75,6,119,79;
+200,45,46,4,96,75;202,49,64,2,115,74;203,14,21,1,36,97;204,19,32,3,55,89;206,20,19,4,44,61;
+208,26,52,1,81,65;210,3,8,0,11,89;212,36,17,4,57,20;214,16,32,1,49,74;216,12,22,1,35,76;
+220,39,45,6,90,65;221,13,26,1,40,56;222,5,5,2,11,100;224,8,10,3,20,74;226,1,1,0,2,100;
+228,17,30,4,53,79;230,45,52,7,106,75;232,19,24,4,47,56;234,77,74,19,170,56;236,27,28,11,66,67;
+238,9,17,5,30,72;240,4,4,1,9,77;242,34,60,12,106,51;244,4,5,0,9,82;246,9,7,1,16,71;
+247,52,19,0,71,22;248,69,46,7,122,19;250,75,73,25,175,58;252,13,19,4,36,75;254,34,51,6,91,64;
+256,23,21,2,46,78;258,19,48,10,76,60;260,23,26,13,63,53;300,12,0,0,12,42;302,9,0,0,9,71;
+303,0,0,0,0,0;304,14,0,0,14,50;306,8,0,0,8,100;308,5,0,0,5,50;310,11,7,1,21,52;312,11,9,1,21,33;
+314,6,13,0,19,44;316,0,1,1,2,11;318,0,0,0,0,0;320,17,12,0,29,62;322,29,26,2,59,79;324,2,0,0,2,50;
+326,6,0,0,6,70;328,4,0,0,4,67;330,2,0,0,2,50;332,38,16,3,57,54;334,25,22,9,55,63;336,54,39,4,96,49;
+337,8,0,0,8,42;338,6,0,0,6,29;339,5,0,0,5,50;340,8,0,0,8,80;342,15,0,0,15,70;344,35,0,0,35,73;
+346,34,0,0,34,57;347,22,0,0,22,20;348,92,0,0,92,44;349,62,0,0,62,27;350,55,0,0,55,25;
+351,24,0,0,24,32;352,19,15,1,35,19;353,96,49,1,146,35;354,152,0,0,152,47;355,30,9,0,39,46;
+356,122,0,0,122,31;357,171,13,7,190,33;358,103,0,0,103,24;359,92,0,36,128,34;360,54,0,9,63,33;
+400,10,0,0,10,64;402,5,0,0,5,50;404,5,0,1,6,15;406,17,0,0,17,13;408,0,0,0,0,0;410,0,0,0,0,0;
+412,5,0,0,5,20;414,2,0,0,2,9;416,1,0,0,1,11;417,4,0,0,4,17;418,0,0,0,0,0;420,2,0,0,2,7;
+422,0,0,0,0,0;426,0,0,0,0,0;428,1,0,0,1,20;429,2,0,0,2,40;430,0,0,0,0,0;432,2,0,0,2,50;
+434,1,0,0,1,9;436,0,0,0,0,0;437,6,0,0,6,26;438,6,0,0,6,17;439,4,0,0,4,32;440,14,0,0,14,38;
+441,9,0,0,9,45;442,5,0,0,5,40;444,2,0,0,2,16;445,10,0,0,10,31;446,13,0,0,13,37;500,8,20,2,29,91;
+501,3,10,1,14,51;502,4,22,11,36,74;503,44,58,8,111,51;504,38,56,10,105,58;505,31,0,5,36,84;
+506,20,32,3,55,56;507,67,53,10,132,41;508,54,53,1,108,65;509,34,20,7,62,56;510,62,0,13,74,50;
+511,21,0,0,21,32;512,50,0,0,50,42;514,10,0,0,10,24;515,6,0,0,6,29;516,9,0,0,9,34;517,2,0,0,2,29;
+518,20,0,0,20,33;519,20,0,0,20,27;520,49,0,0,49,26;521,86,0,10,96,31;522,116,0,33,149,32;
+523,51,0,8,59,30;524,94,0,0,94,38;525,46,0,0,46,44;526,183,0,16,199,49;527,105,0,12,117,42;
+528,87,0,0,87,55;529,4,0,0,4,26;530,53,0,0,53,40;531,14,0,0,14,51;532,10,0,0,10,23;
+534,16,0,0,16,27;535,9,0,0,9,21;536,61,0,0,61,30;537,27,0,0,27,21;539,12,0,0,12,26;
+540,5,0,0,5,57;541,3,0,0,3,11;542,5,0,0,5,14;544,16,0,0,16,44;728/730,17,31,5,53,36;
+841,2,0,0,2,28;936,8,4,1,13,0`);
+
+const MOOSE24=P(`102,1,2,0,3,100;116,2,2,1,5,60;118,0,2,0,2,40;119,0,0,0,0,0;124,0,0,0,0,0;
+148,0,0,0,0,0;150,3,3,0,6,100;151,7,1,0,8,28;152,10,17,0,27,45;156,8,12,0,20,85;158,7,11,1,19,84;
+160,15,15,1,31,47;162,4,5,0,9,54;163,19,21,2,42,85;164,20,27,4,51,75;166,59,60,7,126,77;
+200,70,73,4,147,68;202,68,72,7,147,76;203,14,18,2,34,93;204,28,36,6,70,91;206,26,21,7,54,66;
+208,47,44,3,94,67;210,3,4,0,7,63;212,20,26,4,50,16;214,19,31,4,54,69;216,21,15,5,41,81;
+220,48,38,5,91,62;221,31,22,4,57,60;222,3,6,0,9,85;224,8,5,1,14,65;226,1,1,0,2,100;
+230,61,60,5,126,87;232,32,44,12,88,68;234,69,71,16,156,58;236,44,67,6,117,68;238,13,20,4,37,88;
+240,1,0,2,3,29;242,29,39,15,83,44;244,4,2,2,8,63;246,9,2,3,14,56;247,39,20,2,61,23;
+248,97,45,5,147,21;250,43,63,11,117,46;252,18,31,1,50,77;254,51,55,11,117,70;256,20,21,7,48,65;
+258,36,33,11,80,66;260,22,30,8,60,44;300,9,0,0,9,30;302,14,0,0,14,60;303,0,0,0,0,0;
+304,36,0,0,36,71;306,7,0,0,7,100;308,21,0,0,21,63;310,3,23,0,26,50;312,6,16,3,25,30;
+314,6,10,2,18,37;316,3,10,0,13,40;318,1,0,0,1,14;320,19,9,1,29,52;322,37,28,3,68,78;
+324,1,0,0,1,33;326,3,0,0,3,33;328,0,0,0,0,0;330,0,0,0,0,0;332,42,17,6,65,51;334,26,40,10,76,65;
+336,35,40,4,79,37;337,12,0,0,12,57;338,4,0,0,4,23;339,7,0,0,7,88;340,6,0,0,6,39;342,13,0,0,13,56;
+344,34,0,0,34,61;346,46,0,0,46,51;347,20,0,0,20,18;348,91,0,0,91,49;349,59,0,0,59,26;
+350,75,0,0,75,27;351,24,0,0,24,32;352,31,37,1,69,29;353,68,48,1,117,30;354,109,0,0,109,34;
+355,23,7,0,30,31;356,106,0,0,106,26;357,123,14,0,137,25;358,95,0,0,95,24;359,108,0,38,146,36;
+360,61,0,12,73,38;400,9,0,0,9,57;402,3,0,0,3,33;404,4,0,0,4,10;406,5,2,0,7,4;408,0,0,0,0,0;
+410,2,0,0,2,8;412,3,0,0,3,6;414,3,0,0,3,16;416,0,0,0,0,0;417,1,0,0,1,6;418,0,0,0,0,0;
+420,3,0,0,3,11;422,1,0,0,1,33;426,0,0,0,0,0;428,0,0,0,0,0;429,0,0,0,0,0;430,0,0,0,0,0;
+432,1,0,0,1,33;434,0,0,0,0,0;436,0,0,0,0,0;437,6,0,0,6,33;438,5,0,0,5,21;439,4,0,0,4,17;
+440,8,0,0,8,16;441,10,0,0,10,30;442,3,0,0,3,27;444,1,0,0,1,13;445,12,0,0,12,47;446,11,0,0,11,24;
+500,6,13,1,20,65;501,7,8,0,15,50;502,3,25,5,33,74;503,18,39,4,61,40;504,20,27,1,48,42;
+505,27,0,9,36,86;506,32,44,12,88,56;507,68,38,5,111,42;508,29,58,5,92,59;509,29,26,1,56,46;
+510,80,0,44,124,48;511,6,0,0,6,26;512,42,0,0,42,34;514,12,0,0,12,30;515,8,0,0,8,30;
+516,3,0,0,3,15;517,1,0,0,1,13;518,27,0,0,27,42;519,13,0,0,13,25;520,31,0,0,31,19;
+521,108,0,8,116,34;522,105,0,36,141,28;523,50,0,7,57,29;524,61,0,0,61,43;525,53,0,0,53,42;
+526,173,0,33,206,50;527,94,0,20,114,46;528,69,0,0,69,44;529,3,0,0,3,16;530,70,0,0,70,51;
+531,20,0,0,20,58;532,2,0,0,2,20;534,17,0,0,17,34;535,6,0,0,6,13;536,36,0,0,36,39;
+537,22,0,0,22,37;539,12,0,0,12,40;540,5,0,0,5,60;541,18,0,0,18,59;542,2,0,0,2,8;
+544,13,0,0,13,40;728/730,22,35,10,67,45;841,6,0,0,6,58;936,6,12,0,18,36`);
+
+const ELK24=P(`102,10,12,0,22,46;104,7,1,0,8,30;108,19,35,3,57,64;110,2,2,0,4,12;116,7,0,0,7,17;
+116/118/119,4,26,0,30,63;116/118/119/624,13,123,23,159,103;118,7,2,0,9,12;119,9,0,0,9,19;
+124/128/142/144/148/150,21,64,3,88,49;132,2,2,0,4,13;132/136/138,4,6,0,10,63;136,0,0,0,0,0;
+138,0,0,0,0,0;151,2,2,0,4,3;151/152,12,12,3,27,35;152,2,2,0,4,7;156,0,0,0,0,0;
+156/158/160,2,1,0,3,24;158,0,0,0,0,0;160,4,0,0,4,6;162,2,0,0,2,7;162/163/164/166,32,22,5,59,47;
+163,7,0,0,7,22;164,4,2,0,6,27;166,11,2,0,13,8;200,11,0,0,11,13;
+200/202/203/232/234,84,447,112,643,87;202,4,0,0,4,7;203,0,0,0,0,0;204,2,0,0,2,25;
+204/228/230,2,0,0,2,25;206,2,0,0,2,8;206/222/226/244/246,0,1,1,2,25;208,11,4,0,15,11;
+208/210/220,12,30,0,42,43;210,0,0,0,0,0;212,51,88,13,152,19;214,29,0,0,29,11;
+214/314,0,257,20,277,115;216,27,4,0,31,14;216/320,0,51,1,52,35;220,9,2,0,11,10;221,11,0,0,11,14;
+221/322,0,5,2,7,32;222,2,0,0,2,33;224,18,14,0,32,14;226,0,0,0,0,0;228,2,0,0,2,33;230,0,0,0,0,0;
+232,13,0,0,13,10;234,27,5,2,34,15;236,7,4,2,13,12;236/238/256,19,19,5,43,37;238,7,0,0,7,17;
+240,0,0,0,0,0;240/242,4,6,2,12,39;242,2,0,0,2,3;244,2,0,0,2,33;246,7,2,4,13,25;247,0,0,0,0,0;
+248,5,0,0,5,8;250,3,14,5,22,50;252,5,4,0,9,29;252/254/258/260,14,22,3,39,35;254,16,0,0,16,17;
+256,2,2,0,4,7;258,4,2,0,6,18;260,0,0,0,0,0;300,0,10,2,12,35;302,51,233,27,311,47;
+303,4,13,0,17,22;304,118,354,25,497,30;305,142,459,53,654,40;306,40,51,4,95,18;
+308,67,42,4,113,10;310,45,89,13,147,25;312,164,51,5,220,21;314,80,9,0,89,14;316,0,0,0,0,0;
+318,9,4,0,13,4;320,55,7,2,64,13;322,15,2,0,17,9;324,9,0,0,9,7;326,4,0,0,4,3;328,9,0,0,9,4;
+330,2,0,0,2,1;332,42,40,4,86,13;334,18,12,0,30,15;336,58,20,1,79,15;337,22,4,0,26,11;
+338,7,10,0,17,6;339,24,0,0,24,9;340,29,2,0,31,11;342,15,0,0,15,8;344,58,1,0,59,11;
+346,109,25,3,137,15;347,20,0,0,20,8;348,51,24,0,75,13;349,11,0,0,11,5;350,9,0,0,9,6;
+351,9,0,0,9,10;352,25,15,3,43,14;353,49,53,8,110,16;354,60,27,3,90,21;355,13,10,0,23,13;
+356,122,64,3,189,18;357,266,965,144,1375,59;358,247,443,60,750,43;359,231,416,71,718,45;
+360,149,505,82,736,63;400,29,2,0,31,5;402,49,2,0,51,7;404,3,0,0,3,4;406,5,0,0,5,4;
+408,0,0,0,0,0;410,9,4,0,13,9;412,0,0,0,0,0;414,0,0,0,0,0;416,0,0,0,0,0;417,0,0,0,0,0;
+418,2,0,0,2,50;420,0,0,0,0,0;422,0,0,0,0,0;426,0,0,0,0,0;428,0,0,0,0,0;429,7,0,0,7,9;
+430,0,0,0,0,0;432,0,0,0,0,0;434,0,0,0,0,0;436,0,0,0,0,0;437,0,0,0,0,0;438,0,0,0,0,0;
+439,0,1,0,1,2;440,5,0,0,5,4;441,0,1,0,1,1;442,5,0,0,5,12;444,4,0,0,4,5;445,0,0,0,0,0;
+446,5,0,0,5,5;500,4,0,0,4,6;501,4,2,0,6,19;502,2,0,0,2,3;503,0,1,0,1,33;504,9,8,0,17,12;
+505,9,9,1,19,12;506,18,17,2,37,15;507,49,21,4,74,18;508,20,14,1,35,15;509,11,17,3,31,18;
+510,55,75,10,140,16;511,0,2,0,2,2;514,0,0,0,0,0;520,16,7,0,23,14;521,235,601,113,949,58;
+522,271,218,42,531,30;523,184,107,21,312,31;524,4,0,0,4,13;525,9,0,0,9,10;526,184,189,9,382,31;
+527,169,53,6,228,26;528,15,0,0,15,16;535,24,0,0,24,19;537,16,2,0,18,23;544,20,0,0,20,28;
+728/730,10,4,1,15,41;732,14,278,27,319,131;936,6,9,1,16,23`);
+
+const ELK23=P(`102,8,11,0,19,34;104,9,2,0,11,49;108,23,15,2,40,72;110,2,2,0,4,14;116,4,0,0,4,7;
+116/118/119,4,14,2,20,46;116/118/119/624,11,46,5,62,41;118,16,2,0,18,22;119,0,0,0,0,0;
+124/128/142/144/148/150,32,103,34,169,74;132,0,0,0,0,0;132/136/138,3,11,0,14,65;136,7,0,0,7,22;
+138,0,0,0,0,0;151,2,0,0,2,1;151/152,20,23,3,46,53;152,2,0,0,2,4;156,0,0,0,0,0;
+156/158/160,2,3,1,6,24;158,2,0,0,2,10;160,12,0,2,14,18;162,0,0,0,0,0;
+162/163/164/166,32,39,11,82,67;163,4,0,0,4,15;164,5,0,0,5,30;166,14,2,0,16,10;200,7,0,0,7,7;
+200/202/203/232/234,63,361,31,455,72;202,11,0,0,11,18;203,0,0,0,0,0;204,0,0,0,0,0;
+204/228/230,1,0,2,3,14;206,2,2,2,6,21;206/222/226/244/246,3,11,3,17,20;208,18,4,0,22,17;
+208/210/220,17,29,1,47,40;210,2,0,0,2,5;212,46,113,46,205,27;214,23,2,0,25,10;
+214/314,0,227,28,255,130;216,27,2,0,29,13;216/320,0,40,1,41,45;220,7,2,0,9,9;221,14,0,0,14,16;
+221/322,0,2,0,2,9;222,0,0,0,0,0;224,14,9,0,23,11;226,0,0,0,0,0;228,0,0,0,0,0;230,0,0,0,0,0;
+232,27,2,0,29,18;234,23,12,0,35,19;236,7,2,2,11,12;236/238/256,12,22,3,37,37;238,4,0,0,4,7;
+240,0,0,0,0,0;240/242,4,9,0,13,28;242,5,0,0,5,8;244,2,0,0,2,25;246,0,2,0,2,7;247,0,0,0,0,0;
+248,4,0,0,4,7;252,2,0,0,2,6;252/254/258/260,6,30,2,38,39;254,7,7,0,14,18;256,5,2,0,7,15;
+258,5,0,2,7,17;260,0,0,0,0,0;300A,1,10,2,13,13;300B,0,4,0,4,7;302,84,91,6,181,28;
+303,2,8,1,11,13;304,132,467,49,648,40;305,165,464,33,662,41;306,60,58,2,120,25;
+308,96,64,2,162,16;310,75,63,3,141,25;312,144,441,62,647,54;314,84,7,0,91,14;316,5,0,0,5,3;
+318,16,4,0,20,5;320,36,5,0,41,9;322,5,2,2,9,5;324,5,6,0,11,6;326,2,0,0,2,1;328,11,0,0,11,4;
+330,5,0,1,6,3;332,34,18,0,52,10;334,14,11,0,25,12;336,44,11,3,58,12;337,4,6,1,11,4;
+338,14,9,0,23,8;339,9,0,0,9,4;340,12,3,1,16,6;342,5,6,0,11,7;344,44,2,0,46,9;
+346,71,29,1,101,11;347,20,0,0,20,9;348,34,20,0,54,8;349,11,0,0,11,5;350,4,0,0,4,2;
+351,12,0,0,12,16;352,23,9,0,32,10;353,41,10,3,54,8;354,37,6,3,46,11;355,9,0,0,9,5;
+356,128,22,3,153,14;357,327,289,20,636,26;358,242,139,14,395,22;359,267,221,14,502,30;
+360,123,166,13,302,27;400,30,0,0,30,5;402,39,4,0,43,6;404,8,0,0,8,10;406,13,0,0,13,10;
+408,0,0,0,0,0;410,5,5,0,10,7;412,0,0,0,0,0;414,0,0,0,0,0;416,0,0,0,0,0;417,1,0,0,1,25;
+418,4,0,0,4,75;420,0,0,0,0,0;422,3,0,0,3,67;426,0,0,0,0,0;428,0,0,0,0,0;429,7,0,0,7,11;
+430,0,0,0,0,0;432,2,0,0,2,31;434,0,0,0,0,0;436,0,0,0,0,0;437,2,0,0,2,6;438,7,0,0,7,5;
+439,5,1,0,6,10;440,5,0,0,5,4;441,4,3,0,7,9;442,0,0,0,0,0;444,4,4,0,8,13;445,2,0,0,2,6;
+446,5,0,0,5,5;500,0,0,0,0,0;501,0,0,0,0,0;502,0,0,0,0,0;504,4,0,0,4,3;505,12,3,2,17,12;
+506,9,6,0,15,7;507,32,21,1,54,13;508,16,14,1,31,14;509,5,25,1,31,16;510,55,29,7,91,12;
+511,0,0,0,0,0;514,0,0,0,0,0;520,21,7,0,28,18;521,231,158,18,407,26;522,277,132,12,421,25;
+523,176,91,17,284,28;525,5,0,0,5,7;526,187,78,8,273,23;527,146,27,1,174,21;528,14,0,0,14,20;
+535,25,0,0,25,22;537,16,1,0,17,21;544,7,0,0,7,12;728/730,13,1,0,14,41;732,41,520,168,729,134;
+936,9,9,0,18,21`);
+
+const WT24=P(`102,84,4,0,88,23;104,67,20,5,92,29;106,118,50,2,170,37;108,513,70,7,590,43;
+110,469,90,13,572,54;112,106,36,1,143,28;116,115,19,0,134,22;118,39,2,0,41,7;119,96,21,3,120,24;
+124,78,11,1,90,34;128,81,18,4,103,26;130,118,53,3,174,39;132,136,33,0,169,43;134,48,15,0,63,31;
+136,49,18,2,69,34;138,56,16,0,72,33;140,32,18,0,50,30;142,22,7,0,29,20;144,11,3,1,15,14;
+148,57,7,1,65,17;150,28,3,0,31,13;151,27,0,2,29,11;152,131,8,2,141,23;156,154,13,0,167,28;
+158,76,7,0,83,25;160,110,3,0,113,21;162,22,3,0,25,12;163,40,1,0,41,14;164,56,11,0,67,18;
+166,210,6,0,216,21;200,42,35,5,82,12;202,119,74,9,202,26;203,94,59,5,158,24;204,151,153,23,327,33;
+206,118,86,5,209,25;208,233,233,14,480,35;210,152,7,0,159,28;212,108,2,2,112,22;
+214,207,262,25,494,42;216,223,177,9,409,42;220,334,256,16,606,32;221,166,122,5,293,44;
+222,120,84,7,211,39;224,349,317,14,680,47;226,95,100,5,200,43;228,178,156,6,340,34;
+230,147,170,5,322,36;232,126,55,5,186,23;234,97,65,8,170,17;236,139,40,9,188,21;
+238,138,97,5,240,30;240,75,68,2,145,33;242,282,250,19,551,33;243,0,0,0,0,0;244,81,89,0,170,41;
+246,165,149,7,321,45;247,84,3,2,89,32;248,66,36,5,107,19;250,344,47,4,395,33;252,109,15,0,124,25;
+254,129,36,2,167,23;256,133,30,2,165,29;258,299,289,39,627,41;260,165,170,13,348,38;
+300,266,314,30,610,47;302,187,60,0,247,33;303,21,18,0,39,26;304,194,191,19,404,19;
+305,155,158,12,325,19;306,81,21,2,104,22;308,148,38,6,192,22;310,164,213,21,398,41;
+312,475,326,32,833,39;314,573,497,39,1109,35;316,130,49,4,183,25;318,341,153,11,505,35;
+320,265,571,52,888,44;322,245,224,16,485,45;324,323,80,4,407,41;326,129,38,2,169,27;
+328,235,76,3,314,46;330,450,171,3,624,44;332,623,480,27,1130,39;334,300,145,11,456,35;
+336,475,465,33,973,46;337,458,979,98,1535,58;338,430,69,2,501,41;339,148,62,0,210,38;
+340,152,21,0,173,39;342,74,15,3,92,29;344,147,160,14,321,34;346,493,110,7,610,41;
+347,66,18,2,86,28;348,704,1011,94,1809,63;349,276,64,2,342,35;350,376,676,53,1105,59;
+351,61,91,9,161,47;352,49,80,6,135,35;353,149,257,19,425,41;354,46,7,0,53,20;355,15,34,0,49,21;
+356,151,38,0,189,26;357,495,526,41,1062,43;358,139,201,5,345,34;359,167,150,14,331,40;
+360,412,333,23,768,59;400,72,29,0,101,18;402,47,12,0,59,11;404,18,3,1,22,25;406,39,30,1,70,30;
+408,1,0,0,1,7;410,21,5,0,26,19;412,74,23,8,105,28;414,21,8,0,29,16;416,13,3,0,16,15;
+417,31,0,0,31,19;418,8,3,0,11,22;420,31,5,0,36,34;422,0,0,0,0,0;426,0,2,0,2,13;428,5,2,0,7,40;
+429,57,15,0,72,43;430,0,0,0,0,0;432,0,2,0,2,12;434,3,0,0,3,10;436,0,0,0,0,0;437,3,2,0,5,9;
+438,24,3,0,27,25;439,17,5,0,22,28;440,8,37,0,45,30;441,38,34,0,72,43;442,2,0,0,2,8;
+444,18,6,5,29,27;445,2,0,0,2,12;446,14,25,0,39,38;500,158,168,28,354,43;501,228,222,14,464,48;
+502,339,408,16,763,50;503,446,377,50,873,54;504,223,233,18,474,40;505,210,138,14,362,45;
+506,295,208,23,526,39;507,511,513,34,1058,50;508,445,361,39,845,51;509,324,388,20,732,56;
+510,754,895,71,1720,54;511,284,511,33,828,64;512,218,378,16,612,47;514,260,370,44,674,58;
+515,213,432,25,670,66;516,57,99,5,161,52;517,55,117,0,172,69;518,60,77,5,142,31;
+519,137,298,14,449,48;520,41,104,0,145,51;521,364,373,16,753,55;522,175,137,6,318,30;
+523,325,180,7,512,46;524,13,11,0,24,18;525,30,32,2,64,36;526,336,158,6,500,42;
+527,255,91,11,357,41;528,46,21,0,67,29;529,29,14,0,43,21;530,27,39,0,66,26;531,18,27,0,45,38;
+532,2,0,0,2,27;534,7,11,0,18,45;535,88,40,2,130,36;536,6,6,0,12,20;537,23,12,2,37,47;
+539,4,0,0,4,25;540,7,2,0,9,22;541,5,12,0,17,50;542,28,18,2,48,47;544,89,51,0,140,48;
+728/730,182,144,0,326,79;841,25,2,0,27,33;936,8,2,0,10,9`);
+
+const WT23=P(`102,80,22,1,103,21;104,82,104,19,205,55;106,112,149,15,276,58;108,471,256,23,750,43;
+110,473,229,16,718,56;112,139,179,15,333,54;116,121,66,8,195,23;118,36,25,0,61,8;119,107,54,7,168,26;
+124,49,25,5,79,24;128,100,47,6,153,36;130,82,38,1,121,30;132,125,36,4,165,37;134,49,25,1,75,31;
+136,77,25,0,102,36;138,38,28,2,68,30;140,48,31,0,79,36;142,30,7,2,39,26;144,18,14,0,32,25;
+148,87,29,1,117,22;150,35,5,0,40,12;151,54,17,5,76,18;152,180,37,3,220,27;156,185,56,5,246,31;
+158,75,22,0,97,25;160,115,27,4,146,20;162,31,11,0,42,16;163,42,15,3,60,15;164,75,17,2,94,18;
+166,213,51,1,265,24;200,58,39,0,97,11;202,130,112,25,267,33;203,157,66,0,223,32;204,190,163,21,374,40;
+206,175,120,10,305,37;208,271,250,20,541,42;210,185,31,1,217,34;212,103,8,0,111,22;
+214,289,259,24,572,49;216,234,225,23,482,51;220,425,343,41,809,42;221,214,143,8,365,55;
+222,134,114,6,254,48;224,461,458,43,962,62;226,130,111,12,253,52;228,250,152,35,437,44;
+230,198,154,21,373,43;232,159,155,17,331,35;234,128,60,26,214,19;236,139,84,0,223,23;
+238,170,80,18,268,31;240,125,93,12,230,44;242,307,314,21,642,43;244,88,10,2,100,37;
+246,211,202,21,434,57;247,61,5,0,66,24;248,77,14,0,91,20;250,301,386,37,724,45;252,119,96,12,227,31;
+254,168,161,8,337,38;256,189,177,25,391,49;258,281,351,59,691,51;260,192,175,10,377,44;
+300,295,670,46,1011,89;302,195,116,14,325,38;303,36,13,0,49,35;304,257,589,67,913,43;
+305,155,393,96,644,40;306,68,32,2,102,24;308,162,76,8,246,31;310,160,368,66,594,63;
+312,549,810,75,1434,67;314,609,1117,81,1807,66;316,123,50,4,177,27;318,380,179,8,567,42;
+320,313,692,100,1105,59;322,290,325,4,619,57;324,340,139,8,487,52;326,141,33,0,174,33;
+328,243,57,0,300,45;330,426,105,2,533,44;332,596,1392,146,2134,75;334,341,360,16,717,57;
+336,472,681,45,1198,57;337,536,1407,170,2113,80;338,444,91,4,539,45;339,97,41,3,141,31;
+340,125,23,2,150,36;342,98,20,2,120,42;344,129,340,33,502,59;346,567,525,43,1135,45;
+347,42,81,4,127,28;348,839,1567,99,2505,86;349,246,344,28,618,35;350,310,882,67,1259,69;
+351,43,74,8,125,42;352,55,67,0,122,34;353,146,331,41,518,47;354,73,56,2,131,29;355,21,39,0,60,24;
+356,173,145,8,326,28;357,606,603,73,1282,53;358,124,284,34,442,46;359,140,222,4,366,44;
+360,366,398,39,803,71;400,65,18,0,83,16;402,50,11,0,61,14;404,11,8,1,20,18;406,78,58,2,138,39;
+408,3,1,0,4,12;410,28,2,0,30,22;412,63,27,0,90,26;414,22,5,0,27,15;416,13,0,0,13,14;
+417,41,6,0,47,31;418,10,0,0,10,17;420,31,7,0,38,35;422,0,0,0,0,0;426,0,0,0,0,0;428,6,0,0,6,44;
+429,59,7,0,66,42;430,8,0,0,8,26;432,0,0,0,0,0;434,8,0,0,8,32;436,3,2,0,5,42;437,10,2,0,12,27;
+438,41,10,0,51,35;439,18,5,0,23,34;440,21,29,0,50,39;441,22,20,4,46,37;442,0,8,0,8,43;
+444,16,14,4,34,55;445,2,4,0,6,26;446,18,18,0,36,35;500,170,300,26,496,60;501,241,323,53,617,62;
+502,327,470,71,868,61;503,466,669,45,1180,75;504,211,263,12,486,47;505,219,241,4,464,59;
+506,263,244,32,539,44;507,554,775,65,1394,64;508,445,471,59,975,59;509,303,418,58,779,62;
+510,730,1202,142,2074,69;511,239,831,68,1138,94;512,230,536,26,792,59;514,261,653,49,963,79;
+515,178,568,68,814,95;516,52,143,21,216,71;517,29,112,8,149,76;518,50,141,25,216,44;
+519,137,343,12,492,58;520,37,53,8,98,37;521,368,584,25,977,69;522,196,297,12,505,48;
+523,357,450,57,864,77;524,12,44,4,60,44;525,31,69,8,108,52;526,286,380,43,709,60;
+527,240,215,8,463,52;528,42,33,4,79,45;529,29,39,0,68,34;530,43,116,0,159,60;531,18,43,8,69,49;
+532,3,29,0,32,131;534,12,11,0,23,53;535,117,111,12,240,60;536,0,21,0,21,33;537,32,0,0,32,45;
+539,0,0,0,0,0;540,12,25,4,41,82;541,4,2,0,6,17;542,23,26,4,53,50;544,79,162,12,253,90;
+728/730,351,346,0,697,129;841,33,4,0,37,42;936,5,5,0,10,9`);
+
+const MOOSE23=P(`102,0,0,0,0,0;116,0,3,0,3,38;118,1,0,0,1,20;119,0,0,0,0,0;124,0,0,0,0,0;
+148,0,0,1,1,50;150,1,2,0,3,75;151,12,3,1,16,46;152,9,19,0,28,48;156,13,12,0,25,87;158,9,9,0,18,55;
+160,26,37,5,68,75;162,6,6,0,12,81;163,30,30,0,60,94;164,33,31,6,70,90;166,95,79,13,187,82;
+200,82,94,11,187,71;202,74,79,14,167,78;203,17,23,0,40,100;204,43,39,5,87,93;206,21,19,4,44,54;
+208,62,53,2,117,69;210,9,5,1,15,87;212,45,23,15,83,25;214,33,35,1,69,76;216,25,15,2,42,72;
+220,45,42,10,97,60;221,24,16,3,43,46;222,5,5,0,10,86;224,16,7,2,25,75;226,1,0,0,1,100;
+228,26,23,1,50,71;230,55,52,5,112,76;232,37,39,6,82,59;234,86,111,14,211,61;236,52,63,5,120,68;
+238,20,20,10,50,87;240,6,5,0,11,88;242,45,54,7,106,52;244,2,1,0,3,25;246,9,7,1,17,70;
+247,60,13,4,77,27;248,86,47,13,146,20;250,85,106,16,207,59;252,29,23,6,58,71;254,61,71,12,144,66;
+256,23,23,4,50,65;258,37,39,13,89,54;260,33,22,5,60,43;300,18,0,0,18,59;302,16,0,0,16,63;
+303,0,0,0,0,0;304,31,0,0,31,62;306,6,0,0,6,100;308,25,0,0,25,71;310,13,19,2,34,50;312,14,12,2,28,28;
+314,12,14,1,27,34;316,8,7,0,15,29;318,3,0,0,3,25;320,22,8,0,30,51;322,38,19,1,58,68;324,2,0,0,2,100;
+326,1,0,0,1,10;328,4,0,0,4,67;330,2,0,0,2,25;332,36,27,0,63,45;334,28,34,12,74,64;336,58,40,5,103,41;
+337,6,3,0,9,48;338,7,0,0,7,28;339,3,0,0,3,30;340,7,0,0,7,62;342,12,0,0,12,41;344,23,0,0,23,60;
+346,42,0,0,42,57;347,36,0,0,36,29;348,92,0,0,92,46;349,79,0,0,79,32;350,78,0,0,78,30;
+351,44,0,0,44,57;352,42,33,5,80,39;353,133,132,11,276,42;354,186,0,0,186,43;355,29,33,4,66,51;
+356,117,0,0,117,29;357,167,16,2,185,31;358,97,0,0,97,20;359,121,0,68,189,41;360,53,0,15,68,36;
+400,8,0,0,8,40;402,3,0,0,3,33;404,4,3,0,7,13;406,16,5,0,21,10;408,0,0,0,0,0;410,0,0,0,0,0;
+412,4,0,0,4,16;414,6,0,0,6,19;416,1,0,0,1,10;417,2,0,0,2,8;418,0,0,0,0,0;420,5,0,0,5,16;
+422,1,0,0,1,16;426,0,0,0,0,0;428,0,0,0,0,0;429,3,0,0,3,50;430,0,0,0,0,0;432,0,0,0,0,0;
+434,0,0,0,0,0;436,0,0,0,0,0;437,9,0,0,9,37;438,8,0,0,8,16;439,5,0,0,5,16;440,12,0,0,12,36;
+441,14,0,0,14,56;442,4,0,0,4,26;444,0,0,0,0,0;445,13,0,0,13,40;446,20,0,0,20,45;500,12,11,2,25,61;
+501,2,7,4,13,42;502,4,21,2,27,63;503,47,30,13,90,33;504,33,44,6,83,40;505,32,0,29,61,85;
+506,54,58,11,123,57;507,53,72,14,139,43;508,53,59,7,119,57;509,24,27,6,57,42;510,93,0,51,144,43;
+511,10,0,0,10,44;512,63,0,0,63,38;514,8,0,0,8,22;515,5,0,0,5,18;516,8,0,0,8,42;517,3,0,0,3,36;
+518,32,0,0,32,43;519,17,0,0,17,37;520,41,0,0,41,26;521,99,0,15,114,32;522,151,0,40,191,36;
+523,66,0,8,74,36;524,83,0,0,83,54;525,68,0,0,68,51;526,193,0,34,227,54;527,114,0,18,132,42;
+528,57,0,0,57,45;529,3,0,0,3,12;530,72,0,0,72,39;531,20,0,0,20,57;532,0,0,0,0,0;534,29,0,0,29,33;
+535,2,0,0,2,4;536,54,0,0,54,48;537,35,0,0,35,56;539,12,0,0,12,43;540,2,0,0,2,24;541,12,0,0,12,37;
+542,6,0,0,6,25;544,11,0,0,11,36;728/730,45,43,14,102,64;841,9,0,0,9,66;936,7,21,1,29,38`);
+
+/* Provincial totals as published, by species and season — 2016 to 2025.
+   Per-unit detail is loaded for 2023–2025; earlier seasons are provincial totals only,
+   read from the same annual reports. [male, female, young, total] */
+const T=(m,f,y,t)=>({m,f,y,t});
+const PROVY={
+  elk:{2016:T(3321,3566,577,7464),2017:T(3535,3454,360,7349),2018:T(3373,2873,406,6652),
+       2019:T(3669,2460,268,6396),2020:T(4721,3229,439,8443),2021:T(4345,4272,535,9152),
+       2022:T(3953,3794,467,8210),2023:T(4486,4975,658,10119),2024:T(4536,6903,967,12406),
+       2025:T(4594,4543,608,9781)},
+  deer:{2016:T(22275,16523,1808,40606),2017:T(22932,15677,1657,40265),
+        2018:T(24198,12948,1358,38505),2019:T(23422,13118,1363,37902),
+        2020:T(30189,26907,2600,59709),2021:T(29971,20504,2249,52724),
+        2022:T(24848,30126,3125,58099),2023:T(29061,34525,3223,66809),
+        2024:T(27122,21422,1581,50125),2025:T(27864,11525,747,40131)},
+  moose:{2016:T(4806,2057,755,7618),2017:T(5078,2268,808,8154),2018:T(5372,2193,656,8227),
+         2019:T(5020,2148,676,7900),2020:T(6013,2563,802,9504),2021:T(6024,2719,576,9319),
+         2022:T(4996,2213,608,7855),2023:T(5082,2203,621,7906),2024:T(4089,1844,474,6407),
+         2025:T(4138,1764,414,6326)}
+};
+const TREND_YEARS=[2016,2017,2018,2019,2020,2021,2022,2023,2024,2025];
+const PROV={elk:PROVY.elk[2025],deer:PROVY.deer[2025],moose:PROVY.moose[2025]};
+
+/* licence classification, 2026 regulations
+   gen = general licence with rifle season | genArch = general, archery only
+   archDraw = archery general but rifle by draw | draw = special licence only */
+const ETAG={},WTAG={},WALESS={};
+const put=(o,list,code)=>list.forEach(w=>o[w]=code);
+const R=(a,b,step)=>{const o=[];for(let i=a;i<=b;i+=(step||2))o.push(String(i));return o};
+put(ETAG,["302","303","304","305","306","308","310","312","314","316","318","320","322","324","326",
+ "328","330","332","334","336","337","338","339","340","342","344","346","347","348","349","350","351",
+ "352","353","354","355","356","357","358","359","360","214","216","221","224","400","402","429","436",
+ "437","438","439","440","441","442","444","445","446","500","501","502","504","505","506","507","508",
+ "510","511","514","520","521","522","523","524","525","526","527","528","535","537","544","841"],"gen");
+put(ETAG,["106","112","130","134","140","116","118","119","212","247","248","410","512","515","516",
+ "517","518","519"],"genArch");
+put(ETAG,["110","132","136","138","151","152","156","158","160","162","163","164","166","200","202",
+ "203","204","206","208","210","220","222","226","228","230","232","234","236","238","240","242","244",
+ "246","250","252","254","256","258","260","509"],"archDraw");
+put(ETAG,["102","104","108","124","128","142","144","148","150","732","936","300","404","406","408",
+ "412","414","416","417","418","420","422","426","428","430","432","434","503"],"draw");
+
+put(WTAG,["212","247","248","410"],"genArch");
+put(WTAG,["404","406","408"],"archDraw");
+put(WTAG,["936"],"draw");
+put(WALESS,["102","104","106","108","110","112","116","118","119","124","128","130","132","134","136",
+ "138","140","142","144","148","150","151","152","156","158","160","162","163","164","166","210","404",
+ "406","408","936"],"draw");
+put(WALESS,["212","247","248","410"],"genArch");
+
+const CWD_MANDATORY=["102","108","110","116","118","119","148","150","151","200","212","216","221","224",
+ "232","234","236","238","246","247","248","250","300","302","303","304","305","306","308","310","312",
+ "314","316","320","322","334","402","404","503","504","505","506","508","509","510","514","728","730"];
+const CWD_NEW25=["222","300","316","320","322","503","504"];
+const CWD_NEW24=["221","247","306","505","508"];
+const CWD={tested:6819,suitable:6768,positive:654,rate:9.7,
+  species:[["Mule deer",25.1,1794],["Elk",9.7,308],["Moose",4.2,164],["White-tailed deer",3.7,4477]],
+  sex:[["Mule deer",29.5,18.0],["White-tailed deer",4.1,2.4]],
+  prior:{tested:2963,positive:472,rate:16.2,mule:26.8,wt:8.8,elk:3.9,moose:3.8},
+  cumulative:7289};
+
+const CALGARY=["212","214","216","224","232","234","300","302","303","304","305","306","308","310","312",
+ "314","316","318","320","322","326","328","400","402","404","406","408","410","412","414","429"];
+
+/* named units — controlled-access and notable */
+const NAMES={"732":"CFB Suffield","728/730":"CFB Wainwright","936":"Cooking Lake–Blackfoot",
+ "212":"Calgary fringe","312":"Sundre / Water Valley","314":"Jumpingpound / Sibbald",
+ "402":"Livingstone","400":"Castle","304":"Chain Lakes","305":"Porcupine Hills","308":"Crowsnest",
+ "310":"Highwood","318":"Caroline","320":"Ghost","322":"Cochrane east","841":"Cold Lake AWR"};
+/* units whose success rate reflects controlled access rather than habitat */
+const CONTROLLED=["732","728/730","936","841"];
+
+/* ============================================================
+   MULTI-YEAR / MULTI-SPECIES REGISTRY
+   Add a season by dropping an array into the matching slot.
+   Row format is identical throughout: [WMU, male, female, young, total, successPct]
+   ============================================================ */
+const DATA={
+  elk:  {2025:ELK,     2024:ELK24,   2023:ELK23},
+  deer: {2025:WT,      2024:WT24,    2023:WT23},
+  moose:{2025:MOOSE25, 2024:MOOSE24, 2023:MOOSE23}
+};
+const SPECIES=[["elk","Elk"],["deer","White-tailed deer"],["moose","Moose"]];
+const SPNAME={elk:"Elk",deer:"White-tailed deer",moose:"Moose",all:"All species"};
+const SHORT={elk:"Elk",deer:"Deer",moose:"Moose"};
+const YEARS=[2025,2024,2023];
+const hasData=(sp,yr)=>Array.isArray(DATA[sp]&&DATA[sp][yr]);
+const loadedYears=()=>YEARS.filter(y=>SPECIES.some(([s])=>hasData(s,y)));
+const loadedSpecies=y=>SPECIES.filter(([s])=>hasData(s,y)).map(([s])=>s);
+
+const regionOf=w=>{if(w.includes("/"))return"group";const d=w[0];
+  return ["1","2","3","4","5"].includes(d)&&w.length===3?d:"other"};
+const REGION_NAME={"1":"Prairie","2":"Parkland","3":"Foothills","4":"Mountain","5":"Boreal",
+  other:"Other",group:"Multi-unit"};
+const hunters=(t,s)=>s>0?Math.round(t/(s/100)):null;
+const pct=(a,b)=>b>0?Math.round(a/b*1000)/10:null;
+/* per-species field prefixes: elk=e, deer=w, moose=m */
+const PFX={elk:"e",deer:"w",moose:"m"};
+
+function buildModel(year){
+  const maps={};
+  SPECIES.forEach(([sp])=>{
+    const m={}; const arr=DATA[sp][year];
+    if(Array.isArray(arr))arr.forEach(r=>m[r[0]]=r);
+    maps[sp]=m;
+  });
+  const keys=[...new Set(SPECIES.flatMap(([sp])=>Object.keys(maps[sp])))];
+  const rows=keys.map(w=>{
+    const isGroup=w.includes("/")||/[A-Z]/.test(w);
+    const o={wmu:w,name:NAMES[w]||"",controlled:CONTROLLED.includes(w),isGroup,
+      region:regionOf(w),regionName:REGION_NAME[regionOf(w)],year,
+      eTag:ETAG[w]||"none", wTag:WTAG[w]||(regionOf(w)==="group"?"none":"gen"),
+      wAless:WALESS[w]||(regionOf(w)==="group"?"none":"gen"),
+      cwd:CWD_MANDATORY.includes(w)?(CWD_NEW25.includes(w)?"new25":"mand")
+          :(CWD_NEW25.includes(w)?"new25":(CWD_NEW24.includes(w)?"new24":"none"))};
+    SPECIES.forEach(([sp])=>{
+      const p=PFX[sp], r=maps[sp][w]||null;
+      const has=!!r;
+      o[p+"Has"]=has;
+      o[p+"Male"]=has?r[1]:null; o[p+"Female"]=has?r[2]:null; o[p+"Young"]=has?r[3]:null;
+      o[p+"Total"]=has?r[4]:null; o[p+"Succ"]=has?r[5]:null;
+      o[p+"Antlerless"]=has?r[2]+r[3]:null;
+      o[p+"Hunters"]=has?hunters(r[4],r[5]):null;
+      o[p+"MaleShare"]=has?pct(r[1],r[4]):null;
+      o[p+"Ratio"]=has&&r[2]>0?Math.round(r[1]/r[2]*100):null;
+    });
+    o.combined=(o.eTotal||0)+(o.wTotal||0)+(o.mTotal||0);
+    o.tilt=((o.eTotal||0)+(o.wTotal||0))>0?
+      Math.round((o.eTotal||0)/((o.eTotal||0)+(o.wTotal||0))*1000)/10:null;
+    return o;
+  });
+  const by={}; rows.forEach(r=>by[r.wmu]=r);
+  return {year,rows,by,pure:rows.filter(r=>!r.isGroup)};
+}
+const M={}; loadedYears().forEach(y=>M[y]=buildModel(y));
+const BASE=M[2025];
+const ROWS=BASE.rows, BY=BASE.by, PURE=BASE.pure;
+
+/* ============================================================
+   HELPERS
+   ============================================================ */
+const C={elk:"#e07a4a",deer:"#7d92f0",gold:"#d8a52c",ok:"#5fae7c",grey:"#9aa4b2",red:"#e0655c"};
+const dark=()=>document.documentElement.getAttribute("data-theme")==="dark";
+const lum=h=>{const c=h.replace("#","");
+  return (0.299*parseInt(c.slice(0,2),16)+0.587*parseInt(c.slice(2,4),16)
+    +0.114*parseInt(c.slice(4,6),16))/255};
+const textOn=h=>(h&&h[0]==="#"&&lum(h)>0.62)?"#0d1017":"#ffffff";
+const ink=()=>getComputedStyle(document.documentElement).getPropertyValue("--ink-3").trim()||"#8e8d85";
+const grid=()=>dark()?"rgba(255,255,255,.10)":"rgba(20,20,15,.10)";
+const fmt=n=>n==null?"—":n.toLocaleString();
+const pearson=(a,b)=>{const n=a.length,ma=a.reduce((x,y)=>x+y,0)/n,mb=b.reduce((x,y)=>x+y,0)/n;
+  let c=0,va=0,vb=0;for(let i=0;i<n;i++){c+=(a[i]-ma)*(b[i]-mb);va+=(a[i]-ma)**2;vb+=(b[i]-mb)**2}
+  return c/Math.sqrt(va*vb)};
+const median=a=>{const s=[...a].sort((x,y)=>x-y);const m=s.length>>1;
+  return s.length%2?s[m]:(s[m-1]+s[m])/2};
+const statTile=(lab,val,sub)=>`<div class="stat"><div class="lab">${lab}</div>
+  <div class="val">${val}</div><div class="sub">${sub||""}</div></div>`;
+/* licence and disease colour keys — defined here because several sections use them */
+const TAG_COLORS={gen:C.ok,genArch:C.deer,archDraw:C.gold,draw:C.red,none:C.grey};
+const TAG_LABELS={gen:"General (rifle)",genArch:"General, archery only",
+  archDraw:"Archery general, rifle draw",draw:"Draw only",none:"No season / not classified"};
+const CWD_COLORS={mand:C.gold,new25:C.red,new24:C.elk,none:C.grey};
+const CWD_LABELS={mand:"Mandatory submission",new25:"New detection 2025–26",
+  new24:"New detection 2024–25",none:"Not in target programme"};
+const BLUES=["#1b2740","#24405e","#2f5c86","#4180b4","#5a9ee0","#8dc0f0"];
+const ORANGES=["#3a2318","#5c3520","#8a4a26","#b8622f","#e07a4a","#f0a077"];
+const GREENS=["#16281d","#1e3d2b","#2a5f40","#3a8659","#5fae7c","#8fd0a5"];
+const NODATA=()=>dark()?"#1c2230":"#e8e7e1";
+const rampColor=(v,max,arr)=>{if(v==null||max<=0)return NODATA();
+  const i=Math.min(arr.length-1,Math.floor(v/max*arr.length));return arr[Math.max(0,i)]};
+const baseOpts=(xt,yt,extra)=>Object.assign({responsive:true,maintainAspectRatio:false,
+  plugins:{legend:{display:false}},
+  scales:{x:{title:{display:!!xt,text:xt,color:ink()},grid:{color:grid()},ticks:{color:ink()}},
+    y:{title:{display:!!yt,text:yt,color:ink()},grid:{color:grid()},ticks:{color:ink()}}}},extra||{});
+
+/* ============================================================
+   PROVINCE
+   ============================================================ */
+document.getElementById("provStats").innerHTML=
+  statTile("Elk harvested",fmt(PROV.elk.t),"2025, all licences")+
+  statTile("Deer harvested",fmt(PROV.deer.t),"2025, all licences")+
+  statTile("Moose harvested",fmt(PROV.moose.t),"2025, all licences")+
+  statTile("Deer per elk",(PROV.deer.t/PROV.elk.t).toFixed(1)+"×","harvest ratio")+
+  statTile("Units with harvest",PURE.filter(r=>r.combined>0).length+" of "+PURE.length,"any species");
+
+const compRow=(name,o)=>{const m=o.m/o.t*100,f=o.f/o.t*100,y=o.y/o.t*100;
+  return `<div class="comp"><div class="comp-head"><span style="font-size:15px;font-weight:600">${name}</span>
+  <span style="font-size:13px;color:var(--ink-3)">${fmt(o.t)} total</span></div>
+  <div class="comp-bar"><div style="width:${m}%;background:${C.deer}"></div>
+  <div style="width:${f}%;background:${C.elk}"></div>
+  <div style="width:${y}%;background:${C.gold}"></div></div>
+  <div class="comp-keys"><span>${fmt(o.m)} male (${m.toFixed(1)}%)</span>
+  <span>${fmt(o.f)} female (${f.toFixed(1)}%)</span>
+  <span>${fmt(o.y)} young (${y.toFixed(1)}%)</span></div></div>`};
+document.getElementById("compBars").innerHTML=compRow("Elk",PROV.elk)+
+  compRow("White-tailed deer",PROV.deer)+compRow("Moose",PROV.moose);
+
+/* ============================================================
+   DATA INTEGRITY — row sums vs published totals
+   ============================================================ */
+(function(){
+  let rows="",bad=0,checked=0;
+  YEARS.slice().sort((a,b)=>b-a).forEach(y=>SPECIES.forEach(([sp,full])=>{
+    const arr=DATA[sp][y]; if(!Array.isArray(arr))return;
+    const pub=PROVY[sp]&&PROVY[sp][y]; if(!pub)return;
+    checked++;
+    const s=arr.reduce((a,r)=>({m:a.m+r[1],f:a.f+r[2],y:a.y+r[3],t:a.t+r[4]}),{m:0,f:0,y:0,t:0});
+    const d=s.t-pub.t, off=Math.abs(d)>0;
+    if(off)bad++;
+    const badge=off
+      ? `<span class="pill" style="background:color-mix(in srgb,${C.red} 22%,transparent);color:${C.red}">off by ${d>0?"+":""}${d}</span>`
+      : `<span class="pill" style="background:color-mix(in srgb,${C.ok} 22%,transparent);color:${C.ok}">exact match</span>`;
+    rows+=`<tr><td style="text-align:left">${full}</td><td>${y}</td><td>${arr.length}</td>
+      <td>${fmt(s.m)}</td><td>${fmt(s.f)}</td><td>${fmt(s.y)}</td>
+      <td>${fmt(s.t)}</td><td>${fmt(pub.t)}</td><td>${badge}</td></tr>`;
+  }));
+  document.getElementById("integrityTable").innerHTML=
+    `<thead><tr><th style="cursor:default;text-align:left">Species</th>
+      <th style="cursor:default">Season</th><th style="cursor:default">Unit rows</th>
+      <th style="cursor:default">Σ male</th><th style="cursor:default">Σ female</th>
+      <th style="cursor:default">Σ young</th><th style="cursor:default">Σ total</th>
+      <th style="cursor:default">Published total</th><th style="cursor:default">Check</th></tr></thead>
+     <tbody>${rows}</tbody>
+     <tfoot><tr><td colspan="9" style="text-align:left;padding:10px 12px;color:var(--ink-3);
+       line-height:1.6">
+       <strong style="color:var(--ink-2)">${checked} datasets verified.</strong>
+       ${bad===0?"All row sums reconcile exactly to the published totals.":
+       bad+" dataset differs, and the cause has been traced: the 2024 moose report prints 162 unit rows that "+
+       "sum to 6,354, but its own \"estimated total\" line reads 6,407. The gap is exactly 53 animals — "+
+       "WMU 228, which appears in the 2023 and 2025 moose reports but is omitted from the 2024 table while "+
+       "still being counted in that report's total. This was confirmed by re-parsing the source PDF directly: "+
+       "the row genuinely is not there. The discrepancy is in the published document, not in this "+
+       "transcription, so it is reported rather than silently patched."}
+     </td></tr></tfoot>`;
+})();
+
+/* ============================================================
+   SEASON TRENDS
+   ============================================================ */
+(function(){
+  const ys=TREND_YEARS;
+  const tot=(sp,y)=>PROVY[sp]&&PROVY[sp][y]?PROVY[sp][y].t:null;
+  const fem=(sp,y)=>PROVY[sp]&&PROVY[sp][y]?PROVY[sp][y].f:null;
+  const mal=(sp,y)=>PROVY[sp]&&PROVY[sp][y]?PROVY[sp][y].m:null;
+  const femShare=(sp,y)=>{const p=PROVY[sp]&&PROVY[sp][y];
+    return p?Math.round((p.f+p.y)/p.t*1000)/10:null};
+  const chg=(sp,a,b)=>{const x=tot(sp,a),z=tot(sp,b);
+    return x&&z?Math.round((z-x)/x*100):null};
+  const grand=ys.reduce((s,y)=>s+SPECIES.reduce((a,[sp])=>a+(tot(sp,y)||0),0),0);
+  const peak=sp=>ys.reduce((a,y)=>(tot(sp,y)||0)>(tot(sp,a)||0)?y:a,ys[0]);
+  document.getElementById("trendStats").innerHTML=
+    statTile("Animals, 10 seasons",fmt(grand),"3 species, 2016–2025")+
+    statTile("Deer peak → 2025",chg("deer",peak("deer"),2025)+"%","peak was "+peak("deer"))+
+    statTile("Deer antlerless share","56% → "+femShare("deer",2025)+"%","2023 vs 2025")+
+    statTile("Elk peak → 2025",chg("elk",peak("elk"),2025)+"%","peak was "+peak("elk"))+
+    statTile("Moose peak → 2025",chg("moose",peak("moose"),2025)+"%","peak was "+peak("moose"));
+  new Chart(document.getElementById("chTrendShare"),{type:"line",
+    data:{labels:ys,datasets:SPECIES.map(([sp])=>({label:SHORT[sp],
+      data:ys.map(y=>femShare(sp,y)),
+      borderColor:({elk:C.elk,deer:C.deer,moose:C.ok})[sp],
+      backgroundColor:({elk:C.elk,deer:C.deer,moose:C.ok})[sp],
+      borderWidth:2.5,tension:.2,pointRadius:4}))},
+    options:baseOpts("Season","Antlerless share of harvest (%)",{
+      plugins:{legend:{display:true,labels:{color:ink(),usePointStyle:true,boxWidth:8}},
+        tooltip:{callbacks:{label:c=>c.dataset.label+": "+c.parsed.y+"% antlerless"}}},
+      scales:{x:{grid:{display:false},ticks:{color:ink()}},
+        y:{min:0,max:60,grid:{color:grid()},ticks:{color:ink(),callback:v=>v+"%"}}}})});
+  new Chart(document.getElementById("chTrendTotal"),{type:"line",
+    data:{labels:ys,datasets:SPECIES.map(([sp])=>({label:SHORT[sp],
+      data:ys.map(y=>tot(sp,y)),
+      borderColor:({elk:C.elk,deer:C.deer,moose:C.ok})[sp],
+      backgroundColor:({elk:C.elk,deer:C.deer,moose:C.ok})[sp],
+      borderWidth:2.5,tension:.2,pointRadius:4}))},
+    options:baseOpts("Season","Total harvest (log scale)",{
+      plugins:{legend:{display:true,labels:{color:ink(),usePointStyle:true,boxWidth:8}},
+        tooltip:{callbacks:{label:c=>c.dataset.label+": "+fmt(c.parsed.y)+" animals"}}},
+      scales:{x:{grid:{display:false},ticks:{color:ink()}},
+        y:{type:"logarithmic",min:4000,max:80000,
+          title:{display:true,text:"Total harvest (log scale)",color:ink()},
+          grid:{color:grid()},ticks:{color:ink(),callback:v=>[5000,10000,20000,40000,80000]
+            .includes(v)?v.toLocaleString():""}}}})});
+  const ds=[];
+  SPECIES.forEach(([sp])=>{
+    const col=({elk:C.elk,deer:C.deer,moose:C.ok})[sp];
+    ds.push({label:SHORT[sp]+" male",data:ys.map(y=>mal(sp,y)),borderColor:col,backgroundColor:col,
+      borderWidth:2.5,tension:.2,pointRadius:5,pointStyle:"circle"});
+    ds.push({label:SHORT[sp]+" female",data:ys.map(y=>fem(sp,y)),borderColor:col,backgroundColor:col,
+      borderWidth:2,borderDash:[6,4],tension:.2,pointRadius:5,pointStyle:"rectRot"});
+  });
+  new Chart(document.getElementById("chTrendSex"),{type:"line",
+    data:{labels:ys,datasets:ds},
+    options:baseOpts("Season","Animals harvested",{
+      plugins:{legend:{display:true,labels:{color:ink(),usePointStyle:true,boxWidth:8,font:{size:11}}},
+        tooltip:{callbacks:{label:c=>c.dataset.label+": "+fmt(c.parsed.y)}}},
+      scales:{x:{grid:{display:false},ticks:{color:ink()}},
+        y:{beginAtZero:true,grid:{color:grid()},ticks:{color:ink()}}}})});
+})();
+
+/* ============================================================
+   2026 OUTLOOK — recency-weighted trend projection
+   ============================================================ */
+let oSp="elk",oReg="all",oConf="all",outChart=null;
+function project(sp){
+  const p=PFX[sp],ys=[2023,2024,2025];
+  const rows=[];
+  (M[2025]?M[2025].pure:[]).forEach(base=>{
+    const w=base.wmu;
+    const series=ys.map(y=>{const r=M[y]&&M[y].by[w];
+      return (r&&r[p+"Has"])?{t:r[p+"Total"]||0,s:r[p+"Succ"]||0}:null});
+    if(series.some(v=>v===null))return;
+    const t=series.map(v=>v.t), s=series.map(v=>v.s);
+    if(t.reduce((a,b)=>a+b,0)===0)return;
+    /* recency-weighted baseline: 2023×1, 2024×2, 2025×3 */
+    const wt=[1,2,3], wsum=6;
+    const base_t=t.reduce((a,v,i)=>a+v*wt[i],0)/wsum;
+    const base_s=s.reduce((a,v,i)=>a+v*wt[i],0)/wsum;
+    /* least-squares slope over x = 0,1,2 */
+    const mx=1,my=t.reduce((a,b)=>a+b,0)/3;
+    let num=0,den=0;
+    t.forEach((v,i)=>{num+=(i-mx)*(v-my);den+=(i-mx)**2});
+    const slope=den?num/den:0;
+    /* volatility: mean absolute year-over-year change as a share of the mean */
+    const mean=my||1;
+    const vol=Math.min(2,(Math.abs(t[1]-t[0])+Math.abs(t[2]-t[1]))/2/mean);
+    /* Volatility-weighted shrinkage toward the most recent observation.
+       A trend fitted to three noisy points is unreliable, so the noisier a unit is,
+       the more weight the latest actual season carries. Stable units are barely affected;
+       spiky units stop projecting above every year on record. */
+    const wTrend=Math.max(0,Math.min(1,1-vol));
+    const trendEst=base_t+slope;
+    const proj=Math.max(0,Math.round(wTrend*trendEst+(1-wTrend)*t[2]));
+    const band=Math.round(proj*vol/2);
+    const conf=(t[2]>=60&&vol<0.35)?"high":(t[2]>=20&&vol<0.7)?"medium":"low";
+    rows.push({wmu:w,name:base.name,region:base.regionName,controlled:base.controlled,
+      t2023:t[0],t2024:t[1],t2025:t[2],slope:Math.round(slope),proj,band,
+      projS:Math.round(base_s),vol:Math.round(vol*100),conf,wTrend:+wTrend.toFixed(2),
+      tag:sp==="elk"?base.eTag:sp==="deer"?base.wTag:"none"});
+  });
+  return rows;
+}
+const CONF={high:C.ok,medium:C.gold,low:C.grey};
+function renderOutlook(){
+  document.querySelectorAll("#segOutlook button").forEach(b=>
+    b.classList.toggle("on",b.dataset.osp===oSp));
+  document.querySelectorAll("#segOutRegion button").forEach(b=>
+    b.classList.toggle("on",b.dataset.oreg===oReg));
+  document.querySelectorAll("#segOutConf button").forEach(b=>
+    b.classList.toggle("on",b.dataset.oconf===oConf));
+  let rows=project(oSp);
+  if(document.getElementById("oCtrl").checked)rows=rows.filter(r=>!r.controlled);
+  if(oReg==="calgary")rows=rows.filter(r=>CALGARY.includes(r.wmu));
+  if(oConf==="high")rows=rows.filter(r=>r.conf==="high");
+  if(oConf==="nolow")rows=rows.filter(r=>r.conf!=="low");
+  const oq=document.getElementById("oSearch").value.trim().toLowerCase();
+  if(oq)rows=rows.filter(r=>r.wmu.toLowerCase().includes(oq)||
+    (r.name||"").toLowerCase().includes(oq));
+  rows.sort((a,b)=>b.proj-a.proj);
+  const hi=rows.filter(r=>r.conf==="high");
+  const rising=rows.filter(r=>r.slope>0).length;
+  const bestOdds=rows.filter(r=>r.t2025>=40).sort((a,b)=>b.projS-a.projS)[0];
+  document.getElementById("outlookStats").innerHTML=
+    statTile("Units modelled",rows.length,SHORT[oSp]+", 3 seasons each")+
+    statTile("High confidence",hi.length,"stable and substantial")+
+    statTile("Trending up",rising,"positive 3-season slope")+
+    statTile("Best projected odds",bestOdds?"WMU "+bestOdds.wmu:"—",
+      bestOdds?bestOdds.projS+"% success · "+fmt(bestOdds.proj)+" projected":"")+
+    statTile("Top projected volume",rows[0]?"WMU "+rows[0].wmu:"—",
+      rows[0]?fmt(rows[0].proj)+" animals":"");
+  document.getElementById("outlookTitle").textContent=
+    "Projected 2026 "+SHORT[oSp].toLowerCase()+" harvest — top 20 units";
+  const top=rows.slice(0,20);
+  if(outChart)outChart.destroy();
+  outChart=new Chart(document.getElementById("chOutlook"),{type:"bar",
+    data:{labels:top.map(r=>r.wmu+(r.name?" "+r.name:"")),datasets:[
+      {label:"Actual 2025",data:top.map(r=>r.t2025),
+       backgroundColor:"transparent",borderColor:ink(),borderWidth:1.5,borderSkipped:false,
+       borderRadius:3,maxBarThickness:11},
+      {label:"Projected 2026",data:top.map(r=>r.proj),
+       backgroundColor:top.map(r=>CONF[r.conf]),borderRadius:3,maxBarThickness:11}]},
+    options:baseOpts("Animals","",{indexAxis:"y",
+      plugins:{legend:{display:true,labels:{color:ink(),usePointStyle:true,boxWidth:8}},
+        tooltip:{callbacks:{label:c=>{const r=top[c.dataIndex];
+          return c.datasetIndex===1
+            ?["Projected 2026: "+fmt(r.proj)+"  (range "+fmt(Math.max(0,r.proj-r.band))+
+              "–"+fmt(r.proj+r.band)+")",
+              "actual: "+r.t2023+" → "+r.t2024+" → "+r.t2025,
+              "confidence: "+r.conf+" · volatility "+r.vol+"%"]
+            :"Actual 2025: "+fmt(r.t2025)}}}},
+      onClick:(e,els)=>{if(els.length)showUnit(top[els[0].index].wmu)},
+      scales:{x:{beginAtZero:true,grid:{color:grid()},ticks:{color:ink()},
+        title:{display:true,text:"Animals",color:ink()}},
+        y:{grid:{display:false},ticks:{color:ink(),font:{size:10}}}}})});
+  document.getElementById("outlookTable").innerHTML=
+    `<thead><tr><th style="cursor:default;text-align:left">WMU</th>
+      <th style="cursor:default">2023</th><th style="cursor:default">2024</th>
+      <th style="cursor:default">2025</th><th style="cursor:default">Slope</th>
+      <th style="cursor:default">Projected 2026</th><th style="cursor:default">Range</th>
+      <th style="cursor:default">Proj. success</th>
+      <th style="cursor:default">Volatility</th><th style="cursor:default">Confidence</th>
+      <th style="cursor:default;text-align:left">Licence</th></tr></thead><tbody>`+
+    rows.map(r=>`<tr><td style="text-align:left">${r.wmu}${r.name?
+      ' <span style="color:var(--ink-3)">'+r.name+"</span>":""}</td>
+      <td>${fmt(r.t2023)}</td><td>${fmt(r.t2024)}</td><td>${fmt(r.t2025)}</td>
+      <td style="color:${r.slope>0?C.ok:r.slope<0?C.elk:"var(--ink-3)"}">${
+        r.slope>0?"+":""}${r.slope}</td>
+      <td><strong>${fmt(r.proj)}</strong></td>
+      <td style="color:var(--ink-3)">${fmt(Math.max(0,r.proj-r.band))}–${fmt(r.proj+r.band)}</td>
+      <td>${r.projS}%</td><td>${r.vol}%</td>
+      <td><span class="pill" style="background:color-mix(in srgb,${CONF[r.conf]} 22%,transparent);
+        color:${CONF[r.conf]}">${r.conf}</span></td>
+      <td style="text-align:left;color:var(--ink-3)">${TAG_LABELS[r.tag]||"—"}</td></tr>`).join("")+
+    "</tbody>";
+}
+document.getElementById("segOutlook").addEventListener("click",e=>{
+  const b=e.target.closest("button"); if(!b)return; oSp=b.dataset.osp; renderOutlook()});
+document.getElementById("segOutRegion").addEventListener("click",e=>{
+  const b=e.target.closest("button"); if(!b)return; oReg=b.dataset.oreg; renderOutlook()});
+document.getElementById("segOutConf").addEventListener("click",e=>{
+  const b=e.target.closest("button"); if(!b)return; oConf=b.dataset.oconf; renderOutlook()});
+document.getElementById("oCtrl").addEventListener("input",renderOutlook);
+document.getElementById("oSearch").addEventListener("input",renderOutlook);
+renderOutlook();
+
+/* ============================================================
+   DISTRIBUTION
+   ============================================================ */
+const joint=PURE.filter(r=>r.eTotal>0&&r.wTotal>0);
+const rTot=pearson(joint.map(r=>r.eTotal),joint.map(r=>r.wTotal));
+const rSucc=pearson(joint.map(r=>r.eSucc),joint.map(r=>r.wSucc));
+document.getElementById("corrStats").innerHTML=
+  statTile("Units with both",joint.length,"non-zero harvest in each")+
+  statTile("Harvest correlation","r = "+rTot.toFixed(2),"elk total vs deer total")+
+  statTile("Success correlation","r = "+rSucc.toFixed(2),"elk rate vs deer rate")+
+  statTile("Elk-dominant units",joint.filter(r=>r.tilt>50).length,"more elk than deer taken");
+
+const llPts=joint.filter(r=>r.combined>=60);
+new Chart(document.getElementById("chScatterLogLog"),{
+  type:"scatter",
+  data:{datasets:[
+    {type:"scatter",data:llPts.map(r=>({x:r.wTotal,y:r.eTotal,w:r.wmu})),
+     pointRadius:llPts.map(r=>r.wmu==="312"?9:5),
+     backgroundColor:llPts.map(r=>r.wmu==="312"?C.elk:(dark()?"rgba(90,158,224,.7)":"rgba(42,111,184,.55)")),
+     borderColor:llPts.map(r=>r.wmu==="312"?C.elk:C.deer),borderWidth:1},
+    {type:"line",data:[{x:2,y:2},{x:1600,y:1600}],borderColor:ink(),borderWidth:1,borderDash:[5,4],
+     pointRadius:0,fill:false}]},
+  options:baseOpts("White-tailed deer harvest (log scale)","Elk harvest (log scale)",{
+    plugins:{legend:{display:false},tooltip:{filter:c=>c.datasetIndex===0,callbacks:{
+      label:c=>"WMU "+c.raw.w+" · "+c.raw.y+" elk · "+c.raw.x+" deer"}}},
+    scales:{x:{type:"logarithmic",min:8,max:1700,title:{display:true,text:"White-tailed deer harvest (log)",
+      color:ink()},grid:{color:grid()},ticks:{color:ink()}},
+      y:{type:"logarithmic",min:1,max:1700,title:{display:true,text:"Elk harvest (log)",color:ink()},
+      grid:{color:grid()},ticks:{color:ink()}}}})
+});
+
+const tiltAll=PURE.filter(r=>(r.eTotal||0)+(r.wTotal||0)>=150)
+  .map(r=>Object.assign({},r,{lean:Math.round(((r.eTotal||0)/((r.eTotal||0)+(r.wTotal||0))*100-50)*10)/10}))
+  .sort((a,b)=>b.lean-a.lean);
+new Chart(document.getElementById("chTilt"),{type:"bar",
+  data:{labels:tiltAll.map(r=>r.wmu+(r.name?" "+r.name:"")),
+    datasets:[{data:tiltAll.map(r=>r.lean),
+    backgroundColor:tiltAll.map(r=>r.lean>=0?C.elk:C.deer),
+    borderColor:tiltAll.map(r=>r.wmu==="312"?C.gold:"transparent"),
+    borderWidth:tiltAll.map(r=>r.wmu==="312"?2:0),
+    borderRadius:3,maxBarThickness:15}]},
+  options:baseOpts("","",{indexAxis:"y",
+    plugins:{legend:{display:false},tooltip:{callbacks:{
+      title:c=>"WMU "+tiltAll[c[0].dataIndex].wmu,
+      label:c=>{const r=tiltAll[c.dataIndex];const e=r.eTotal||0,d=r.wTotal||0;
+        const sh=Math.round(e/(e+d)*100);
+        return [e+" elk vs "+d+" deer",sh+"% elk / "+(100-sh)+"% deer",
+          (r.lean>=0?"elk-dominant":"deer-dominant")+" by "+Math.abs(r.lean).toFixed(0)+" points"]}}}},
+    scales:{x:{min:-50,max:50,
+      title:{display:true,text:"← more deer taken     ·     50 / 50     ·     more elk taken →",
+        color:ink()},
+      grid:{color:c=>c.tick.value===0?(dark()?"rgba(255,255,255,.45)":"rgba(0,0,0,.45)"):grid(),
+        lineWidth:c=>c.tick.value===0?1.5:1},
+      ticks:{color:ink(),stepSize:10,callback:v=>v===0?"50/50":Math.abs(v)+(v>0?"% elk":"% deer")}},
+      y:{grid:{display:false},ticks:{color:ink(),font:{size:10}}}}})
+});
+(function(){
+  const elkSide=tiltAll.filter(r=>r.lean>0),deerSide=tiltAll.filter(r=>r.lean<0);
+  const extreme=tiltAll.reduce((a,r)=>Math.abs(r.lean)>Math.abs(a.lean)?r:a,tiltAll[0]);
+  const balanced=tiltAll.reduce((a,r)=>Math.abs(r.lean)<Math.abs(a.lean)?r:a,tiltAll[0]);
+  document.getElementById("tiltStats").innerHTML=
+    statTile("Deer-dominant",deerSide.length+" units","of "+tiltAll.length+" analysed")+
+    statTile("Elk-dominant",elkSide.length+" units","more elk than deer")+
+    statTile("Most lopsided","WMU "+extreme.wmu,(extreme.eTotal||0)+" elk vs "+(extreme.wTotal||0)+" deer")+
+    statTile("Most balanced","WMU "+balanced.wmu,(balanced.eTotal||0)+" elk vs "+(balanced.wTotal||0)+" deer");
+})();
+
+/* ============================================================
+   SEX RATIOS
+   ============================================================ */
+const sexUnits=["312","314","304","305","332","348","357","522","320","353"]
+  .filter(w=>BY[w]&&BY[w].eRatio!=null&&BY[w].wRatio!=null);
+new Chart(document.getElementById("chSexRatio"),{type:"bar",
+  data:{labels:sexUnits,datasets:[
+    {label:"Elk",data:sexUnits.map(w=>BY[w].eRatio),backgroundColor:C.elk,borderRadius:3,maxBarThickness:20},
+    {label:"Deer",data:sexUnits.map(w=>BY[w].wRatio),backgroundColor:C.deer,borderRadius:3,maxBarThickness:20},
+    {label:"Moose",data:sexUnits.map(w=>BY[w].mRatio),backgroundColor:C.ok,borderRadius:3,maxBarThickness:20}]},
+  options:baseOpts("WMU","Males per 100 females (log scale)",{
+    plugins:{legend:{display:false},tooltip:{callbacks:{
+      label:c=>c.dataset.label+": "+c.parsed.y+" males per 100 females"}}},
+    scales:{x:{grid:{display:false},ticks:{color:ink(),autoSkip:false}},
+      y:{type:"logarithmic",min:40,max:1400,title:{display:true,
+        text:"Males per 100 females harvested (log)",color:ink()},grid:{color:grid()},ticks:{color:ink()}}}})
+});
+const eRatios=PURE.filter(r=>r.eRatio!=null&&r.eTotal>=30).map(r=>r.eRatio);
+const wRatios=PURE.filter(r=>r.wRatio!=null&&r.wTotal>=30).map(r=>r.wRatio);
+document.getElementById("sexStats").innerHTML=
+  statTile("Median elk ratio",Math.round(median(eRatios)),"bulls per 100 cows")+
+  statTile("Median deer ratio",Math.round(median(wRatios)),"bucks per 100 does")+
+  statTile("Elk range",Math.min(...eRatios)+"–"+Math.max(...eRatios),"widest policy spread")+
+  statTile("Deer range",Math.min(...wRatios)+"–"+Math.max(...wRatios),"hunter preference");
+
+/* ============================================================
+   PRESSURE
+   ============================================================ */
+const pr=PURE.filter(r=>r.eHunters||r.wHunters);
+new Chart(document.getElementById("chPressure"),{type:"bubble",
+  data:{datasets:[
+    {label:"Elk",data:pr.filter(r=>r.eHunters&&r.eTotal>=20).map(r=>({x:r.eHunters,y:r.eSucc,
+      r:Math.max(3,Math.sqrt(r.eTotal)/1.6),w:r.wmu,t:r.eTotal})),
+      backgroundColor:"rgba(194,90,44,.5)",borderColor:C.elk,borderWidth:1},
+    {label:"Deer",data:pr.filter(r=>r.wHunters&&r.wTotal>=20).map(r=>({x:r.wHunters,y:r.wSucc,
+      r:Math.max(3,Math.sqrt(r.wTotal)/1.6),w:r.wmu,t:r.wTotal})),
+      backgroundColor:"rgba(42,111,184,.4)",borderColor:C.deer,borderWidth:1}]},
+  options:baseOpts("Estimated hunters (log scale)","Success rate (%)",{
+    plugins:{legend:{display:true,labels:{color:ink(),usePointStyle:true,boxWidth:8}},
+      tooltip:{callbacks:{label:c=>"WMU "+c.raw.w+" · "+c.raw.t+" taken · ~"+
+        c.raw.x.toLocaleString()+" hunters · "+c.raw.y+"%"}}},
+    scales:{x:{type:"logarithmic",title:{display:true,text:"Estimated hunters (log)",color:ink()},
+      grid:{color:grid()},ticks:{color:ink()}},
+      y:{min:0,max:80,title:{display:true,text:"Success rate (%)",color:ink()},grid:{color:grid()},
+      ticks:{color:ink(),callback:v=>v+"%"}}}})
+});
+
+const bins=[],labels=[];
+for(let b=0;b<100;b+=5){labels.push(b+"–"+(b+5)+"%");bins.push(b)}
+const hist=(arr)=>bins.map(b=>arr.filter(v=>v>=b&&v<b+5).length);
+const eS=PURE.filter(r=>r.eTotal>50).map(r=>r.eSucc), wS=PURE.filter(r=>r.wTotal>50).map(r=>r.wSucc);
+new Chart(document.getElementById("chHist"),{type:"bar",
+  data:{labels,datasets:[
+    {label:"Elk",data:hist(eS),backgroundColor:C.elk,borderRadius:3},
+    {label:"Deer",data:hist(wS),backgroundColor:C.deer,borderRadius:3}]},
+  options:baseOpts("Success rate band","Number of WMUs")});
+document.getElementById("pressureStats").innerHTML=
+  statTile("Median elk success",median(eS)+"%","units above 50 animals")+
+  statTile("Median deer success",median(wS)+"%","units above 50 animals")+
+  statTile("Est. elk hunters",fmt(PURE.reduce((s,r)=>s+(r.eHunters||0),0)),"derived, single units")+
+  statTile("Est. deer hunters",fmt(PURE.reduce((s,r)=>s+(r.wHunters||0),0)),"derived, single units");
+
+/* ============================================================
+   REGIONAL
+   ============================================================ */
+const regs=["1","2","3","4","5"];
+const regAgg=regs.map(d=>{const s=PURE.filter(r=>r.region===d);
+  const sum=(k)=>s.reduce((a,r)=>a+(r[k]||0),0);
+  const et=sum("eTotal"),wt=sum("wTotal"),mt=sum("mTotal");
+  const eh=sum("eHunters"),wh=sum("wHunters"),mh=sum("mHunters");
+  return {d,name:REGION_NAME[d],et,wt,mt,eh,wh,mh,es:eh?Math.round(et/eh*1000)/10:0,
+    ws:wh?Math.round(wt/wh*1000)/10:0,ms:mh?Math.round(mt/mh*1000)/10:0,n:s.length}});
+new Chart(document.getElementById("chRegional"),{type:"bar",
+  data:{labels:regAgg.map(r=>r.name),datasets:[
+    {label:"Elk",data:regAgg.map(r=>r.et),backgroundColor:C.elk,borderRadius:4,maxBarThickness:32},
+    {label:"Deer",data:regAgg.map(r=>r.wt),backgroundColor:C.deer,borderRadius:4,maxBarThickness:32},
+    {label:"Moose",data:regAgg.map(r=>r.mt),backgroundColor:C.ok,borderRadius:4,maxBarThickness:32}]},
+  options:baseOpts("","Animals harvested")});
+new Chart(document.getElementById("chRegionalSucc"),{type:"bar",
+  data:{labels:regAgg.map(r=>r.name),datasets:[
+    {label:"Elk",data:regAgg.map(r=>r.es),backgroundColor:C.elk,borderRadius:4,maxBarThickness:32},
+    {label:"Deer",data:regAgg.map(r=>r.ws),backgroundColor:C.deer,borderRadius:4,maxBarThickness:32},
+    {label:"Moose",data:regAgg.map(r=>r.ms),backgroundColor:C.ok,borderRadius:4,maxBarThickness:32}]},
+  options:baseOpts("","Aggregate success (%)",{plugins:{legend:{display:false},
+    tooltip:{callbacks:{label:c=>c.dataset.label+": "+c.parsed.y+"%"}}},
+    scales:{x:{grid:{display:false},ticks:{color:ink()}},
+      y:{title:{display:true,text:"Aggregate success (%)",color:ink()},grid:{color:grid()},
+      ticks:{color:ink(),callback:v=>v+"%"}}}})});
+document.getElementById("regionalTable").innerHTML=
+  `<thead><tr><th style="cursor:default;text-align:left">Region</th><th style="cursor:default">Units</th>
+  <th style="cursor:default">Elk</th><th style="cursor:default">Elk succ</th>
+  <th style="cursor:default">Deer</th><th style="cursor:default">Deer succ</th>
+  <th style="cursor:default">Moose</th><th style="cursor:default">Moose succ</th>
+  <th style="cursor:default">Deer per elk</th></tr></thead><tbody>`+
+  regAgg.map(r=>`<tr><td>${r.name} (${r.d}00s)</td><td>${r.n}</td><td>${fmt(r.et)}</td>
+  <td>${r.es}%</td><td>${fmt(r.wt)}</td><td>${r.ws}%</td><td>${fmt(r.mt)}</td><td>${r.ms}%</td>
+  <td>${r.et?(r.wt/r.et).toFixed(1)+"×":"—"}</td></tr>`).join("")+"</tbody>";
+
+/* ============================================================
+   CALGARY CASE STUDY
+   ============================================================ */
+const cal=CALGARY.map(w=>BY[w]).filter(r=>r&&r.combined>=40);
+new Chart(document.getElementById("chCalgary"),{type:"bubble",
+  data:{datasets:[{data:cal.map(r=>({x:r.wSucc,y:r.eSucc,r:Math.max(4,Math.sqrt(r.combined)/1.5),
+    w:r.wmu,e:r.eTotal,d:r.wTotal})),
+    backgroundColor:cal.map(r=>r.wmu==="312"?C.elk:"rgba(42,111,184,.45)"),
+    borderColor:cal.map(r=>r.wmu==="312"?C.elk:C.deer),borderWidth:1}]},
+  options:baseOpts("Deer success (%)","Elk success (%)",{
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>"WMU "+c.raw.w+" · elk "+c.raw.y+
+      "% ("+c.raw.e+") · deer "+c.raw.x+"% ("+c.raw.d+")"}}},
+    scales:{x:{min:0,max:55,title:{display:true,text:"Deer success (%)",color:ink()},grid:{color:grid()},
+      ticks:{color:ink(),callback:v=>v+"%"}},
+      y:{min:-2,max:32,title:{display:true,text:"Elk success (%)",color:ink()},grid:{color:grid()},
+      ticks:{color:ink(),callback:v=>v+"%"}}}})
+});
+
+/* ============================================================
+   UNIT STUDY
+   ============================================================ */
+const us=["312","402","212"].map(w=>BY[w]);
+new Chart(document.getElementById("chUnitStudy"),{type:"bar",
+  data:{labels:["Elk success %","Deer success %","Elk male share %","Deer male share %",
+    "Est. elk hunters ÷10","Est. deer hunters ÷10"],
+   datasets:us.map((r,i)=>({label:"WMU "+r.wmu,
+     data:[r.eSucc,r.wSucc,r.eMaleShare,r.wMaleShare,Math.round(r.eHunters/10),Math.round(r.wHunters/10)],
+     backgroundColor:[C.elk,C.ok,C.gold][i],borderRadius:3,maxBarThickness:26}))},
+  options:baseOpts("","Value",{plugins:{legend:{display:true,
+    labels:{color:ink(),usePointStyle:true,boxWidth:8}}},
+    scales:{x:{grid:{display:false},ticks:{color:ink(),font:{size:11}}},
+      y:{grid:{color:grid()},ticks:{color:ink()}}}})});
+
+/* ============================================================
+   CWD CHARTS
+   ============================================================ */
+document.getElementById("cwdStats").innerHTML=
+  statTile("Animals tested",fmt(CWD.tested),"2025–26 season")+
+  statTile("Positive cases",fmt(CWD.positive),CWD.rate+"% of those tested")+
+  statTile("Cases since 2005",fmt(CWD.cumulative),"cumulative provincial total")+
+  statTile("Mandatory units",CWD_MANDATORY.length,"head submission required")+
+  statTile("New units 2025–26",CWD_NEW25.length,"first documented detection");
+new Chart(document.getElementById("chCwdSpecies"),{type:"bar",
+  data:{labels:CWD.species.map(s=>s[0]+" (n="+s[2].toLocaleString()+")"),
+    datasets:[{data:CWD.species.map(s=>s[1]),
+      backgroundColor:[C.red,C.elk,C.gold,C.deer],borderRadius:4,maxBarThickness:30}]},
+  options:baseOpts("Prevalence (%)","",{indexAxis:"y",
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.parsed.x+"% tested positive"}}},
+    scales:{x:{min:0,max:30,title:{display:true,text:"Share testing positive (%)",color:ink()},
+      grid:{color:grid()},ticks:{color:ink(),callback:v=>v+"%"}},
+      y:{grid:{display:false},ticks:{color:ink()}}}})});
+new Chart(document.getElementById("chCwdSex"),{type:"bar",
+  data:{labels:CWD.sex.map(s=>s[0]),datasets:[
+    {label:"Male",data:CWD.sex.map(s=>s[1]),backgroundColor:C.deer,borderRadius:4,maxBarThickness:44},
+    {label:"Female",data:CWD.sex.map(s=>s[2]),backgroundColor:C.elk,borderRadius:4,maxBarThickness:44}]},
+  options:baseOpts("","Prevalence (%)",{plugins:{legend:{display:false},
+    tooltip:{callbacks:{label:c=>c.dataset.label+": "+c.parsed.y+"%"}}},
+    scales:{x:{grid:{display:false},ticks:{color:ink()}},
+      y:{min:0,max:35,title:{display:true,text:"Share testing positive (%)",color:ink()},
+      grid:{color:grid()},ticks:{color:ink(),callback:v=>v+"%"}}}})});
+new Chart(document.getElementById("chCwdTrend"),{type:"bar",
+  data:{labels:["Mule deer","White-tailed deer","Elk","Moose","All species"],datasets:[
+    {label:"2024–25",data:[CWD.prior.mule,CWD.prior.wt,CWD.prior.elk,CWD.prior.moose,CWD.prior.rate],
+     backgroundColor:C.grey,borderRadius:4,maxBarThickness:32},
+    {label:"2025–26",data:[25.1,3.7,9.7,4.2,CWD.rate],
+     backgroundColor:C.red,borderRadius:4,maxBarThickness:32}]},
+  options:baseOpts("","Prevalence (%)",{plugins:{legend:{display:true,
+    labels:{color:ink(),usePointStyle:true,boxWidth:8}},
+    tooltip:{callbacks:{label:c=>c.dataset.label+": "+c.parsed.y+"%"}}},
+    scales:{x:{grid:{display:false},ticks:{color:ink(),font:{size:11}}},
+      y:{min:0,max:30,title:{display:true,text:"Share testing positive (%)",color:ink()},
+      grid:{color:grid()},ticks:{color:ink(),callback:v=>v+"%"}}}})});
+document.getElementById("cwdChips").innerHTML=CWD_MANDATORY.map(w=>
+  `<span class="chip${CWD_NEW25.includes(w)?" hot":""}" title="${CWD_NEW25.includes(w)?
+   "First detection in 2025–26":"Mandatory submission"}">${w}</span>`).join("")+
+  `<span style="font-size:12.5px;color:var(--ink-3);margin-left:6px">highlighted = first detected 2025–26</span>`;
+
+/* ============================================================
+   TILE MAP
+   ============================================================ */
+const GROUPS=[["1","Prairie — 100 series"],["2","Parkland — 200 series"],["3","Foothills — 300 series"],
+  ["4","Mountain — 400 series"],["5","Boreal — 500 series"],["other","Other units"]];
+let mapMode="elkTag";
+const maxOf=f=>Math.max(...PURE.map(r=>f(r)||0));
+
+function tileFill(r){
+  switch(mapMode){
+    case "elkTag":return TAG_COLORS[r.eTag];
+    case "deerTag":return TAG_COLORS[r.wTag];
+    case "deerAntlerless":return TAG_COLORS[r.wAless];
+    case "cwd":return CWD_COLORS[r.cwd];
+    case "elkSucc":return rampColor(r.eSucc,50,ORANGES);
+    case "deerSucc":return rampColor(r.wSucc,56,BLUES);
+    case "mooseSucc":return rampColor(r.mSucc,100,GREENS);
+    case "elkHarvest":return rampColor(r.eTotal,maxOf(x=>x.eTotal),ORANGES);
+    case "deerHarvest":return rampColor(r.wTotal,maxOf(x=>x.wTotal),BLUES);
+    case "mooseHarvest":return rampColor(r.mTotal,maxOf(x=>x.mTotal),GREENS);
+    case "tilt":return r.tilt==null?NODATA():
+      (r.tilt>=50?ORANGES[Math.min(5,Math.floor((r.tilt-50)/10)+2)]:BLUES[Math.min(5,Math.floor((50-r.tilt)/10)+1)]);
+  }
+}
+const tileTextColor=r=>textOn(tileFill(r));
+function legendFor(){
+  const wrap=document.getElementById("mapLegend");
+  const key=(c,t)=>`<span class="k"><span class="sw" style="background:${c}"></span>${t}</span>`;
+  if(["elkTag","deerTag","deerAntlerless"].includes(mapMode))
+    wrap.innerHTML=Object.keys(TAG_LABELS).map(k=>key(TAG_COLORS[k],TAG_LABELS[k])).join("");
+  else if(mapMode==="cwd")
+    wrap.innerHTML=Object.keys(CWD_LABELS).map(k=>key(CWD_COLORS[k],CWD_LABELS[k])).join("");
+  else if(mapMode==="tilt")
+    wrap.innerHTML=key(BLUES[4],"deer-dominant")+key(dark()?"#2c2c2a":"#e8e7e1","no data")+
+      key(ORANGES[4],"elk-dominant");
+  else{const arr=mapMode.startsWith("elk")?ORANGES:mapMode.startsWith("moose")?GREENS:BLUES;
+    wrap.innerHTML=`<span class="k">low</span>`+arr.map(c=>key(c,"")).join("")+`<span class="k">high</span>`;}
+}
+function drawTileMap(){
+  const TW=44,TH=32,GX=4,GY=4,PER=13,PAD=16;
+  let y=0,html="";
+  GROUPS.forEach(([g,name])=>{
+    const set=ROWS.filter(r=>r.region===g&&!r.isGroup).sort((a,b)=>+a.wmu-+b.wmu);
+    if(!set.length)return;
+    html+=`<text x="0" y="${y+12}" font-size="12.5" font-weight="600" fill="currentColor">${name}</text>`;
+    y+=22;
+    set.forEach((r,i)=>{
+      const col=i%PER,row=Math.floor(i/PER);
+      const x=col*(TW+GX),ty=y+row*(TH+GY);
+      html+=`<g class="tile" data-wmu="${r.wmu}"><rect x="${x}" y="${ty}" width="${TW}" height="${TH}"
+        rx="4" fill="${tileFill(r)}" stroke="${dark()?"rgba(255,255,255,.14)":"rgba(0,0,0,.10)"}"
+        stroke-width="1"/><text x="${x+TW/2}" y="${ty+TH/2+4}" font-size="11.5" text-anchor="middle"
+        fill="${tileTextColor(r)}" font-weight="${r.wmu==="312"?"700":"500"}"
+        style="pointer-events:none">${r.wmu}</text></g>`;
+    });
+    y+=Math.ceil(set.length/PER)*(TH+GY)+PAD;
+  });
+  const W=PER*(TW+GX);
+  document.getElementById("tileMap").innerHTML=
+    `<svg viewBox="0 0 ${W} ${y}" width="100%" style="max-width:${W}px;color:var(--ink)"
+      xmlns="http://www.w3.org/2000/svg" role="img"
+      aria-label="Tile map of Alberta Wildlife Management Units grouped by ecoregion and coloured by the selected metric">${html}</svg>`;
+  document.querySelectorAll("#tileMap .tile").forEach(el=>{
+    el.addEventListener("mouseenter",()=>{
+      const r=BY[el.dataset.wmu];
+      document.getElementById("tileTip").innerHTML=
+        `<strong>WMU ${r.wmu}</strong> · ${r.regionName} — elk ${fmt(r.eTotal)} @ ${r.eSucc}% (${
+        TAG_LABELS[r.eTag]}) · deer ${fmt(r.wTotal)} @ ${r.wSucc}% (${TAG_LABELS[r.wTag]}) · antlerless deer: ${
+        TAG_LABELS[r.wAless]} · CWD: ${CWD_LABELS[r.cwd]}`;
+    });
+    el.addEventListener("click",()=>{
+      document.getElementById("fSearch").value=el.dataset.wmu;
+      document.getElementById("fZero").checked=false;
+      render();document.getElementById("data").scrollIntoView({behavior:"smooth"});
+    });
+  });
+}
+document.querySelectorAll("button.mode").forEach(b=>b.addEventListener("click",()=>{
+  document.querySelectorAll("button.mode").forEach(x=>x.classList.remove("on"));
+  b.classList.add("on");mapMode=b.dataset.mode;
+  const titles={elkTag:"Elk licence type by unit",deerTag:"White-tailed deer licence type by unit",
+    deerAntlerless:"Antlerless white-tailed deer licence type by unit",
+    cwd:"Chronic wasting disease programme status by unit",elkSucc:"Elk hunter success by unit",
+    deerSucc:"Deer hunter success by unit",mooseSucc:"Moose hunter success by unit",
+    elkHarvest:"Elk harvest volume by unit",deerHarvest:"Deer harvest volume by unit",
+    mooseHarvest:"Moose harvest volume by unit",tilt:"Species tilt by unit"};
+  document.getElementById("tileMapTitle").textContent=titles[mapMode];
+  legendFor();drawTileMap();
+}));
+legendFor();drawTileMap();
+
+/* ============================================================
+   CALGARY GEOGRAPHIC SCHEMATIC
+   ============================================================ */
+const CAL_LAYOUT=[["412",40,40,"Panther"],["318",150,20,"Caroline"],["232",470,120,"E parkland"],
+["410",40,120,"Bow Valley"],["312",150,95,"Sundre"],["216",370,110,"Beiseker"],
+["320",150,170,"Ghost"],["408",40,200,"Kananaskis"],["234",470,200,"Drumheller"],
+["314",150,245,"Jumpingpound"],["212",265,215,"Calgary ring"],["214",370,190,"Strathmore"],
+["406",40,280,"Elbow"],["322",240,170,"Cochrane E"],["310",150,320,"Highwood"],
+["224",370,270,"Vulcan"],["404",40,360,"Sheep"],["303",245,320,"Turner V."],
+["304",150,395,"Chain Lakes"],["302",245,395,"Nanton"],["429",40,440,"Bow-Crow"],
+["305",150,470,"Porcupine"],["306",245,470,"Willow Ck"],["300",460,430,"Bow-Crow SE"],
+["732",470,300,"CFB Suffield"],
+["402",45,520,"Livingstone"],["308",150,545,"Crowsnest"],["400",45,600,"Castle"],
+["326",340,395,"S ranchland"],["328",340,470,"Milk River"]];
+let mapSp="elk";
+function calgaryMap(){
+  const W=560,H=660,TW=86,TH=54;
+  const pfx=PFX[mapSp];
+  const tagOf=r=>mapSp==="elk"?r.eTag:mapSp==="deer"?r.wTag:"none";
+  const MOOSE_NOTE=mapSp==="moose";
+  let s=`<svg viewBox="0 0 ${W} ${H}" width="100%" style="color:var(--ink)"
+    xmlns="http://www.w3.org/2000/svg" role="img"
+    aria-label="Schematic map of wildlife management units around Calgary coloured by elk licence type">`;
+  s+=`<g fill="none" stroke="${ink()}" stroke-width="1" stroke-dasharray="4 5" opacity=".55">
+    <circle cx="300" cy="242" r="118"/><circle cx="300" cy="242" r="235"/><circle cx="300" cy="242" r="352"/></g>
+    <text x="300" y="130" font-size="10.5" fill="${ink()}" text-anchor="middle">~1 hr</text>
+    <text x="300" y="14" font-size="10.5" fill="${ink()}" text-anchor="middle">~2 hr</text>`;
+  s+=`<rect x="0" y="0" width="30" height="${H}" fill="#639922" opacity=".14"/>
+    <text x="15" y="330" font-size="10.5" fill="#8fc45a" text-anchor="middle"
+      transform="rotate(-90 15 330)">Rocky Mountains / Continental Divide</text>`;
+  CAL_LAYOUT.forEach(([w,x,y,nm])=>{
+    const r=BY[w]; if(!r)return;
+    const fill=MOOSE_NOTE?rampColor(r.mSucc,100,GREENS):TAG_COLORS[tagOf(r)], tc=textOn(fill);
+    s+=`<g><rect x="${x}" y="${y}" width="${TW}" height="${TH}" rx="6" fill="${fill}"
+      stroke="${w==="312"?"#d8a52c":(dark()?"rgba(255,255,255,.2)":"rgba(0,0,0,.14)")}"
+      stroke-width="${w==="312"?3:1}"/>
+      <text x="${x+TW/2}" y="${y+22}" font-size="15" font-weight="700" text-anchor="middle"
+        fill="${tc}">${w}</text>
+      <text x="${x+TW/2}" y="${y+37}" font-size="9.5" text-anchor="middle"
+        fill="${tc}" fill-opacity=".9">${nm}</text>
+      <text x="${x+TW/2}" y="${y+48}" font-size="9" text-anchor="middle"
+        fill="${tc}" fill-opacity=".82">${r[pfx+"Total"]==null?"no data":
+          r[pfx+"Total"]+" · "+(r[pfx+"Succ"]||0)+"%"}</text></g>`;
+  });
+  s+=`<circle cx="300" cy="242" r="7" fill="${dark()?"#eef1f6":"#14140f"}"
+    stroke="${dark()?"#0d1017":"#fff"}" stroke-width="2"/>
+    <text x="313" y="246" font-size="13" font-weight="600" fill="currentColor">Calgary</text>`;
+  s+=`<g transform="translate(300,560)" font-size="11">`;
+  if(MOOSE_NOTE){
+    s+=`<text x="0" y="10" fill="currentColor">Moose is draw-only across this region —</text>
+        <text x="0" y="26" fill="currentColor">shaded by 2025 hunter success instead.</text>`;
+    GREENS.forEach((c,i)=>{s+=`<rect x="${i*20}" y="38" width="18" height="10" rx="2" fill="${c}"/>`});
+    s+=`<text x="0" y="62" fill="currentColor" font-size="10">low success</text>
+        <text x="120" y="62" fill="currentColor" font-size="10" text-anchor="end">high</text>`;
+  }else{
+    Object.keys(TAG_LABELS).forEach((k,i)=>{
+      s+=`<rect x="0" y="${i*20}" width="12" height="12" rx="3" fill="${TAG_COLORS[k]}"/>
+        <text x="18" y="${i*20+10}" fill="currentColor">${TAG_LABELS[k]}</text>`;});
+  }
+  s+=`</g></svg>`;
+  document.getElementById("calgaryMap").innerHTML=s;
+}
+document.getElementById("segMapSp").addEventListener("click",e=>{
+  const b=e.target.closest("button"); if(!b)return;
+  mapSp=b.dataset.msp;
+  document.querySelectorAll("#segMapSp button").forEach(x=>
+    x.classList.toggle("on",x.dataset.msp===mapSp));
+  calgaryMap();
+});
+calgaryMap();
+
+/* ============================================================
+   DATA EXPLORER
+   ============================================================ */
+const el=id=>document.getElementById(id);
+const SEXKEY={total:"Total",male:"Male",female:"Female",young:"Young",antlerless:"Antlerless"};
+let sortKey="metric",sortDir=-1,topChart=null,scChart=null,compChart=null,unitChart=null;
+let stYear=2025, stSpecies="all", stSex="total", stRegion="all", openUnit=null, showAllRows=false;
+
+/* build the season and species segmented controls from whatever data is loaded */
+el("segYear").innerHTML=loadedYears().sort((a,b)=>b-a)
+  .map(y=>`<button data-year="${y}"${y===2025?' class="on"':""}>${y}</button>`).join("");
+el("segSpecies").innerHTML=`<button data-sp="all" class="on">All</button>`+
+  SPECIES.map(([s,n])=>`<button data-sp="${s}" class="${s}">${SHORT[s]}</button>`).join("");
+const activeYear=()=>stYear;
+const activeModel=()=>M[stYear]||BASE;
+const activeSpecies=()=>{const av=loadedSpecies(stYear);
+  return stSpecies==="all"?av:(av.includes(stSpecies)?[stSpecies]:[])};
+
+function syncSegs(){
+  const av=loadedSpecies(stYear);
+  el("segYear").querySelectorAll("button").forEach(b=>
+    b.classList.toggle("on",+b.dataset.year===stYear));
+  el("segSpecies").querySelectorAll("button").forEach(b=>{
+    const s=b.dataset.sp;
+    const ok=s==="all"||av.includes(s);
+    b.disabled=!ok;
+    b.title=ok?"":"No "+SHORT[s].toLowerCase()+" data for "+stYear;
+    b.classList.toggle("on",s===stSpecies&&ok);
+  });
+  if(stSpecies!=="all"&&!av.includes(stSpecies)){stSpecies="all";
+    el("segSpecies").querySelector('[data-sp="all"]').classList.add("on")}
+  el("segSex").querySelectorAll("button").forEach(b=>
+    b.classList.toggle("on",b.dataset.sex===stSex));
+  el("segRegion").querySelectorAll("button").forEach(b=>
+    b.classList.toggle("on",b.dataset.region===stRegion));
+  document.querySelectorAll(".seg button").forEach(b=>
+    b.setAttribute("aria-pressed",b.classList.contains("on")?"true":"false"));
+}
+
+function metricOf(r,list,sx){
+  const field=sx==="total"?"Total":sx==="male"?"Male":sx==="female"?"Female":
+    sx==="young"?"Young":"Antlerless";
+  return list.reduce((a,sp)=>a+(r[PFX[sp]+field]||0),0);
+}
+const successOf=(r,list)=>list.length?Math.max(...list.map(sp=>r[PFX[sp]+"Succ"]||0)):0;
+const huntersOf=(r,list)=>list.reduce((a,sp)=>a+(r[PFX[sp]+"Hunters"]||0),0);
+
+function buildSet(year){
+  const av=loadedSpecies(year);
+  const list=stSpecies==="all"?av:(av.includes(stSpecies)?[stSpecies]:[]);
+  const sx=stSex,rg=stRegion;
+  const minH=+el("fHarvest").value,minS=+el("fSuccess").value;
+  const q=el("fSearch").value.trim();
+  let set=(M[year]||BASE).rows.slice();
+  if(el("fGroup").checked)set=set.filter(r=>!r.isGroup);
+  if(el("fCtrl").checked)set=set.filter(r=>!r.controlled);
+  if(rg==="calgary")set=set.filter(r=>CALGARY.includes(r.wmu));
+  else if(rg!=="all")set=set.filter(r=>r.region===rg);
+  set=set.map(r=>Object.assign({},r,{metric:metricOf(r,list,sx),msucc:successOf(r,list),
+    mhunters:huntersOf(r,list)}));
+  if(el("fZero").checked)set=set.filter(r=>r.metric>0);
+  set=set.filter(r=>r.metric>=minH&&r.msucc>=minS);
+  if(q)set=set.filter(r=>r.wmu.includes(q)||(r.name||"").toLowerCase().includes(q.toLowerCase()));
+  const lead=list[0]?PFX[list[0]]:"e";
+  const key={metric:"metric",success:"msucc",hunters:"mhunters",maleshare:lead+"MaleShare",
+    ratio:lead+"Ratio",tilt:"tilt",wmu:"wmu"}[el("fSort").value];
+  set.sort((a,b)=>{
+    if(key==="wmu")return (+a.wmu||0)-(+b.wmu||0);
+    return (b[key]==null?-1:b[key])-(a[key]==null?-1:a[key]);
+  });
+  if(sortKey!=="metric"){
+    /* sortDir -1 = descending (first click), +1 = ascending.
+       Blank values always sort last, in either direction. */
+    set.sort((a,b)=>{
+      const x=a[sortKey],y=b[sortKey];
+      if(x==null&&y==null)return 0;
+      if(x==null)return 1;
+      if(y==null)return -1;
+      if(typeof x==="string")return sortDir===-1?y.localeCompare(x):x.localeCompare(y);
+      return sortDir===-1?y-x:x-y;
+    });
+  }
+  return {set,list,sx};
+}
+const currentSet=()=>buildSet(stYear);
+/* same filters applied to the previous season, for the delta readout */
+function priorTotal(){
+  const py=stYear-1; if(!M[py])return null;
+  return buildSet(py).set.reduce((a,r)=>a+r.metric,0);
+}
+const SPC={elk:C.elk,deer:C.deer,moose:C.ok};
+function speciesColor(list){
+  return list.length===1?SPC[list[0]]:C.gold;
+}
+/* when several species are selected, colour each unit by whichever species dominates it —
+   more informative than one flat colour across the whole selection */
+function unitColor(r,list){
+  if(list.length===1)return SPC[list[0]];
+  let best=null,bv=-1;
+  list.forEach(sp=>{const v=r[PFX[sp]+"Total"]||0;if(v>bv){bv=v;best=sp}});
+  return best?SPC[best]:C.gold;
+}
+function render(){
+  syncSegs();
+  const {set,list,sx}=currentSet();
+  const yr=activeYear();
+  el("lblHarvest").textContent=el("fHarvest").value;
+  el("lblSuccess").textContent=el("fSuccess").value+"%";
+  const missing=SPECIES.filter(([s])=>!hasData(s,yr)).map(([,n])=>n);
+  el("dataStatus").innerHTML=
+    `${yr} season · loaded: ${loadedSpecies(yr).map(s=>SPNAME[s]).join(", ")||"none"}`+
+    (missing.length?` · awaiting data: ${missing.join(", ")}`:"");
+  const chips=[`<span class="fchip"><b>${yr}</b> season</span>`,
+    `<span class="fchip">${list.length?list.map(s=>SHORT[s]).join(" + "):"no species"}</span>`,
+    `<span class="fchip">${SEXKEY[sx]}</span>`];
+  if(stRegion!=="all")chips.push(`<span class="fchip">${stRegion==="calgary"?"Calgary catchment":
+    REGION_NAME[stRegion]+" "+stRegion+"00s"}</span>`);
+  if(+el("fHarvest").value>0)chips.push(`<span class="fchip">≥ <b>${el("fHarvest").value}</b> animals</span>`);
+  if(+el("fSuccess").value>0)chips.push(`<span class="fchip">≥ <b>${el("fSuccess").value}%</b> success</span>`);
+  if(el("fSearch").value.trim())chips.push(`<span class="fchip">“${el("fSearch").value.trim()}”</span>`);
+  if(el("fCtrl").checked)chips.push(`<span class="fchip">military draws hidden</span>`);
+  el("activeChips").innerHTML=chips.join("");
+  buildHead(list);
+  const tot=set.reduce((a,r)=>a+r.metric,0);
+  const hun=set.reduce((a,r)=>a+r.mhunters,0);
+  const succs=set.filter(r=>r.msucc>0).map(r=>r.msucc);
+  const spName=list.length===1?SPNAME[list[0]].toLowerCase():list.length+" species";
+  const prev=priorTotal();
+  let sub=SEXKEY[sx]+" harvest, "+yr;
+  if(prev!=null&&prev>0){
+    const d=Math.round((tot-prev)/prev*100);
+    sub=`<span class="delta ${d>=0?"up":"down"}">${d>=0?"▲":"▼"} ${Math.abs(d)}%</span>`+
+      ` vs ${stYear-1} (${fmt(prev)})`;
+  }
+  el("explorerStats").innerHTML=
+    statTile("Units matching",set.length,spName+" · "+SEXKEY[sx].toLowerCase())+
+    statTile("Animals in selection",fmt(tot),sub)+
+    statTile("Est. hunters",fmt(hun),"derived from success")+
+    statTile("Median success",succs.length?median(succs)+"%":"—","of matching units")+
+    statTile("Animals per hunter",hun?(tot/hun).toFixed(2):"—","selection efficiency");
+  el("emptyState").hidden=set.length>0;
+  el("emptyState").innerHTML=set.length?"":
+    `No units match these filters.<br><span style="font-size:13px">`+
+    (list.length?`Try lowering the minimum harvest or success sliders, or clearing the search.`:
+     `No ${SHORT[stSpecies]||"species"} data is loaded for ${yr} — pick another season or species.`)+
+    `</span>`;
+  el("topChartTitle").textContent="Top "+Math.min(25,set.length)+" units — "+
+    SEXKEY[sx].toLowerCase()+" harvest, "+spName+", "+yr;
+  const top=set.slice().sort((a,b)=>b.metric-a.metric).slice(0,25);
+  const spc=speciesColor(list);
+  if(topChart)topChart.destroy();
+  topChart=new Chart(el("chExplorerTop"),{type:"bar",
+    data:{labels:top.map(r=>r.wmu+(r.name?" · "+r.name:" · "+r.regionName)),
+      datasets:[{data:top.map(r=>r.metric),
+      backgroundColor:top.map(r=>r.controlled?C.red:unitColor(r,list)),
+      borderRadius:3,maxBarThickness:20}]},
+    options:baseOpts(SEXKEY[sx]+" harvest","",{indexAxis:"y",
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>{const r=top[c.dataIndex];
+        return c.parsed.x+" animals · "+r.msucc+"% success · ~"+fmt(r.mhunters)+" hunters"}}}},
+      onClick:(e,els)=>{if(els.length)showUnit(top[els[0].index].wmu)},
+      scales:{x:{grid:{color:grid()},ticks:{color:ink()},
+        title:{display:true,text:SEXKEY[sx]+" harvest",color:ink()}},
+        y:{grid:{display:false},ticks:{color:ink(),font:{size:10}}}}})});
+  const sc=set.filter(r=>r.metric>0&&r.msucc>0);
+  if(scChart)scChart.destroy();
+  scChart=new Chart(el("chExplorerScatter"),{type:"bubble",
+    data:{datasets:[{data:sc.map(r=>({x:r.metric,y:r.msucc,r:Math.max(3,Math.sqrt(r.mhunters)/6),
+      w:r.wmu,h:r.mhunters,n:r.name})),
+      backgroundColor:sc.map(r=>r.controlled?C.red:unitColor(r,list)),
+      borderColor:spc,borderWidth:1}]},
+    options:baseOpts(SEXKEY[sx]+" harvest","Success rate (%)",{
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>"WMU "+c.raw.w+
+        (c.raw.n?" ("+c.raw.n+")":"")+" · "+c.raw.x+" animals · "+c.raw.y+"% · ~"+
+        fmt(c.raw.h)+" hunters"}}},
+      scales:{x:{title:{display:true,text:SEXKEY[sx]+" harvest",color:ink()},grid:{color:grid()},
+        ticks:{color:ink()}},
+        y:{min:0,title:{display:true,text:"Success rate (%)",color:ink()},grid:{color:grid()},
+        ticks:{color:ink(),callback:v=>v+"%"}}}})});
+  /* composition of the whole selection, per species */
+  if(compChart)compChart.destroy();
+  compChart=new Chart(el("chExplorerComp"),{type:"bar",
+    data:{labels:list.map(s=>SHORT[s]),datasets:[
+      {label:"Male",data:list.map(s=>set.reduce((a,r)=>a+(r[PFX[s]+"Male"]||0),0)),
+        backgroundColor:C.deer,borderRadius:3,maxBarThickness:46},
+      {label:"Female",data:list.map(s=>set.reduce((a,r)=>a+(r[PFX[s]+"Female"]||0),0)),
+        backgroundColor:C.elk,borderRadius:3,maxBarThickness:46},
+      {label:"Young",data:list.map(s=>set.reduce((a,r)=>a+(r[PFX[s]+"Young"]||0),0)),
+        backgroundColor:C.gold,borderRadius:3,maxBarThickness:46}]},
+    options:baseOpts("","Animals",{
+      plugins:{legend:{display:true,labels:{color:ink(),usePointStyle:true,boxWidth:8}}},
+      scales:{x:{stacked:true,grid:{display:false},ticks:{color:ink()}},
+        y:{stacked:true,beginAtZero:true,grid:{color:grid()},ticks:{color:ink()}}}})});
+  const cell=v=>v==null?'<td style="color:var(--ink-3)">—</td>':"<td>"+v.toLocaleString()+"</td>";
+  const pc=v=>v==null?'<td style="color:var(--ink-3)">—</td>':"<td>"+v+"%</td>";
+  /* cap rendered rows by default — with three species this table is 28 columns wide, and
+     drawing every row on every keystroke is the single heaviest thing on the page */
+  const CAP=80, shown=showAllRows?set:set.slice(0,CAP);
+  el("dataTable").querySelector("tbody").innerHTML=shown.map(r=>{
+    let cells=`<td>${r.wmu}${r.name?' <span style="color:var(--ink-3);font-weight:400">'+
+      r.name+"</span>":""}</td><td style="text-align:left;color:var(--ink-3)">${r.regionName}</td>`;
+    list.forEach(sp=>{const p=PFX[sp];
+      cells+=cell(r[p+"Total"])+cell(r[p+"Male"])+cell(r[p+"Female"])+cell(r[p+"Young"])+
+        pc(r[p+"Succ"]||null)+cell(r[p+"Hunters"])+pc(r[p+"MaleShare"])+cell(r[p+"Ratio"]);});
+    if(list.length>1)cells+=pc(r.tilt)+cell(r.combined);
+    return `<tr class="${r.wmu==="312"?"mark":""}" data-wmu="${r.wmu}">${cells}</tr>`;
+  }).join("");
+  el("dataTable").querySelectorAll("tbody tr").forEach(tr=>
+    tr.addEventListener("click",()=>showUnit(tr.dataset.wmu)));
+  el("tblCount").innerHTML=(shown.length===set.length
+      ? set.length+" units · "+yr+" season"
+      : "showing "+shown.length+" of "+set.length+" units · "+yr+" season "+
+        '<button class="mini" id="showAll" style="margin-left:8px">show all</button>')+
+    (showAllRows&&set.length>CAP?' <button class="mini" id="showLess" style="margin-left:8px">show fewer</button>':"");
+  const sa=el("showAll"); if(sa)sa.addEventListener("click",()=>{showAllRows=true;render()});
+  const sl=el("showLess"); if(sl)sl.addEventListener("click",()=>{showAllRows=false;render()});
+  if(openUnit)showUnit(openUnit,true);
+}
+
+/* ---- unit detail panel: every season, every species ---- */
+function showUnit(wmu,keep){
+  openUnit=wmu;
+  const seasons=loadedYears().sort((a,b)=>a-b);
+  const rowFor=(sp,y)=>{const m=M[y];return m&&m.by[wmu]?m.by[wmu]:null};
+  const any=BY[wmu]||activeModel().by[wmu];
+  const nm=(any&&any.name)?" · "+any.name:"";
+  const reg=any?any.regionName:"";
+  let html=`<button class="close" onclick="closeUnit()">close ✕</button>
+    <h3>WMU ${wmu}${nm}</h3>
+    <p style="font-size:13px;color:var(--ink-3);margin:0 0 14px">${reg} region · every loaded season and
+    species · elk licence: ${TAG_LABELS[any?any.eTag:"none"]} · deer licence: ${
+    TAG_LABELS[any?any.wTag:"none"]} · CWD: ${CWD_LABELS[any?any.cwd:"none"]}</p>
+    <div class="tbl-scroll" style="margin-bottom:16px"><table class="data"><thead><tr>
+    <th style="cursor:default;text-align:left">Species</th>`+
+    seasons.map(y=>`<th style="cursor:default">${y} harvest</th><th style="cursor:default">${y} succ</th>`)
+      .join("")+`</tr></thead><tbody>`;
+  SPECIES.forEach(([sp,full])=>{
+    if(!seasons.some(y=>hasData(sp,y)))return;
+    html+=`<tr><td style="text-align:left">${full}</td>`;
+    seasons.forEach(y=>{
+      const r=rowFor(sp,y),p=PFX[sp];
+      const has=r&&hasData(sp,y)&&r[p+"Has"];
+      html+=has?`<td>${(r[p+"Total"]||0).toLocaleString()}</td><td>${r[p+"Succ"]||0}%</td>`
+               :`<td style="color:var(--ink-3)">—</td><td style="color:var(--ink-3)">—</td>`;
+    });
+    html+=`</tr>`;
+  });
+  html+=`</tbody></table></div>
+    <div class="chart-box" style="height:280px;padding:12px"><canvas id="chUnitTrend"></canvas></div>`;
+  const p=el("unitPanel"); p.hidden=false; p.innerHTML=html;
+  if(unitChart)unitChart.destroy();
+  unitChart=new Chart(el("chUnitTrend"),{type:"line",
+    data:{labels:seasons,datasets:SPECIES.filter(([sp])=>seasons.some(y=>hasData(sp,y)))
+      .map(([sp])=>({label:SHORT[sp],
+        data:seasons.map(y=>{const r=rowFor(sp,y),k=PFX[sp];
+          return (r&&hasData(sp,y)&&r[k+"Has"])?(r[k+"Total"]||0):null}),
+        borderColor:({elk:C.elk,deer:C.deer,moose:C.ok})[sp],
+        backgroundColor:({elk:C.elk,deer:C.deer,moose:C.ok})[sp],
+        borderWidth:2,tension:.25,pointRadius:5,spanGaps:true}))},
+    options:baseOpts("Season","Animals harvested",{
+      plugins:{legend:{display:true,labels:{color:ink(),usePointStyle:true,boxWidth:8}},
+        tooltip:{callbacks:{label:c=>c.dataset.label+": "+(c.parsed.y==null?"no data":
+          c.parsed.y.toLocaleString()+" animals")}}},
+      scales:{x:{grid:{display:false},ticks:{color:ink()}},
+        y:{beginAtZero:true,grid:{color:grid()},ticks:{color:ink()}}}})});
+  if(!keep)p.scrollIntoView({behavior:"smooth",block:"nearest"});
+}
+function closeUnit(){openUnit=null;const p=el("unitPanel");p.hidden=true;p.innerHTML="";
+  if(unitChart){unitChart.destroy();unitChart=null}}
+function buildHead(list){
+  let h=`<th data-k="wmu">WMU</th><th data-k="region">Region</th>`;
+  list.forEach(sp=>{const p=PFX[sp],n=SHORT[sp];
+    h+=`<th data-k="${p}Total">${n} total</th><th data-k="${p}Male">${n} M</th>`+
+       `<th data-k="${p}Female">${n} F</th><th data-k="${p}Young">${n} Y</th>`+
+       `<th data-k="${p}Succ">${n} succ</th><th data-k="${p}Hunters">${n} hunters</th>`+
+       `<th data-k="${p}MaleShare">${n} M%</th><th data-k="${p}Ratio">${n} M:100F</th>`;});
+  if(list.length>1)h+=`<th data-k="tilt">Elk share</th><th data-k="combined">Combined</th>`;
+  el("dataHead").innerHTML=h;
+  el("dataHead").querySelectorAll("th").forEach(th=>{
+    if(th.dataset.k===sortKey)th.setAttribute("data-dir",sortDir);
+    th.addEventListener("click",()=>{
+      const k=th.dataset.k;if(!k)return;
+      sortDir=(sortKey===k&&sortDir===-1)?1:-1;sortKey=k;render();
+    });
+  });
+}
+["fSort","fSearch","fHarvest","fSuccess","fZero","fGroup","fCtrl"]
+  .forEach(id=>{el(id).addEventListener("input",()=>{sortKey="metric";render()})});
+const segBind=(id,attr,set)=>el(id).addEventListener("click",e=>{
+  const b=e.target.closest("button"); if(!b||b.disabled)return;
+  set(b.dataset[attr]); sortKey="metric"; render();
+});
+segBind("segYear","year",v=>{stYear=+v});
+segBind("segSpecies","sp",v=>{stSpecies=v});
+segBind("segSex","sex",v=>{stSex=v});
+segBind("segRegion","region",v=>{stRegion=v});
+document.querySelectorAll("[data-preset]").forEach(b=>b.addEventListener("click",()=>{
+  const p=b.dataset.preset;
+  el("fSearch").value="";el("fZero").checked=true;el("fGroup").checked=true;el("fCtrl").checked=false;
+  stSpecies="all";stSex="total";stRegion="all";
+  el("fHarvest").value=0;el("fSuccess").value=0;el("fSort").value="metric";
+  closeUnit();
+  if(p==="trophy"){el("fSuccess").value=30;el("fHarvest").value=50;el("fSort").value="success";
+    el("fCtrl").checked=true}
+  if(p==="volume"){el("fHarvest").value=200;el("fSort").value="metric"}
+  if(p==="antlerless"){stSex="antlerless";stSpecies="deer";
+    el("fHarvest").value=50;el("fSort").value="metric"}
+  if(p==="calgary"){stRegion="calgary"}
+  if(p==="elkcountry"){el("fSort").value="tilt";el("fHarvest").value=100}
+  if(p==="suffield"){el("fSearch").value="732";el("fZero").checked=false}
+  sortKey="metric";render();
+  if(p==="suffield")showUnit("732");
+}));
+render();
+</script>
+
+</body>
+</html>
