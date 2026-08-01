@@ -613,9 +613,10 @@ table.data tbody tr{cursor:pointer}
     <div class="legend">
       <span class="k"><span class="sw" style="background:var(--elk)"></span>elk-dominant →</span>
       <span class="k"><span class="sw" style="background:var(--deer)"></span>← deer-dominant</span>
-      <span>centre line = 50 / 50 split</span>
+      <span>centre line = 50 / 50 · <span style="color:var(--gold)">gold labels</span> are the units named in
+      the summary below</span>
     </div>
-    <div class="chart-box" style="height:860px"><canvas id="chTilt"></canvas></div>
+    <div class="chart-box" style="height:1580px"><canvas id="chTilt"></canvas></div>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;
       margin-top:14px" id="tiltStats"></div>
   </div>
@@ -2154,9 +2155,7 @@ new Chart(document.getElementById("chTilt"),{type:"bar",
   data:{labels:tiltAll.map(r=>r.wmu+(r.name?" "+r.name:"")),
     datasets:[{data:tiltAll.map(r=>r.lean),
     backgroundColor:tiltAll.map(r=>r.lean>=0?C.elk:C.deer),
-    borderColor:tiltAll.map(r=>r.wmu==="312"?C.gold:"transparent"),
-    borderWidth:tiltAll.map(r=>r.wmu==="312"?2:0),
-    borderRadius:3,maxBarThickness:15}]},
+    borderRadius:3,maxBarThickness:11}]},
   options:baseOpts("","",{indexAxis:"y",
     plugins:{legend:{display:false},tooltip:{callbacks:{
       title:c=>"WMU "+tiltAll[c[0].dataIndex].wmu,
@@ -2170,7 +2169,11 @@ new Chart(document.getElementById("chTilt"),{type:"bar",
       grid:{color:c=>c.tick.value===0?(dark()?"rgba(255,255,255,.45)":"rgba(0,0,0,.45)"):grid(),
         lineWidth:c=>c.tick.value===0?1.5:1},
       ticks:{color:ink(),stepSize:10,callback:v=>v===0?"50/50":Math.abs(v)+(v>0?"% elk":"% deer")}},
-      y:{grid:{display:false},ticks:{color:ink(),font:{size:10}}}}})
+      y:{grid:{display:false},
+        ticks:{color:ink(),font:{size:10},autoSkip:false,
+          /* highlight the two units the summary tiles call out */
+          color:c=>{const l=(c.chart.data.labels[c.index]||"");
+            return (l.startsWith("526")||l.startsWith("312"))?C.gold:ink()}}}}})
 });
 (function(){
   const elkSide=tiltAll.filter(r=>r.lean>0),deerSide=tiltAll.filter(r=>r.lean<0);
