@@ -64,6 +64,15 @@
 
     .two { display: grid; grid-template-columns: 1fr 1fr; gap: 0 34px; }
 
+    @media (max-width: 640px) {
+        body { padding: 10px; }
+        .band { padding: 24px 22px 20px; }
+        .band h1 { font-size: 23px; }
+        .band .contact { gap: 5px 14px; }
+        .body { padding: 22px 22px 26px; }
+        .two { grid-template-columns: 1fr; gap: 0; }
+    }
+
     @media print {
         html, body { background: #fff; padding: 0; margin: 0; }
         .toolbar { display: none; }

@@ -44,7 +44,7 @@
         }
         a { color: inherit; text-decoration: none; }
         .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 24px; }
-        section { padding: 84px 0; }
+        section { padding: 84px 0; scroll-margin-top: 72px; }
         .eyebrow {
             display: inline-block; font-size: 13px; font-weight: 600; letter-spacing: .08em;
             text-transform: uppercase; color: var(--accent); margin-bottom: 12px;
@@ -68,6 +68,7 @@
         .nav-links a { font-size: 14.5px; font-weight: 500; color: var(--muted); transition: color .2s; }
         .nav-links a:hover { color: var(--text); }
         .nav-actions { display: flex; align-items: center; gap: 12px; }
+        .dock { display: none; }
         .icon-btn { width: 38px; height: 38px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface); color: var(--text); display: grid; place-items: center; cursor: pointer; font-size: 16px; transition: .2s; }
         .icon-btn:hover { border-color: var(--accent); color: var(--accent); }
         .btn {
@@ -78,7 +79,21 @@
         .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 18px color-mix(in srgb, var(--accent) 40%, transparent); }
         .btn-ghost { background: var(--surface); border-color: var(--border); color: var(--text); }
         .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
-        @media (max-width: 760px) { .nav-links { display: none; } }
+        @media (max-width: 760px) {
+            .nav-links { display: none; }
+            body { padding-bottom: 84px; }
+            .dock {
+                display: flex; gap: 4px; align-items: center;
+                position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%);
+                z-index: 100; padding: 7px 9px; border-radius: 999px;
+                background: color-mix(in srgb, var(--surface) 88%, transparent);
+                backdrop-filter: saturate(180%) blur(14px);
+                border: 1px solid var(--border); box-shadow: 0 8px 30px rgba(16,24,40,.22);
+            }
+            .dock a { width: 42px; height: 42px; display: grid; place-items: center; border-radius: 50%; font-size: 18px; text-decoration: none; transition: background .2s, transform .2s; }
+            .dock a:active { transform: scale(.9); }
+            .dock a.active { background: var(--accent); }
+        }
 
         /* HERO */
         .hero { padding: 96px 0 72px; position: relative; overflow: hidden; }
@@ -94,7 +109,6 @@
         .hero p.lead { font-size: 18.5px; color: var(--muted); max-width: 540px; margin-bottom: 30px; }
         .hero-cta { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 34px; }
         .hero-meta { display: flex; gap: 26px; flex-wrap: wrap; }
-        .hero-meta .m { }
         .hero-meta .m .n { font-size: 26px; font-weight: 800; letter-spacing: -.02em; }
         .hero-meta .m .l { font-size: 13px; color: var(--muted); }
         .avatar-card {
@@ -229,7 +243,6 @@
                 <div class="socials">
                     <a class="icon-btn" href="https://www.linkedin.com/in/nitin-wadhwani" target="_blank" aria-label="LinkedIn">in</a>
                     <a class="icon-btn" href="mailto:nitinwadhwani@me.com" aria-label="Email">✉</a>
-                    <a class="icon-btn" href="tel:+14037976221" aria-label="Call">☎</a>
                 </div>
             </div>
         </div>
@@ -249,7 +262,7 @@
                     <div class="info-row"><span class="k">Education</span><span class="v">BSc Computer Information Systems</span></div>
                     <div class="info-row"><span class="k">Email</span><span class="v">nitinwadhwani@me.com</span></div>
                     <div class="info-row"><span class="k">Phone</span><span class="v">+1 (403) 797-6221</span></div>
-                    <div class="info-row"><span class="k">Based in</span><span class="v">Calgary, Alberta 🇨🇦</span></div>
+                    <div class="info-row"><span class="k">Based in</span><span class="v">Calgary, Alberta, Canada</span></div>
                     <div class="info-row"><span class="k">Languages</span><span class="v">English</span></div>
                 </div>
             </div>
@@ -448,6 +461,15 @@
         </div>
     </section>
 
+    <nav class="dock" aria-label="Section navigation">
+        <a href="#about" data-sec="about" aria-label="About">👤</a>
+        <a href="#skills" data-sec="skills" aria-label="Skills">🧰</a>
+        <a href="#experience" data-sec="experience" aria-label="Experience">💼</a>
+        <a href="#portfolio" data-sec="portfolio" aria-label="Portfolio">🗂️</a>
+        <a href="#education" data-sec="education" aria-label="Education">🎓</a>
+        <a href="#contact" data-sec="contact" aria-label="Contact">✉️</a>
+    </nav>
+
     <footer>
         <div class="wrap">© <span id="year"></span> Nitin Wadhwani · Built in Calgary, Alberta</div>
     </footer>
@@ -463,6 +485,16 @@
             document.documentElement.setAttribute('data-theme', dark ? 'light' : 'dark');
             toggle.textContent = dark ? '🌙' : '☀️';
         });
+
+        const dockLinks = document.querySelectorAll('.dock a');
+        const spy = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                if (e.isIntersecting) {
+                    dockLinks.forEach(a => a.classList.toggle('active', a.dataset.sec === e.target.id));
+                }
+            });
+        }, { rootMargin: '-45% 0px -45% 0px' });
+        document.querySelectorAll('section[id]').forEach(s => spy.observe(s));
 
         const io = new IntersectionObserver((entries) => {
             entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('show'); io.unobserve(e.target); } });
