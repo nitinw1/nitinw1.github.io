@@ -274,6 +274,35 @@ button.mini{font-size:12px;padding:5px 10px}
 .unit-panel .close{float:right;font-size:12px;padding:3px 9px}
 .unit-panel h3{margin-bottom:2px}
 table.data tbody tr{cursor:pointer}
+/* ---- ask-the-data prototype ---- */
+.ask-box{background:var(--surface);border:1px solid var(--border-accent,var(--line-2));border-radius:12px;
+  padding:16px 18px;margin-bottom:18px}
+.ask-head{font-size:14px;font-weight:600;color:var(--ink);margin-bottom:12px}
+.ask-head .ask-sub{font-weight:400;color:var(--ink-3);font-size:12.5px}
+.ask-badge{display:inline-block;background:var(--elk);color:#0d1017;font-size:10.5px;font-weight:700;
+  letter-spacing:.04em;text-transform:uppercase;padding:2px 7px;border-radius:20px;vertical-align:1px;
+  margin-right:4px}
+.ask-row{display:flex;gap:8px;margin-bottom:10px}
+.ask-row input{flex:1;min-width:0;font-size:14px;padding:9px 12px;border:1px solid var(--line-2);
+  border-radius:var(--radius);background:var(--bg);color:var(--ink)}
+.ask-row input:focus{outline:none;border-color:var(--elk);box-shadow:0 0 0 3px color-mix(in srgb,var(--elk) 25%,transparent)}
+.ask-row button{flex:none;background:var(--elk);color:#0d1017;font-weight:600;border:none;
+  padding:9px 18px;border-radius:var(--radius);cursor:pointer}
+.ask-row button:hover{opacity:.9}
+.ask-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:4px}
+.ask-eg{font-size:12px;padding:5px 10px;border-radius:20px;background:var(--surface-2);
+  border:1px solid var(--line);color:var(--ink-2);cursor:pointer}
+.ask-eg:hover{border-color:var(--elk);color:var(--ink)}
+.ask-answer{margin:12px 0 8px;padding:14px 16px;background:var(--surface-2);border-radius:10px;
+  border-left:3px solid var(--elk);font-size:14px;line-height:1.6;color:var(--ink-2)}
+.ask-answer strong{color:var(--ink)}
+.ask-answer .ask-rank{margin:10px 0 0;border-collapse:collapse;width:100%;font-size:13px}
+.ask-answer .ask-rank td{padding:4px 8px;border-bottom:1px solid var(--line);
+  font-variant-numeric:tabular-nums}
+.ask-answer .ask-rank td:first-child{font-weight:600;color:var(--ink)}
+.ask-answer .ask-rank td:last-child{text-align:right}
+.ask-answer .ask-follow{margin-top:10px;font-size:12.5px;color:var(--ink-3)}
+.ask-note{font-size:11.5px;color:var(--ink-3);margin:8px 0 0}
 @media print{nav{display:none}section{break-inside:avoid}}
 </style>
 </head>
@@ -954,6 +983,29 @@ table.data tbody tr{cursor:pointer}
     someone; <strong>Export CSV</strong> downloads exactly what is on screen.</p>
   </div>
   <div id="data"></div>
+
+  <div class="ask-box">
+    <div class="ask-head">
+      <span class="ask-badge">beta</span> Ask in plain English
+      <span class="ask-sub">— a question gets parsed into the filters below and answered from the data</span>
+    </div>
+    <div class="ask-row">
+      <input id="askInput" type="text" autocomplete="off"
+        placeholder="e.g. best over-the-counter elk unit near Calgary" aria-label="Ask about the units">
+      <button id="askBtn">Ask</button>
+    </div>
+    <div class="ask-chips">
+      <button class="ask-eg">best over-the-counter elk near Calgary</button>
+      <button class="ask-eg">highest whitetail success in the foothills</button>
+      <button class="ask-eg">most moose harvested in the boreal</button>
+      <button class="ask-eg">where are antlerless deer most underharvested</button>
+      <button class="ask-eg">tell me about WMU 312</button>
+    </div>
+    <div id="askAnswer" class="ask-answer" hidden></div>
+    <p class="ask-note">Prototype: a rules-based parser, running entirely in your browser with no server. In
+    production the parser swaps for a language model behind a small serverless endpoint — the data layer stays
+    exactly as it is here.</p>
+  </div>
 
   <div class="dash-bar">
     <div class="dash-row">
@@ -3009,6 +3061,249 @@ render();
 if(restored&&openUnit)showUnit(openUnit);
 if(restored)setTimeout(()=>document.getElementById("dashboard")
   .scrollIntoView({behavior:"smooth",block:"start"}),300);
+
+/* ============================================================
+   ASK THE DATA — rules-based natural-language query (prototype)
+   Parses a plain-English question into a filter spec, answers from the
+   loaded data, and drives the dashboard. Structured so parseAsk() is the
+   single seam a language model would replace in production.
+   ============================================================ */
+const REGION_LABEL={calgary:"the Calgary catchment","1":"the prairie","2":"the parkland",
+  "3":"the foothills","4":"the mountains","5":"the boreal"};
+const LIC_MATCH={otc:r=>["gen","genArch"].includes(r),archery:r=>r==="genArch",draw:r=>r==="draw"};
+const LIC_WORD={otc:"over-the-counter",archery:"archery-only general",draw:"draw"};
+
+function parseAsk(text){
+  let t=" "+text.toLowerCase().replace(/[^a-z0-9%\s]/g," ").replace(/\s+/g," ")+" ";
+  const has=re=>re.test(t);
+  const p={species:null,speciesList:[],wmus:[]};
+  /* season (4 digits) before we touch 3-digit WMUs */
+  const y=t.match(/\b(2023|2024|2025)\b/); if(y){p.year=+y[1];t=t.replace(y[0]," ");}
+  /* numeric thresholds first, then strip them so their digits aren't read as a WMU */
+  const ms=t.match(/(?:over|above|at least|more than|min(?:imum)?|>)\s*(\d{1,2})\s*%/);
+  if(ms){p.minSucc=+ms[1];t=t.replace(ms[0]," ");}
+  const mh=t.match(/(?:more than|over|at least|min(?:imum)?|>)\s*(\d{2,4})(?!\s*%)/);
+  if(mh){p.minHarvest=+mh[1];t=t.replace(mh[0]," ");}
+  /* specific WMUs (3 digits) — validated against the data later */
+  (t.match(/\b\d{3}\b/g)||[]).forEach(n=>p.wmus.push(n));
+  /* species — collect all mentioned (for "both") */
+  if(has(/\belk\b/))p.speciesList.push("elk");
+  if(has(/\b(white ?tail|whitetail|deer|buck|doe|mule)\b/))p.speciesList.push("deer");
+  if(has(/\bmoose\b/))p.speciesList.push("moose");
+  p.species=p.speciesList[0]||null;
+  /* region */
+  if(has(/near calgary|around calgary|by calgary|from calgary|close to calgary|calgary/))p.region="calgary";
+  else if(has(/foothill/))p.region="3";
+  else if(has(/boreal|far north|up north/))p.region="5";
+  else if(has(/parkland/))p.region="2";
+  else if(has(/mountain/))p.region="4";
+  else if(has(/prairie/))p.region="1";
+  /* licence, with negation */
+  if(has(/not.{0,8}draw|isn.?t.{0,8}draw|no.?draw|without.{0,8}draw|non.?draw|avoid.{0,8}draw|over.the.counter|\botc\b|general licen|buy a tag|walk.?in/))p.licence="otc";
+  else if(has(/archery|bow/))p.licence="archery";
+  else if(has(/draw|special licen|priority point|apply for/))p.licence="draw";
+  /* class */
+  if(has(/antlerless/))p.sex="antlerless";
+  else if(has(/\b(cow|doe|female|sow)\b/))p.sex="female";
+  else if(has(/\b(bull|buck|male)\b/))p.sex="male";
+  else if(has(/\b(calf|calves|fawn|young)\b/))p.sex="young";
+  /* disease */
+  if(has(/avoid.{0,10}(cwd|disease)|no cwd|without cwd|cwd.free|away from.{0,10}cwd/))p.cwd="avoid";
+  else if(has(/cwd|chronic wasting|prion|mandatory submission|disease/))p.cwd="in";
+  /* intent — order matters */
+  if(p.wmus.length>=2||has(/\bvs\b|versus|compare|difference between|better than| or (?=\d)/))p.intent="compare";
+  else if(p.wmus.length===1&&!has(/best|top|most|highest|which/))p.intent="unit";
+  else if(has(/how many|total number|combined|altogether|sum of|on average|average|typical|overall/))p.intent="aggregate";
+  else if(has(/underharvest/))p.intent="antlerless-gap";
+  else if(has(/declin|dropp|falling|shrink|losing|down the most|worst trend|getting worse/))p.intent="declining";
+  else if(has(/growing|rising|increasing|improving|on the rise|gaining|best trend|getting better|bounce|recover/))p.intent="rising";
+  else if(has(/least crowd|fewest hunter|less pressure|uncrowded|quiet|low pressure|not crowded|avoid crowd/))p.intent="low-pressure";
+  else if(has(/sleeper|underrated|under.the.radar|best value|efficient|hidden gem|overlooked/))p.intent="value";
+  else p.intent="rank";
+  /* metric for the plain ranking */
+  if(has(/success|odds|best chance|likely|hit rate|percentage/))p.metric="success";
+  else if(has(/most|highest harvest|number|volume|biggest|top harvest|abundan/))p.metric="harvest";
+  return p;
+}
+
+function askEcho(p,sp){
+  const bits=[];
+  if(p.intent==="compare")bits.push("compare units");
+  else if(p.intent==="aggregate")bits.push("total up");
+  else if(p.intent==="antlerless-gap")bits.push("antlerless gap");
+  else if(p.intent==="declining")bits.push("declining trend");
+  else if(p.intent==="rising")bits.push("rising trend");
+  else if(p.intent==="low-pressure")bits.push("least crowded");
+  else if(p.intent==="value")bits.push("best value");
+  if(sp)bits.push(SHORT[sp].toLowerCase());
+  if(p.region)bits.push(REGION_LABEL[p.region].replace(/^the /,""));
+  if(p.licence)bits.push(LIC_WORD[p.licence]);
+  if(p.sex&&p.sex!=="antlerless")bits.push(p.sex);
+  if(p.cwd==="in")bits.push("CWD units");
+  if(p.cwd==="avoid")bits.push("outside CWD units");
+  if(p.minSucc)bits.push("≥"+p.minSucc+"% success");
+  if(p.minHarvest)bits.push("≥"+p.minHarvest+" animals");
+  if(p.metric)bits.push("by "+(p.metric==="success"?"success":"harvest"));
+  bits.push(((p.year&&M[p.year])?p.year:2025)+" season");
+  return `<div style="font-size:11.5px;color:var(--ink-3);margin-bottom:8px">Read as: `+
+    bits.join(" · ")+`</div>`;
+}
+
+/* apply the shared constraints (region, licence, cwd, thresholds) to a species set */
+function askFilter(rows,sp,p){
+  const k=PFX[sp];const crit=[];
+  let set=rows.filter(r=>r[k+"Has"]&&(r[k+"Total"]||0)>0);
+  if(p.region){set=p.region==="calgary"?set.filter(r=>CALGARY.includes(r.wmu))
+      :set.filter(r=>r.region===p.region);crit.push("in "+REGION_LABEL[p.region]);}
+  if(p.licence&&(sp==="elk"||sp==="deer")){const tag=sp==="elk"?"eTag":"wTag";
+    set=set.filter(r=>LIC_MATCH[p.licence](r[tag]));crit.push(LIC_WORD[p.licence]);}
+  if(p.cwd==="in"){set=set.filter(r=>CWD_MANDATORY.includes(r.wmu));crit.push("CWD surveillance units");}
+  if(p.cwd==="avoid"){set=set.filter(r=>!CWD_MANDATORY.includes(r.wmu));crit.push("outside CWD units");}
+  if(p.minSucc){set=set.filter(r=>(r[k+"Succ"]||0)>=p.minSucc);crit.push("over "+p.minSucc+"% success");}
+  if(p.minHarvest){set=set.filter(r=>(r[k+"Total"]||0)>=p.minHarvest);crit.push("over "+p.minHarvest+" taken");}
+  return {set,crit};
+}
+const licLabelFor=(sp,r)=>{if(sp==="moose")return r.regionName;
+  const lab=TAG_LABELS[sp==="elk"?r.eTag:r.wTag]||"";return lab.split(" (")[0];};
+const drive=(sp,p,sort,minH,sex)=>{stYear=(p.year&&M[p.year])?p.year:2025;stSpecies=sp;
+  stSex=sex||"total";stRegion=p.region||"all";el("fSort").value=sort;
+  el("fSuccess").value=p.minSucc||0;el("fHarvest").value=Math.max(minH||0,p.minHarvest||0);
+  el("fSearch").value="";sortKey="metric";render();};
+
+function answerAsk(text){
+  const box=el("askAnswer");const p=parseAsk(text);
+  const yr=(p.year&&M[p.year])?p.year:2025;
+  const model=M[yr];const rows=model.pure.slice();
+  const sp=p.species||"elk";const k=PFX[sp];
+  const say=html=>{box.hidden=false;box.innerHTML=askEcho(p,p.intent==="unit"||p.intent==="compare"?null:sp)+html;};
+  const valid=p.wmus.filter(w=>model.by[w]);
+
+  /* ---- COMPARE two or more units ---- */
+  if(p.intent==="compare"&&valid.length>=2){
+    const specs=p.speciesList.length?p.speciesList:["elk","deer","moose"];
+    let head="<tr><td></td>"+valid.map(w=>`<td><strong>WMU ${w}</strong></td>`).join("")+"</tr>";
+    let body="";
+    specs.forEach(s=>{const kk=PFX[s];
+      body+=`<tr><td>${SHORT[s]}</td>`+valid.map(w=>{const r=model.by[w];
+        return `<td>${r&&r[kk+"Has"]?r[kk+"Total"]+" @ "+r[kk+"Succ"]+"%":"—"}</td>`;}).join("")+"</tr>";});
+    body+=`<tr><td>Elk licence</td>`+valid.map(w=>`<td>${TAG_LABELS[model.by[w].eTag].split(" (")[0]}</td>`).join("")+"</tr>";
+    el("fSearch").value="";drive(specs[0],p,"metric",0,"total");showUnit(valid[0]);
+    say(`Comparing ${valid.join(", ")} (${yr}):
+      <table class="ask-rank">${head}${body}</table>
+      <div class="ask-follow">${valid[0]} opened below; click the others in the table to swap.</div>`);
+    return;
+  }
+  /* ---- SINGLE unit ---- */
+  if(p.intent==="unit"&&valid.length===1){
+    const w=valid[0],r=model.by[w];
+    el("fSearch").value=w;sortKey="metric";render();showUnit(w);
+    const parts=["elk","deer","moose"].map(s=>{const kk=PFX[s];
+      return r[kk+"Has"]&&r[kk+"Total"]!=null?`${SHORT[s]} ${r[kk+"Total"]} @ ${r[kk+"Succ"]}%`:null;}).filter(Boolean);
+    say(`<strong>WMU ${w}</strong>${r.name?" · "+r.name:""} — ${r.regionName} region, ${yr}.
+      ${parts.join(" · ")}. Elk licence ${TAG_LABELS[r.eTag]}; deer ${TAG_LABELS[r.wTag]}${
+      CWD_MANDATORY.includes(w)?"; CWD head submission mandatory":""}.
+      <div class="ask-follow">Opened below with full multi-season detail.</div>`);
+    return;
+  }
+  if(p.wmus.length&&!valid.length){
+    say(`I don't have ${p.wmus.length>1?"those units":"a unit numbered "+p.wmus[0]} in the ${yr} data.`);return;}
+
+  /* ---- AGGREGATE: how many / totals ---- */
+  if(p.intent==="aggregate"){
+    const {set,crit}=askFilter(rows,sp,p);
+    const tot=set.reduce((a,r)=>a+(r[k+"Total"]||0),0);
+    const hun=set.reduce((a,r)=>a+(r[k+"Hunters"]||0),0);
+    const succ=hun?Math.round(tot/hun*1000)/10:0;
+    const male=set.reduce((a,r)=>a+(r[k+"Male"]||0),0),fem=set.reduce((a,r)=>a+(r[k+"Female"]||0),0);
+    drive(sp,p,"metric",0,"total");
+    say(`<strong>${fmt(tot)} ${SHORT[sp].toLowerCase()}</strong> harvested across ${set.length} units${
+      crit.length?" "+crit.join(", "):""} in ${yr}, from about ${fmt(hun)} estimated hunters
+      (${succ}% group success). Split roughly ${male+fem?Math.round(male/(male+fem)*100):0}% male /
+      ${male+fem?Math.round(fem/(male+fem)*100):0}% female.
+      <div class="ask-follow">Dashboard filtered to the same selection.</div>`);
+    return;
+  }
+  /* ---- TREND: declining / rising (needs 2023 and 2025 per unit) ---- */
+  if(p.intent==="declining"||p.intent==="rising"){
+    const {set,crit}=askFilter(rows,sp,p);
+    const withChange=set.map(r=>{const a=M[2023].by[r.wmu],b=M[2025].by[r.wmu];
+      if(!a||!b||!a[k+"Has"]||!b[k+"Has"]||(a[k+"Total"]||0)<20)return null;
+      return {r,from:a[k+"Total"],to:b[k+"Total"],pct:Math.round((b[k+"Total"]-a[k+"Total"])/a[k+"Total"]*100)};})
+      .filter(Boolean);
+    withChange.sort((x,y)=>p.intent==="declining"?x.pct-y.pct:y.pct-x.pct);
+    const topT=withChange.slice(0,6);
+    drive(sp,p,"metric",0,"total");
+    const rk=topT.map(o=>`<tr><td>${o.r.wmu}${o.r.name?" "+o.r.name:""}</td>
+      <td style="color:${o.pct>=0?'var(--ok)':'var(--elk)'}">${o.pct>=0?"+":""}${o.pct}%</td>
+      <td>${o.from} → ${o.to}</td></tr>`).join("");
+    say(`${SHORT[sp]} units ${p.intent==="declining"?"declining":"growing"} fastest 2023 → 2025${
+      crit.length?", "+crit.join(", "):""} (units with 20+ animals in 2023):
+      <table class="ask-rank">${rk}</table>
+      <div class="ask-follow">Harvest change is often a tag-allocation signal more than an animal-count one —
+      see the seasons section.</div>`);
+    return;
+  }
+  /* ---- LOW PRESSURE / VALUE ---- */
+  if(p.intent==="low-pressure"||p.intent==="value"){
+    const {set,crit}=askFilter(rows,sp,p);
+    let pool=set.filter(r=>(r[k+"Total"]||0)>=15&&r[k+"Hunters"]);
+    if(p.intent==="low-pressure")pool.sort((a,b)=>a[k+"Hunters"]-b[k+"Hunters"]);
+    else pool.sort((a,b)=>(b[k+"Succ"]/Math.sqrt(b[k+"Hunters"]))-(a[k+"Succ"]/Math.sqrt(a[k+"Hunters"])));
+    const topP=pool.slice(0,6);
+    drive(sp,p,"success",15,"total");
+    const rk=topP.map(r=>`<tr><td>${r.wmu}${r.name?" "+r.name:""}</td>
+      <td>${r[k+"Succ"]}% · ~${fmt(r[k+"Hunters"])} hunters</td>
+      <td>${fmt(r[k+"Total"])} taken · ${licLabelFor(sp,r)}</td></tr>`).join("");
+    say(`${p.intent==="low-pressure"?"Least-crowded":"Best value (high odds, few hunters)"} ${
+      SHORT[sp].toLowerCase()} units${crit.length?", "+crit.join(", "):""} (${yr}):
+      <table class="ask-rank">${rk}</table>
+      <div class="ask-follow">Hunter counts are derived from success rate, so treat them as estimates.</div>`);
+    return;
+  }
+  /* ---- ANTLERLESS GAP ---- */
+  if(p.intent==="antlerless-gap"){
+    const {set,crit}=askFilter(rows,sp,p);
+    const dd=set.filter(r=>(r[k+"Total"]||0)>=50&&r[k+"MaleShare"]!=null)
+      .sort((a,b)=>b[k+"MaleShare"]-a[k+"MaleShare"]).slice(0,6);
+    drive(sp,p,"metric",50,"antlerless");
+    const rk=dd.map(r=>`<tr><td>${r.wmu}${r.name?" "+r.name:""}</td>
+      <td>${r[k+"MaleShare"]}% male</td><td>${fmt(r[k+"Total"])} taken</td></tr>`).join("");
+    say(`Where antlerless ${SHORT[sp].toLowerCase()} are most underharvested${crit.length?" "+crit.join(", "):""}
+      (${yr}) — ranked by how male-skewed the harvest is:
+      <table class="ask-rank">${rk}</table>
+      <div class="ask-follow">Antlered animals dominate despite antlerless tags being available — the surplus
+      behind crop-damage complaints. Dashboard set to antlerless ${SHORT[sp].toLowerCase()}.</div>`);
+    return;
+  }
+
+  /* ---- DEFAULT RANK ---- */
+  const {set,crit}=askFilter(rows,sp,p);
+  const metric=p.metric||"success";
+  let ranked=set.slice();
+  if(metric==="success")ranked=ranked.filter(r=>(r[k+"Total"]||0)>=15);
+  ranked.sort((a,b)=>metric==="success"?(b[k+"Succ"]||0)-(a[k+"Succ"]||0):(b[k+"Total"]||0)-(a[k+"Total"]||0));
+  const top=ranked.slice(0,6);
+  drive(sp,p,metric==="success"?"success":"metric",metric==="success"?15:0,
+    p.sex&&p.sex!=="antlerless"?p.sex:"total");
+  if(!top.length){say(`No ${SHORT[sp].toLowerCase()} units match ${crit.join(", ")||"that"} in ${yr}.
+    Try loosening the criteria — drop the region or the licence filter.`);return;}
+  const rk=top.map(r=>`<tr><td>${r.wmu}${r.name?" "+r.name:""}</td>
+    <td>${r[k+"Succ"]}% success</td><td>${fmt(r[k+"Total"])} taken · ${licLabelFor(sp,r)}</td></tr>`).join("");
+  say(`Top ${SHORT[sp].toLowerCase()} units by ${metric==="success"?"highest hunter success":"most harvested"}${
+    crit.length?", "+crit.join(", "):""} (${yr}):
+    <table class="ask-rank">${rk}</table>
+    <div class="ask-follow">Dashboard below filtered to match${
+      metric==="success"?" (units under 15 animals hidden so small-sample flukes don't top the list)":""}.</div>`);
+}
+
+(function wireAsk(){
+  const run=()=>{const v=el("askInput").value.trim();if(v)answerAsk(v);};
+  el("askBtn").addEventListener("click",run);
+  el("askInput").addEventListener("keydown",e=>{if(e.key==="Enter")run();});
+  document.querySelectorAll(".ask-eg").forEach(b=>b.addEventListener("click",()=>{
+    el("askInput").value=b.textContent;answerAsk(b.textContent);
+    document.getElementById("dashboard").scrollIntoView({behavior:"smooth",block:"start"});}));
+})();
 </script>
 
 </body>
