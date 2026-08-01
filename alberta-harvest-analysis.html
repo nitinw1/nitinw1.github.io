@@ -594,8 +594,14 @@ table.data tbody tr{cursor:pointer}
 
   <div class="chart-block">
     <div class="chart-title">Elk harvest vs white-tailed deer harvest by WMU</div>
-    <div class="chart-note">Logarithmic on both axes. The dashed diagonal marks equal harvest of both
-    species — points above it are elk-dominant units, points below are deer-dominant.</div>
+    <div class="chart-note">Logarithmic on both axes. Points above the diagonal are elk-dominant units,
+    points below are deer-dominant.</div>
+    <div class="legend">
+      <span class="k"><span class="sw" style="background:var(--deer)"></span>WMU</span>
+      <span class="k"><span class="sw" style="background:var(--elk)"></span>WMU 312</span>
+      <span class="k"><span class="sw" style="background:transparent;border-top:1.5px dashed var(--ink-3);
+        border-radius:0;height:0"></span>equal harvest of both species</span>
+    </div>
     <div class="chart-box" style="height:480px"><canvas id="chScatterLogLog"></canvas></div>
   </div>
 
@@ -671,11 +677,13 @@ table.data tbody tr{cursor:pointer}
 
   <div class="chart-block">
     <div class="chart-title">Distribution of success rates</div>
-    <div class="chart-note">Units with harvest above 50 animals, binned in 5-point intervals. Deer success
-    is centred markedly higher than elk. The lone elk unit above 95% is a controlled military-base draw.</div>
+    <div class="chart-note">Units with harvest above 50 animals, binned in 5-point intervals. Moose sits
+    highest, deer in the middle, elk lowest — a draw-restricted species with few tags produces high success per
+    hunter. The lone elk unit above 95% is a controlled military-base draw.</div>
     <div class="legend">
       <span class="k"><span class="sw" style="background:var(--elk)"></span>Elk</span>
       <span class="k"><span class="sw" style="background:var(--deer)"></span>Deer</span>
+      <span class="k"><span class="sw" style="background:var(--ok)"></span>Moose</span>
     </div>
     <div class="chart-box" style="height:340px"><canvas id="chHist"></canvas></div>
   </div>
@@ -692,10 +700,11 @@ table.data tbody tr{cursor:pointer}
 
   <div class="chart-block">
     <div class="chart-title">Total harvest by region and species</div>
-    <div class="chart-note">Single-unit rows only; multi-unit licence groupings excluded.</div>
+    <div class="chart-note">2025 season, single-unit rows only; multi-unit licence groupings excluded.</div>
     <div class="legend">
       <span class="k"><span class="sw" style="background:var(--elk)"></span>Elk</span>
       <span class="k"><span class="sw" style="background:var(--deer)"></span>Deer</span>
+      <span class="k"><span class="sw" style="background:var(--ok)"></span>Moose</span>
     </div>
     <div class="chart-box" style="height:340px"><canvas id="chRegional"></canvas></div>
   </div>
@@ -704,6 +713,11 @@ table.data tbody tr{cursor:pointer}
     <div class="chart-title">Aggregate success rate by region</div>
     <div class="chart-note">Harvest-weighted: total regional harvest divided by total estimated regional
     hunters, rather than a mean of unit percentages.</div>
+    <div class="legend">
+      <span class="k"><span class="sw" style="background:var(--elk)"></span>Elk</span>
+      <span class="k"><span class="sw" style="background:var(--deer)"></span>Deer</span>
+      <span class="k"><span class="sw" style="background:var(--ok)"></span>Moose</span>
+    </div>
     <div class="chart-box" style="height:340px"><canvas id="chRegionalSucc"></canvas></div>
   </div>
 
@@ -803,6 +817,7 @@ table.data tbody tr{cursor:pointer}
       <table>
         <tr><td>Elk harvest</td><td>292 @ 26%</td></tr>
         <tr><td>Deer harvest</td><td>648 @ 40%</td></tr>
+        <tr><td>Moose harvest</td><td>21 @ 33%</td></tr>
         <tr><td>Elk male share</td><td>60%</td></tr>
         <tr><td>General rifle, elk</td><td>37 days</td></tr>
         <tr><td>Land tenure</td><td>lease + private</td></tr>
@@ -815,6 +830,7 @@ table.data tbody tr{cursor:pointer}
       <table>
         <tr><td>Elk harvest</td><td>56 @ 7%</td></tr>
         <tr><td>Deer harvest</td><td>94 @ 16%</td></tr>
+        <tr><td>Moose harvest</td><td>5 @ 50%</td></tr>
         <tr><td>Elk male share</td><td>95%</td></tr>
         <tr><td>General rifle, elk</td><td>75 days</td></tr>
         <tr><td>Land tenure</td><td>public</td></tr>
@@ -827,6 +843,7 @@ table.data tbody tr{cursor:pointer}
       <table>
         <tr><td>Elk harvest</td><td>135 @ 20%</td></tr>
         <tr><td>Deer harvest</td><td>107 @ 22%</td></tr>
+        <tr><td>Moose harvest</td><td>57 @ 20%</td></tr>
         <tr><td>Elk male share</td><td>49%</td></tr>
         <tr><td>General rifle, elk</td><td>none</td></tr>
         <tr><td>Land tenure</td><td>private</td></tr>
@@ -2202,7 +2219,10 @@ new Chart(document.getElementById("chPressure"),{type:"bubble",
       backgroundColor:"rgba(194,90,44,.5)",borderColor:C.elk,borderWidth:1},
     {label:"Deer",data:pr.filter(r=>r.wHunters&&r.wTotal>=20).map(r=>({x:r.wHunters,y:r.wSucc,
       r:Math.max(3,Math.sqrt(r.wTotal)/1.6),w:r.wmu,t:r.wTotal})),
-      backgroundColor:"rgba(42,111,184,.4)",borderColor:C.deer,borderWidth:1}]},
+      backgroundColor:"rgba(42,111,184,.4)",borderColor:C.deer,borderWidth:1},
+    {label:"Moose",data:pr.filter(r=>r.mHunters&&r.mTotal>=20).map(r=>({x:r.mHunters,y:r.mSucc,
+      r:Math.max(3,Math.sqrt(r.mTotal)/1.6),w:r.wmu,t:r.mTotal})),
+      backgroundColor:"rgba(95,174,124,.45)",borderColor:C.ok,borderWidth:1}]},
   options:baseOpts("Estimated hunters (log scale)","Success rate (%)",{
     plugins:{legend:{display:true,labels:{color:ink(),usePointStyle:true,boxWidth:8}},
       tooltip:{callbacks:{label:c=>"WMU "+c.raw.w+" · "+c.raw.t+" taken · ~"+
@@ -2216,17 +2236,21 @@ new Chart(document.getElementById("chPressure"),{type:"bubble",
 const bins=[],labels=[];
 for(let b=0;b<100;b+=5){labels.push(b+"–"+(b+5)+"%");bins.push(b)}
 const hist=(arr)=>bins.map(b=>arr.filter(v=>v>=b&&v<b+5).length);
-const eS=PURE.filter(r=>r.eTotal>50).map(r=>r.eSucc), wS=PURE.filter(r=>r.wTotal>50).map(r=>r.wSucc);
+const eS=PURE.filter(r=>r.eTotal>50).map(r=>r.eSucc), wS=PURE.filter(r=>r.wTotal>50).map(r=>r.wSucc),
+      mS=PURE.filter(r=>r.mTotal>50).map(r=>r.mSucc);
 new Chart(document.getElementById("chHist"),{type:"bar",
   data:{labels,datasets:[
     {label:"Elk",data:hist(eS),backgroundColor:C.elk,borderRadius:3},
-    {label:"Deer",data:hist(wS),backgroundColor:C.deer,borderRadius:3}]},
+    {label:"Deer",data:hist(wS),backgroundColor:C.deer,borderRadius:3},
+    {label:"Moose",data:hist(mS),backgroundColor:C.ok,borderRadius:3}]},
   options:baseOpts("Success rate band","Number of WMUs")});
 document.getElementById("pressureStats").innerHTML=
   statTile("Median elk success",median(eS)+"%","units above 50 animals")+
   statTile("Median deer success",median(wS)+"%","units above 50 animals")+
+  statTile("Median moose success",median(mS)+"%","units above 50 animals")+
   statTile("Est. elk hunters",fmt(PURE.reduce((s,r)=>s+(r.eHunters||0),0)),"derived, single units")+
-  statTile("Est. deer hunters",fmt(PURE.reduce((s,r)=>s+(r.wHunters||0),0)),"derived, single units");
+  statTile("Est. deer hunters",fmt(PURE.reduce((s,r)=>s+(r.wHunters||0),0)),"derived, single units")+
+  statTile("Est. moose hunters",fmt(PURE.reduce((s,r)=>s+(r.mHunters||0),0)),"derived, single units");
 
 /* ============================================================
    REGIONAL
@@ -2287,11 +2311,13 @@ new Chart(document.getElementById("chCalgary"),{type:"bubble",
    ============================================================ */
 const us=["312","402","212"].map(w=>BY[w]);
 new Chart(document.getElementById("chUnitStudy"),{type:"bar",
-  data:{labels:["Elk success %","Deer success %","Elk male share %","Deer male share %",
-    "Est. elk hunters ÷10","Est. deer hunters ÷10"],
+  data:{labels:["Elk success %","Deer success %","Moose success %","Elk male share %",
+    "Deer male share %","Moose male share %","Est. elk hunters ÷10","Est. deer hunters ÷10",
+    "Est. moose hunters ÷10"],
    datasets:us.map((r,i)=>({label:"WMU "+r.wmu,
-     data:[r.eSucc,r.wSucc,r.eMaleShare,r.wMaleShare,Math.round(r.eHunters/10),Math.round(r.wHunters/10)],
-     backgroundColor:[C.elk,C.ok,C.gold][i],borderRadius:3,maxBarThickness:26}))},
+     data:[r.eSucc,r.wSucc,r.mSucc,r.eMaleShare,r.wMaleShare,r.mMaleShare,
+       Math.round((r.eHunters||0)/10),Math.round((r.wHunters||0)/10),Math.round((r.mHunters||0)/10)],
+     backgroundColor:[C.elk,C.deer,C.gold][i],borderRadius:3,maxBarThickness:20}))},
   options:baseOpts("","Value",{plugins:{legend:{display:true,
     labels:{color:ink(),usePointStyle:true,boxWidth:8}}},
     scales:{x:{grid:{display:false},ticks:{color:ink(),font:{size:11}}},
